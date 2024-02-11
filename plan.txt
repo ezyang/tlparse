@@ -1,0 +1,41 @@
+discrete features:
+- parse compilation starts [0/0] annotation and create a visualization of the
+  stack and how they relate together
+    - each compilation represents a stack trace
+    - a compilation is an ancestor of another compilation if its stack trace is a
+      prefix of the other stack trace
+    - this is a tree structure, so can use dot to visualize
+      - sort of like a flame graph, but there is no logical length (maybe
+        could use compilation time!)
+- correlating generated fx graph / dynamo trace / sizes
+  - just get all the graphs, display them in an indexed fashion
+  - use case:
+    https://fb.workplace.com/groups/1075192433118967/posts/1377556259549248/ did the sizes change?
+- why are our logs so big / who is generating all the logs
+
+
+infrastructure:
+- parse out a single compilation [0/0]
+  - start/end time for compilation
+
+some problems:
+- downloading all logs from logarithm takes surprisingly long (using lg
+  command)
+- there may be a lot of logs with a given MAST job, as there may be multiple
+  flows pasted together, sometimes not obvious which one to look at
+
+
+samples logs:
+- https://fb.workplace.com/groups/1075192433118967/posts/1377556259549248 why
+  cuda graph cause regression problem
+  - ~/local/eval-log.txt - the eval log
+  - ~/local/rank0-cudagraph-train.txt - the train log, rank0 only
+
+- > ~/log2.txt ~torch only~> ~/f2.txt
+  - from  lg tw:tsp_zch/mast_hpc/f524854032-TrainingApplication.trainers.mqdbca/0 --start-time=1706158048 --end-time=1706165989 --stream=stderr
+  - this is the jon chuang config pr caused shampoo dynamic compile disaster
+
+- ~/log.txt (flavio-log.txt)
+  - this is flavio truzzi recent aps log
+  - xref https://fb.workplace.com/groups/6829516587176185/posts/6829560007171843/
+  - nb: this doesn't have all debug info
