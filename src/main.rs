@@ -61,7 +61,7 @@ fn summary(path: &PathBuf) {
                 {
                     ok += 1;
                     let module = caps.name("module").unwrap().as_str();
-                    if (module == "torch._dynamo.guards.__guards") {
+                    if module == "torch._dynamo.guards.__guards" {
                         print!("{}\n", caps.name("message").unwrap().as_str())
                     }
                     let val = mod_count.entry(module.to_string()).or_insert(0);
