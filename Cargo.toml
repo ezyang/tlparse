@@ -2,6 +2,9 @@
 name = "tlparse"
 version = "0.1.0"
 edition = "2021"
+authors = ["Edward Z. Yang <ezyang@mit.edu>"]
+description = "Parse TORCH_LOG logs produced by PyTorch torch.compile"
+license = "BSD-3-Clause"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
