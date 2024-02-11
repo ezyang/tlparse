@@ -1,9 +1,9 @@
 use clap::{Parser, Subcommand};
 use regex::Regex;
+use std::collections::HashMap;
 use std::fs::File;
 use std::io::{self, BufRead};
 use std::path::PathBuf;
-use std::collections::HashMap;
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
@@ -40,10 +40,12 @@ fn summary(path: &PathBuf) {
         r"(?<module>[^:]+): ",
         r"\[(?<level>DEBUG|INFO|WARNING|ERROR)\]",
         r" ?(?<message>.+)"
-    )).unwrap();
+    ))
+    .unwrap();
 
     let re2 = Regex::new(r"\[rank\d+\]:.+torch").unwrap();
     let mut ok = 0;
+    let mut other_rank = 0;
     let mut fail = 0;
     let mut skip = 0;
     let mut mod_count: HashMap<String, i32> = HashMap::new();
@@ -52,13 +54,21 @@ fn summary(path: &PathBuf) {
         let line = line.unwrap();
         match re.captures(&line) {
             Some(caps) => {
-                ok += 1;
-                let module = caps.name("module").unwrap().as_str();
-                if (module == "torch._dynamo.guards.__guards") {
-                    print!("{}\n", caps.name("message").unwrap().as_str())
+                if caps
+                    .name("rank")
+                    .and_then(|v| v.as_str().parse::<i32>().ok())
+                    == Some(0)
+                {
+                    ok += 1;
+                    let module = caps.name("module").unwrap().as_str();
+                    if (module == "torch._dynamo.guards.__guards") {
+                        print!("{}\n", caps.name("message").unwrap().as_str())
+                    }
+                    let val = mod_count.entry(module.to_string()).or_insert(0);
+                    *val += 1;
+                } else {
+                    other_rank += 1;
                 }
-                let val = mod_count.entry(module.to_string()).or_insert(0);
-                *val += 1;
             }
             None => {
                 if re2.is_match(&line) {
@@ -71,7 +81,10 @@ fn summary(path: &PathBuf) {
         }
     });
 
-    print!("ok = {}, fail = {}, skip = {}\n", ok, fail, skip);
+    print!(
+        "ok = {}, other_rank = {}, fail = {}, skip = {}\n",
+        ok, other_rank, fail, skip
+    );
     for (key, value) in mod_count {
         print!("{}: {}\n", key, value);
     }
