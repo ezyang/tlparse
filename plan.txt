@@ -12,6 +12,10 @@ discrete features:
   - use case:
     https://fb.workplace.com/groups/1075192433118967/posts/1377556259549248/ did the sizes change?
 - why are our logs so big / who is generating all the logs
+- rank comparison / differ (for rank desychronization problems due to
+  nondeterminism)
+- rank tracing (compare how compilation is proceeding on different ranks, is
+  it imbalanced, debug compile time performance problems)
 
 
 infrastructure:
