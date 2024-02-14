@@ -54,12 +54,30 @@ fn main() {
     }
 }
 
+#[derive(Debug)]
+struct FrameSummary {
+    filename: String,
+    lineno: i32,
+    name: String,
+}
+
+type StackSummary = Vec<FrameSummary>;
+
+enum State {
+    Scan,
+    ExpectStackHeader,
+    ExpectStackFile,
+    ExpectStackCode,
+}
+
 fn summary(path: &PathBuf) {
     print!("hello {}\n", path.display());
     let file = File::open(path).unwrap();
     let reader = io::BufReader::new(file);
 
-    let re = Regex::new(concat!(
+    let mut st = State::Scan;
+
+    let re_envelope = Regex::new(concat!(
         r"(\[trainer\d+\]:)?(\[rank(?<rank>\d+)\]:)?",
         r"\[(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2}) ",
         r"(?<hour>\d{2}):(?<minute>\d{2}):(?<second>\d{2}),(?<millisecond>\d{3})\] ",
@@ -70,7 +88,15 @@ fn summary(path: &PathBuf) {
     ))
     .unwrap();
 
-    let re2 = Regex::new(r"\[rank\d+\]:.+torch").unwrap();
+    let re_fuzzy_envelope = Regex::new(r"\[rank\d+\]:.+torch").unwrap();
+
+    let re_dynamo_start_tracing = Regex::new("Step 1: torchdynamo start tracing.+").unwrap();
+    let re_stack_header = Regex::new(r"Stack.+:").unwrap();
+    let re_stack_file = Regex::new(r#"  File "(?<file>[^"]+)", line (?<line>\d+), in (?<function>.+)"#).unwrap();
+    let re_stack_code = Regex::new(r"    .+").unwrap();
+
+    let mut stack = Vec::new();
+
     let mut ok = 0;
     let mut other_rank = 0;
     let mut no_rank = 0;
@@ -81,7 +107,7 @@ fn summary(path: &PathBuf) {
 
     reader.lines().for_each(|line| {
         let line = line.unwrap();
-        match re.captures(&line) {
+        match re_envelope.captures(&line) {
             Some(caps) => {
                 let rank = caps
                     .name("rank")
@@ -112,9 +138,58 @@ fn summary(path: &PathBuf) {
                         */
                         let val = mod_count.entry(module.to_string()).or_insert(0);
                         *val += 1;
+
+                        // Run the state machine
+                        let scan = |st: &mut State| {
+                            if re_dynamo_start_tracing.is_match(message) {
+                                *st = State::ExpectStackHeader;
+                            }
+                        };
+
+                        match st {
+                            State::Scan => { scan(&mut st); }
+                            State::ExpectStackHeader => {
+                                if re_stack_header.is_match(message) {
+                                    st = State::ExpectStackFile;
+                                    stack.clear();
+                                } else {
+                                    scan(&mut st);
+                                }
+                            }
+                            State::ExpectStackFile => {
+                                match re_stack_file.captures(message) {
+                                    Some(caps) => {
+                                        st = State::ExpectStackCode;
+                                        let file = caps.name("file").unwrap().as_str();
+                                        let line = caps.name("line").unwrap().as_str().parse::<i32>().ok().unwrap_or(-1);
+                                        let function = caps.name("function").unwrap().as_str();
+                                        stack.push(FrameSummary { filename: file.to_string(), lineno: line, name: function.to_string() });
+                                    }
+                                    None => {
+                                        if !stack.is_empty() {
+                                            //println!("{:?}", stack);
+                                            stack.clear();
+                                        }
+                                        scan(&mut st);
+                                    }
+                                }
+                            }
+                            State::ExpectStackCode => {
+                                if re_stack_code.is_match(message) {
+                                    st = State::ExpectStackFile;
+                                } else {
+                                    if !stack.is_empty() {
+                                        //println!("{:?}", stack);
+                                        stack.clear();
+                                    }
+                                    scan(&mut st);
+                                }
+                            }
+                        }
                     }
                     Some(_) => {
                         other_rank += 1;
+                        //println!("{}", line);
                     }
                     None => {
                         no_rank += 1;
@@ -122,7 +197,7 @@ fn summary(path: &PathBuf) {
                 }
             }
             None => {
-                if re2.is_match(&line) {
+                if re_fuzzy_envelope.is_match(&line) {
                     println!("{}", line);
                     fail += 1;
                 } else {

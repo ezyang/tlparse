@@ -34,6 +34,8 @@ samples logs:
   cuda graph cause regression problem
   - ~/local/eval-log.txt - the eval log
   - ~/local/rank0-cudagraph-train.txt - the train log, rank0 only
+    (cudagraph-log.txt)
+      - interestingly, sometimes the ranks are interleaved in a naughty way
 
 - > ~/log2.txt ~torch only~> ~/f2.txt
   - from  lg tw:tsp_zch/mast_hpc/f524854032-TrainingApplication.trainers.mqdbca/0 --start-time=1706158048 --end-time=1706165989 --stream=stderr
@@ -43,3 +45,14 @@ samples logs:
   - this is flavio truzzi recent aps log
   - xref https://fb.workplace.com/groups/6829516587176185/posts/6829560007171843/
   - nb: this doesn't have all debug info
+
+
+
+what do i want to change about the logs
+- split into separate log file per rank to prevent splicing
+  - dedicated_log file is OK
+  - need some sort of hook for this
+  - need some way to test this
+- stack frame stored in single line and parseable
+  - this is actively harmful without preventing muxing (because larger write
+    is less likely to be atomic)
