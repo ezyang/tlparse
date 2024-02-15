@@ -1,9 +1,15 @@
 use clap::{Parser, Subcommand};
 use regex::Regex;
-use std::collections::HashMap;
+use core::hash::BuildHasherDefault;
+use fxhash::{FxHashMap, FxHasher};
+use indexmap::IndexMap;
 use std::fs::File;
 use std::io::{self, BufRead, Write};
 use std::path::PathBuf;
+use std::mem;
+use std::fmt;
+
+pub type FxIndexMap<K, V> = IndexMap<K, V, BuildHasherDefault<FxHasher>>;
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
@@ -21,14 +27,14 @@ enum Commands {
 
 struct RankDemuxer {
     out_dir: PathBuf,
-    writers: HashMap<u32, io::BufWriter<File>>,
+    writers: FxHashMap<u32, io::BufWriter<File>>,
 }
 
 impl RankDemuxer {
     fn new(out_dir: PathBuf) -> Self {
         RankDemuxer {
             out_dir: out_dir,
-            writers: HashMap::new(),
+            writers: FxHashMap::default(),
         }
     }
 
@@ -46,6 +52,55 @@ impl RankDemuxer {
     }
 }
 
+#[derive(Default)]
+struct StackTrieNode {
+    terminal: bool,
+    // Ordered map so that when we print we roughly print in chronological order
+    children: FxIndexMap<FrameSummary, StackTrieNode>,
+}
+
+impl StackTrieNode {
+    fn insert(&mut self, mut stack: StackSummary) {
+        let mut cur = self;
+        for frame in stack.drain(..) {
+            if frame.filename.contains("torch/_dynamo/eval_frame.py") && frame.name == "catch_errors" {
+                break;
+            }
+            cur = cur.children.entry(frame).or_insert_with(|| StackTrieNode::default());
+        }
+        cur.terminal = true;
+    }
+
+    fn print(&self, indent: usize) {
+        for (frame, node) in self.children.iter() {
+            let mut star = "";
+            if node.terminal {
+                star = "⚡ ";
+            }
+            if self.children.len() > 1 {
+                // If the node has multiple children, increase the indent and print a hyphen
+                println!("{:indent$}- {star}{}", "", frame, indent = indent, star = star);
+                node.print(indent + 2);
+            } else {
+                // If the node has only one child, don't increase the indent and don't print a hyphen
+                println!("{:indent$}  {star}{}", "", frame, indent = indent, star = star);
+                node.print(indent);
+            }
+        }
+    }
+}
+
+#[derive(Default, Debug)]
+struct Stats {
+    ok: u64,
+    other_rank: u64,
+    no_rank: u64,
+    fail: u64,
+    skip: u64,
+    stack_ok: u64,
+    stack_truncated: u64,
+}
+
 fn main() {
     let cli = Cli::parse();
 
@@ -54,11 +109,25 @@ fn main() {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Hash, Eq, PartialEq)]
 struct FrameSummary {
     filename: String,
     lineno: i32,
     name: String,
+}
+
+fn simplify_filename<'a>(filename: &'a str) -> &'a str {
+    let parts: Vec<&'a str> = filename.split("#link-tree/").collect();
+    if parts.len() > 1 {
+        return parts[1];
+    }
+    return filename;
+}
+
+impl fmt::Display for FrameSummary {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}:{} in {}", simplify_filename(&self.filename), self.lineno, self.name)
+    }
 }
 
 type StackSummary = Vec<FrameSummary>;
@@ -96,13 +165,10 @@ fn summary(path: &PathBuf) {
     let re_stack_code = Regex::new(r"    .+").unwrap();
 
     let mut stack = Vec::new();
+    let mut stack_trie = StackTrieNode::default();
 
-    let mut ok = 0;
-    let mut other_rank = 0;
-    let mut no_rank = 0;
-    let mut fail = 0;
-    let mut skip = 0;
-    let mut mod_count: HashMap<String, i32> = HashMap::new();
+    let mut stats = Stats::default();
+    let mut mod_count: FxHashMap<String, i32> = FxHashMap::default();
     let mut rank_demuxer = RankDemuxer::new(PathBuf::from("out")); // TODO: flag
 
     reader.lines().for_each(|line| {
@@ -130,7 +196,7 @@ fn summary(path: &PathBuf) {
                     // TODO: make this configurable or automatically pick the rank with most log
                     // messages
                     Some(0) => {
-                        ok += 1;
+                        stats.ok += 1;
                         /*
                         if module == "torch._dynamo.guards.__guards" {
                             println!("{}", caps.name("message").unwrap().as_str())
@@ -143,6 +209,13 @@ fn summary(path: &PathBuf) {
                         let scan = |st: &mut State| {
                             if re_dynamo_start_tracing.is_match(message) {
                                 *st = State::ExpectStackHeader;
+                            }
+                        };
+
+                        let move_stack = |stack: &mut StackSummary, stack_trie: &mut StackTrieNode| {
+                            if !stack.is_empty() {
+                                let result_stack = mem::replace(stack, vec![]);
+                                stack_trie.insert(result_stack);
                             }
                         };
 
@@ -166,10 +239,9 @@ fn summary(path: &PathBuf) {
                                         stack.push(FrameSummary { filename: file.to_string(), lineno: line, name: function.to_string() });
                                     }
                                     None => {
-                                        if !stack.is_empty() {
-                                            //println!("{:?}", stack);
-                                            stack.clear();
-                                        }
+                                        st = State::Scan;
+                                        stats.stack_ok += 1;
+                                        move_stack(&mut stack, &mut stack_trie);
                                         scan(&mut st);
                                     }
                                 }
@@ -178,40 +250,38 @@ fn summary(path: &PathBuf) {
                                 if re_stack_code.is_match(message) {
                                     st = State::ExpectStackFile;
                                 } else {
-                                    if !stack.is_empty() {
-                                        //println!("{:?}", stack);
-                                        stack.clear();
-                                    }
+                                    st = State::Scan;
+                                    stats.stack_truncated += 1;
+                                    move_stack(&mut stack, &mut stack_trie);
                                     scan(&mut st);
                                 }
                             }
                         }
                     }
                     Some(_) => {
-                        other_rank += 1;
+                        stats.other_rank += 1;
                         //println!("{}", line);
                     }
                     None => {
-                        no_rank += 1;
+                        stats.no_rank += 1;
                     }
                 }
             }
             None => {
                 if re_fuzzy_envelope.is_match(&line) {
                     println!("{}", line);
-                    fail += 1;
+                    stats.fail += 1;
                 } else {
-                    skip += 1;
+                    stats.skip += 1;
                 }
             }
         }
     });
 
-    println!(
-        "ok = {}, other_rank = {}, no_rank = {}, fail = {}, skip = {}",
-        ok, other_rank, no_rank, fail, skip
-    );
+    println!("{:?}", stats);
     for (key, value) in mod_count {
         println!("{}: {}", key, value);
     }
+
+    stack_trie.print(0);
 }
