@@ -12,4 +12,5 @@ license = "BSD-3-Clause"
 clap = { version = "4.5.0", features = ["derive"] }
 fxhash = "0.2.1"
 indexmap = "2.2.3"
+indicatif = "0.17.8"
 regex = "1.10.3"

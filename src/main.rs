@@ -8,6 +8,7 @@ use std::io::{self, BufRead, Write};
 use std::path::PathBuf;
 use std::mem;
 use std::fmt;
+use indicatif::{ProgressBar, ProgressStyle};
 
 pub type FxIndexMap<K, V> = IndexMap<K, V, BuildHasherDefault<FxHasher>>;
 
@@ -142,6 +143,12 @@ enum State {
 fn summary(path: &PathBuf) {
     print!("hello {}\n", path.display());
     let file = File::open(path).unwrap();
+    let metadata = file.metadata().unwrap();
+    let file_size = metadata.len();
+    let pb = ProgressBar::new(file_size);
+    pb.set_style(ProgressStyle::default_bar()
+        .template("{spinner:.green} [{elapsed_precise}] [{wide_bar:.cyan/blue}] {bytes}/{total_bytes} [{bytes_per_sec}] ({eta})").unwrap()
+        .progress_chars("#>-"));
     let reader = io::BufReader::new(file);
 
     let mut st = State::Scan;
@@ -170,6 +177,8 @@ fn summary(path: &PathBuf) {
     let mut stats = Stats::default();
     let mut mod_count: FxHashMap<String, i32> = FxHashMap::default();
     let mut rank_demuxer = RankDemuxer::new(PathBuf::from("out")); // TODO: flag
+
+    let mut bytes_read: u64 = 0;
 
     reader.lines().for_each(|line| {
         let line = line.unwrap();
@@ -276,7 +285,10 @@ fn summary(path: &PathBuf) {
                 }
             }
         }
+        bytes_read += line.len() as u64;
+        pb.set_position(bytes_read);
     });
+    pb.finish_with_message("done");
 
     println!("{:?}", stats);
     /*
