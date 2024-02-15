@@ -269,7 +269,7 @@ fn summary(path: &PathBuf) {
             }
             None => {
                 if re_fuzzy_envelope.is_match(&line) {
-                    println!("{}", line);
+                    // println!("{}", line);
                     stats.fail += 1;
                 } else {
                     stats.skip += 1;
@@ -279,9 +279,11 @@ fn summary(path: &PathBuf) {
     });
 
     println!("{:?}", stats);
+    /*
     for (key, value) in mod_count {
         println!("{}: {}", key, value);
     }
+    */
 
     stack_trie.print(0);
 }
