@@ -8,7 +8,7 @@ use std::io::{self, BufRead, Write};
 use std::path::PathBuf;
 use std::mem;
 use std::fmt;
-use indicatif::{ProgressBar, ProgressStyle};
+use indicatif::{MultiProgress, ProgressBar, ProgressStyle};
 
 pub type FxIndexMap<K, V> = IndexMap<K, V, BuildHasherDefault<FxHasher>>;
 
@@ -145,24 +145,39 @@ fn summary(path: &PathBuf) {
     let file = File::open(path).unwrap();
     let metadata = file.metadata().unwrap();
     let file_size = metadata.len();
-    let pb = ProgressBar::new(file_size);
+    let multi = MultiProgress::new();
+    let pb = multi.add(ProgressBar::new(file_size));
     pb.set_style(ProgressStyle::default_bar()
         .template("{spinner:.green} [{elapsed_precise}] [{wide_bar:.cyan/blue}] {bytes}/{total_bytes} [{bytes_per_sec}] ({eta})").unwrap()
         .progress_chars("#>-"));
+    let spinner = multi.add(ProgressBar::new_spinner());
     let reader = io::BufReader::new(file);
 
     let mut st = State::Scan;
 
     let re_envelope = Regex::new(concat!(
-        r"(\[trainer\d+\]:)?(\[rank(?<rank>\d+)\]:)?",
+        r"^(\[trainer\d+\]:)?(\[rank(?<rank>\d+)\]:)?",
         r"\[(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2}) ",
         r"(?<hour>\d{2}):(?<minute>\d{2}):(?<second>\d{2}),(?<millisecond>\d{3})\] ",
         r"(?<compile_id>(\[(?<frame_id>\d+)/(?<frame_compile_id>\d)+(_(?<restart>\d+))?\] )?)",
         r"(?<module>[^:]+): ",
         r"\[(?<level>DEBUG|INFO|WARNING|ERROR)\]",
+        r" ?(?<message>.+)$"
+    ))
+    .unwrap();
+    /*
+
+    let re_envelope = Regex::new(concat!(
+        r"(\[trainer\d+\]:)?(\[rank(?<rank>\d+)\]:)?",
+        r"\[\d{4}-\d{2}-\d{2} ",
+        r"\d{2}:\d{2}:\d{2},\d{3}\] ",
+        r"(?<compile_id>(\[(?<frame_id>\d+)/(?<frame_compile_id>\d)+(_(?<restart>\d+))?\] )?)",
+        r"(?<module>[^:]+): ",
+        r"\[(?:DEBUG|INFO|WARNING|ERROR)\]",
         r" ?(?<message>.+)"
     ))
     .unwrap();
+    */
 
     let re_fuzzy_envelope = Regex::new(r"\[rank\d+\]:.+torch").unwrap();
 
@@ -171,7 +186,7 @@ fn summary(path: &PathBuf) {
     let re_stack_file = Regex::new(r#"  File "(?<file>[^"]+)", line (?<line>\d+), in (?<function>.+)"#).unwrap();
     let re_stack_code = Regex::new(r"    .+").unwrap();
 
-    let mut stack = Vec::new();
+    let mut stack: StackSummary = Vec::new();
     let mut stack_trie = StackTrieNode::default();
 
     let mut stats = Stats::default();
@@ -182,8 +197,13 @@ fn summary(path: &PathBuf) {
 
     reader.lines().for_each(|line| {
         let line = line.unwrap();
+        bytes_read += line.len() as u64;
+        pb.set_position(bytes_read);
+        spinner.set_message(format!("{:?}", stats));
         match re_envelope.captures(&line) {
             Some(caps) => {
+                stats.ok += 1;
+                return;
                 let rank = caps
                     .name("rank")
                     .and_then(|v| v.as_str().parse::<u32>().ok());
@@ -285,8 +305,6 @@ fn summary(path: &PathBuf) {
                 }
             }
         }
-        bytes_read += line.len() as u64;
-        pb.set_position(bytes_read);
     });
     pb.finish_with_message("done");
 
