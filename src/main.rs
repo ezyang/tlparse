@@ -77,7 +77,7 @@ impl StackTrieNode {
         for (frame, node) in self.children.iter() {
             let mut star = "";
             if node.terminal {
-                star = "⚡ ";
+                star = "* ";
             }
             if self.children.len() > 1 {
                 // If the node has multiple children, increase the indent and print a hyphen
@@ -101,6 +101,7 @@ struct Stats {
     skip: u64,
     stack_ok: u64,
     stack_truncated: u64,
+    stack_header: u64,
 }
 
 fn main() {
@@ -120,6 +121,10 @@ struct FrameSummary {
 
 fn simplify_filename<'a>(filename: &'a str) -> &'a str {
     let parts: Vec<&'a str> = filename.split("#link-tree/").collect();
+    if parts.len() > 1 {
+        return parts[1];
+    }
+    let parts: Vec<&'a str> = filename.split("1e322330-seed-nspid4026531836_cgpid26364902-ns-4026531840/").collect();
     if parts.len() > 1 {
         return parts[1];
     }
@@ -169,10 +174,10 @@ fn summary(path: &PathBuf) {
 
     let re_fuzzy_envelope = Regex::new(r"\[rank\d+\]:.+torch").unwrap();
 
-    let re_dynamo_start_tracing = Regex::new("Step 1: torchdynamo start tracing.+").unwrap();
-    let re_stack_header = Regex::new(r"Stack.+:").unwrap();
+    let re_dynamo_start_tracing = Regex::new("Step 1: torchdynamo start tracing").unwrap();
+    let re_stack_header = Regex::new(r"Stack").unwrap();
     let re_stack_file = Regex::new(r#"  File "(?<file>[^"]+)", line (?<line>\d+), in (?<function>.+)"#).unwrap();
-    let re_stack_code = Regex::new(r"    .+").unwrap();
+    let re_stack_code = Regex::new(r"    ").unwrap();
 
     let mut stack: StackSummary = Vec::new();
     let mut stack_trie = StackTrieNode::default();
@@ -234,7 +239,7 @@ fn summary(path: &PathBuf) {
                         *val += 1;
 
                         // Run the state machine
-                        let scan = |st: &mut State| {
+                        let scan = |st: &mut State, stats: &mut Stats| {
                             if re_dynamo_start_tracing.is_match(message) {
                                 *st = State::ExpectStackHeader;
                             }
@@ -248,13 +253,13 @@ fn summary(path: &PathBuf) {
                         };
 
                         match st {
-                            State::Scan => { scan(&mut st); }
+                            State::Scan => { scan(&mut st, &mut stats); }
                             State::ExpectStackHeader => {
                                 if re_stack_header.is_match(message) {
                                     st = State::ExpectStackFile;
                                     stack.clear();
                                 } else {
-                                    scan(&mut st);
+                                    scan(&mut st, &mut stats);
                                 }
                             }
                             State::ExpectStackFile => {
@@ -270,7 +275,7 @@ fn summary(path: &PathBuf) {
                                         st = State::Scan;
                                         stats.stack_ok += 1;
                                         move_stack(&mut stack, &mut stack_trie);
-                                        scan(&mut st);
+                                        scan(&mut st, &mut stats);
                                     }
                                 }
                             }
@@ -278,10 +283,21 @@ fn summary(path: &PathBuf) {
                                 if re_stack_code.is_match(message) {
                                     st = State::ExpectStackFile;
                                 } else {
-                                    st = State::Scan;
-                                    stats.stack_truncated += 1;
-                                    move_stack(&mut stack, &mut stack_trie);
-                                    scan(&mut st);
+                                    match re_stack_file.captures(message) {
+                                        Some(caps) => {
+                                            st = State::ExpectStackCode;
+                                            let file = caps.name("file").unwrap().as_str();
+                                            let line = caps.name("line").unwrap().as_str().parse::<i32>().ok().unwrap_or(-1);
+                                            let function = caps.name("function").unwrap().as_str();
+                                            stack.push(FrameSummary { filename: file.to_string(), lineno: line, name: function.to_string() });
+                                        }
+                                        None => {
+                                            st = State::Scan;
+                                            stats.stack_ok += 1;
+                                            move_stack(&mut stack, &mut stack_trie);
+                                            scan(&mut st, &mut stats);
+                                        }
+                                    }
                                 }
                             }
                         }
