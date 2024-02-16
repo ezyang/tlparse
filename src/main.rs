@@ -75,7 +75,7 @@ impl StackTrieNode {
 
     fn print(&self, indent: usize) {
         for (frame, node) in self.children.iter() {
-            let star = node.terminal.join(" ");
+            let star = node.terminal.join("");
             if self.children.len() > 1 {
                 // If the node has multiple children, increase the indent and print a hyphen
                 println!("{:indent$}- {star}{}", "", frame, indent = indent, star = star);
