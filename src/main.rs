@@ -56,13 +56,13 @@ impl RankDemuxer {
 
 #[derive(Default)]
 struct StackTrieNode {
-    terminal: bool,
+    terminal: Vec<String>,
     // Ordered map so that when we print we roughly print in chronological order
     children: FxIndexMap<FrameSummary, StackTrieNode>,
 }
 
 impl StackTrieNode {
-    fn insert(&mut self, mut stack: StackSummary) {
+    fn insert(&mut self, mut stack: StackSummary, compile_id: String) {
         let mut cur = self;
         for frame in stack.drain(..) {
             if frame.filename.contains("torch/_dynamo/eval_frame.py") && frame.name == "catch_errors" {
@@ -70,15 +70,12 @@ impl StackTrieNode {
             }
             cur = cur.children.entry(frame).or_insert_with(|| StackTrieNode::default());
         }
-        cur.terminal = true;
+        cur.terminal.push(compile_id);
     }
 
     fn print(&self, indent: usize) {
         for (frame, node) in self.children.iter() {
-            let mut star = "";
-            if node.terminal {
-                star = "* ";
-            }
+            let star = node.terminal.join(" ");
             if self.children.len() > 1 {
                 // If the node has multiple children, increase the indent and print a hyphen
                 println!("{:indent$}- {star}{}", "", frame, indent = indent, star = star);
@@ -248,7 +245,7 @@ fn summary(path: &PathBuf) {
                         let move_stack = |stack: &mut StackSummary, stack_trie: &mut StackTrieNode| {
                             if !stack.is_empty() {
                                 let result_stack = mem::replace(stack, vec![]);
-                                stack_trie.insert(result_stack);
+                                stack_trie.insert(result_stack, compile_id.to_string());
                             }
                         };
 
@@ -283,6 +280,7 @@ fn summary(path: &PathBuf) {
                                 if re_stack_code.is_match(message) {
                                     st = State::ExpectStackFile;
                                 } else {
+                                    // TODO: dedupe this
                                     match re_stack_file.captures(message) {
                                         Some(caps) => {
                                             st = State::ExpectStackCode;
