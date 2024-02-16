@@ -9,6 +9,7 @@ use std::path::PathBuf;
 use std::mem;
 use std::fmt;
 use indicatif::{MultiProgress, ProgressBar, ProgressStyle};
+use std::time::{Instant};
 
 pub type FxIndexMap<K, V> = IndexMap<K, V, BuildHasherDefault<FxHasher>>;
 
@@ -160,24 +161,11 @@ fn summary(path: &PathBuf) {
         r"\[(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2}) ",
         r"(?<hour>\d{2}):(?<minute>\d{2}):(?<second>\d{2}),(?<millisecond>\d{3})\] ",
         r"(?<compile_id>(\[(?<frame_id>\d+)/(?<frame_compile_id>\d)+(_(?<restart>\d+))?\] )?)",
-        r"(?<module>[^:]+): ",
+        r"(?<module>[a-zA-Z0-9._]+?): ",
         r"\[(?<level>DEBUG|INFO|WARNING|ERROR)\]",
-        r" ?(?<message>.+)$"
+        r" ?(?<message>.)"
     ))
     .unwrap();
-    /*
-
-    let re_envelope = Regex::new(concat!(
-        r"(\[trainer\d+\]:)?(\[rank(?<rank>\d+)\]:)?",
-        r"\[\d{4}-\d{2}-\d{2} ",
-        r"\d{2}:\d{2}:\d{2},\d{3}\] ",
-        r"(?<compile_id>(\[(?<frame_id>\d+)/(?<frame_compile_id>\d)+(_(?<restart>\d+))?\] )?)",
-        r"(?<module>[^:]+): ",
-        r"\[(?:DEBUG|INFO|WARNING|ERROR)\]",
-        r" ?(?<message>.+)"
-    ))
-    .unwrap();
-    */
 
     let re_fuzzy_envelope = Regex::new(r"\[rank\d+\]:.+torch").unwrap();
 
@@ -195,22 +183,33 @@ fn summary(path: &PathBuf) {
 
     let mut bytes_read: u64 = 0;
 
+    let mut fastest_time = std::time::Duration::MAX;
+    let mut slowest_time = std::time::Duration::ZERO;
+
     reader.lines().for_each(|line| {
         let line = line.unwrap();
         bytes_read += line.len() as u64;
         pb.set_position(bytes_read);
         spinner.set_message(format!("{:?}", stats));
+        //spinner.set_message(format!("{:?} {:?}", slowest_time, fastest_time));
+        let start = Instant::now();
         match re_envelope.captures(&line) {
             Some(caps) => {
-                stats.ok += 1;
-                return;
+                let end = start.elapsed();
+                if end < fastest_time {
+                    fastest_time = end;
+                }
+                if end > slowest_time {
+                    slowest_time = end;
+                    //println!("{}", line);
+                }
                 let rank = caps
                     .name("rank")
                     .and_then(|v| v.as_str().parse::<u32>().ok());
                 let compile_id = caps.name("compile_id").unwrap().as_str();
                 let module = caps.name("module").unwrap().as_str();
                 let level = caps.name("level").unwrap().as_str();
-                let message = caps.name("message").unwrap().as_str();
+                let message = &line[caps.name("message").unwrap().start()..];
                 match rank {
                     Some(r) => {
                         rank_demuxer.write(
