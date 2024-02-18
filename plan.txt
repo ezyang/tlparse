@@ -56,3 +56,75 @@ what do i want to change about the logs
 - stack frame stored in single line and parseable
   - this is actively harmful without preventing muxing (because larger write
     is less likely to be atomic)
+
+
+uploading functionality
+- motivation
+  - if you run tlparse on a server, and it generates html, want to be able to
+    conveniently view it / share it to someone else, without having to download
+  - otherwise, can only do plain text report and share via pastebin
+- alternate models
+  - perfetto/chrome trace viewer: generate a trace json, separate viewer you
+    upload the file too
+    - but note that internally we built a built-in viewer that you can link to
+      with data directly. Convenient!
+  - generate an html file, pop open browser to view
+
+
+
+what does the one-size-fits-all command do (drive structured logging)
+- extract all IR representations into separate files (preferably machine
+  readable, but that's other people's problem)
+  - rendering these in human readable way, potentially *downstream* tool
+    problem
+
+use cases for the log parser
+- there is some problem, you are trying to diagnose the problem from logs
+  - but the logs are too big
+    - because all the ranks are muxed together
+    - because the dynamo debug logs are too spammy
+      - because I can't actually tell what I'm running over from the Dynamo
+        logs
+        - because I don't actually know what the model is doing (pdb style
+          view?)
+      - because there are so many values on the stack
+      - because this ia cursed model with lots of tiny tensors and lots of
+        bytecodes and therefore traversal is terrible !!!
+    - because the graph outputs are too big
+      - because no one asked for tabular output
+      - because the graph sizes are too far away from where you need them
+      - the graph is so long so you can't easily jump to def/use
+    - because the guard output is too big
+      - because you can't easily find the recompiles logs
+        - because the recompiles log doesn't say what exactly changed the next
+          time
+    - because the tracebacks are too big
+    - finding the graph break information is finding a needle in haystack
+    - because the restart analysis logs are annoying
+    - because the inductor logs are too long
+      - because I can't easily correlate inductor with aten being processed
+        (godbolt style, but godbolt not useful because too difficult to do the full information)
+    - because I don't know how to jump to the end of a section
+      - dynamo -> aot -> inductor -> guard
+  - but you can't get runnable artifacts from the logs
+  - you want to display some information, if you print everything fully
+    detailed it's too much, so you want fold/expand html UI (then the dump representation is full information)
+  - what's same/different between ranks
+  - what's same/different between recompiles
+  - two users: PyTorch developers, mass market general developers
+- you are working on a new model and you want to know how far along you are
+- trace recording and visualization (but maybe just defer to zoomer)
+- logarithm actually sort of sucks?
+- it's too hard to figure out how to modify source code to hit some s0 as
+  dynamic, from the logs
+  - because I can't tell what the source of a size guard is
+  - because automatic dynamic is printed by default
+
+- that's weird, why is the same frame having very different behavior each
+  time?
+  - are we allocating separate numbers for the separate object instances?
+
+
+value added
+- download (all) the logs in the first place
+- put the result somewhere shareable
