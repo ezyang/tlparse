@@ -39,7 +39,7 @@ static TEMPLATE_INDEX: &str = r#"
     <li>{compile_directory.0}
     <ul>
         {{ for path in compile_directory.1 }}
-            <ul><a href="{path}">{path}</a></ul>
+            <li><a href="{path}">{path}</a></li>
         {{ endfor }}
     </ul>
     </li>
