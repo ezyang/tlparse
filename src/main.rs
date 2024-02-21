@@ -4,7 +4,7 @@ use fxhash::{FxHashMap, FxHasher};
 use indexmap::IndexMap;
 use regex::Regex;
 use std::fs::File;
-use std::io::{self, BufRead, Write};
+use std::io::{self, BufRead};
 use std::path::PathBuf;
 
 use indicatif::{MultiProgress, ProgressBar, ProgressStyle};
@@ -140,7 +140,7 @@ fn main() {
         r"(?<hour>\d{2}):(?<minute>\d{2}):(?<second>\d{2}).(?<millisecond>\d{6}) ",
         r"(?<thread>\d+)",
         r"(?<pathname>[^:]+):(?<line>\d+)\] ",
-        r"(?<name>[^ ]+) (?<payload>.)"
+        r"(?<payload>.)"
     ))
     .unwrap();
 
@@ -180,9 +180,13 @@ fn main() {
         }
         let payload = &line[caps.name("payload").unwrap().start()..];
 
-        let Ok(envelope) = serde_json::from_str::<Envelope>(payload) else {
-            stats.fail_json += 1;
-            continue;
+        let envelope = match serde_json::from_str::<Envelope>(payload) {
+            Ok(r) => r,
+            Err(err) => {
+                multi.suspend(|| { println!("{}\n{:?}", payload, err); });
+                stats.fail_json += 1;
+                continue;
+            }
         };
 
         match expected_rank {
@@ -199,10 +203,13 @@ fn main() {
 
         stats.ok += 1;
         if let Some(stack) = envelope.compile_stack {
+            stats.compile_stack += 1;
             stack_trie.insert(stack, "*".to_string()); // TODO: compile id
         };
     }
     pb.finish_with_message("done");
+    spinner.finish();
 
+    println!("{:?}", stats);
     stack_trie.print(0);
 }
