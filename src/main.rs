@@ -3,7 +3,7 @@ use core::hash::BuildHasherDefault;
 use fxhash::{FxHashMap, FxHasher};
 use html_escape::encode_safe;
 use indexmap::IndexMap;
-use opener;
+
 use regex::Regex;
 use std::fmt::{self, Display, Formatter};
 use std::fs;
@@ -19,10 +19,10 @@ use std::time::Instant;
 
 pub type FxIndexMap<K, V> = IndexMap<K, V, BuildHasherDefault<FxHasher>>;
 
-static CSS: &'static str = r#"
+static CSS: &str = r#"
 "#;
 
-static TEMPLATE_INDEX: &'static str = r#"
+static TEMPLATE_INDEX: &str = r#"
 <html>
 <style>
 {css}
@@ -314,9 +314,9 @@ fn main() {
 
         if let Some(r) = e.dynamo_output_graph {
             let filename = "dynamo_output_graph.txt";
-            let f = subdir.join(&filename);
+            let f = subdir.join(filename);
             fs::write(&f, r).unwrap();
-            compile_directory.push(Path::new(&compile_id_dir).join(&filename));
+            compile_directory.push(Path::new(&compile_id_dir).join(filename));
         };
     }
     pb.finish_with_message("done");
