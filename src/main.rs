@@ -1,17 +1,17 @@
 use clap::Parser;
-use std::fmt::{self, Formatter, Display};
 use core::hash::BuildHasherDefault;
 use fxhash::{FxHashMap, FxHasher};
-use indexmap::IndexMap;
-use regex::Regex;
-use std::fs::File;
-use std::fs;
-use std::io::{self, BufRead};
-use std::path::PathBuf;
-use std::path::Path;
-use tinytemplate::TinyTemplate;
-use opener;
 use html_escape::encode_safe;
+use indexmap::IndexMap;
+use opener;
+use regex::Regex;
+use std::fmt::{self, Display, Formatter};
+use std::fs;
+use std::fs::File;
+use std::io::{self, BufRead};
+use std::path::Path;
+use std::path::PathBuf;
+use tinytemplate::TinyTemplate;
 
 use indicatif::{MultiProgress, ProgressBar, ProgressStyle};
 use serde::{Deserialize, Serialize};
@@ -202,7 +202,10 @@ fn main() {
 
     if out_path.exists() {
         if !cli.overwrite {
-            panic!("{} already exists, pass --overwrite to overwrite", out_path.display());
+            panic!(
+                "{} already exists, pass --overwrite to overwrite",
+                out_path.display()
+            );
         }
         fs::remove_dir_all(&out_path).unwrap();
     }
@@ -269,7 +272,9 @@ fn main() {
         let e = match serde_json::from_str::<Envelope>(payload) {
             Ok(r) => r,
             Err(err) => {
-                multi.suspend(|| { eprintln!("{}\n{:?}", payload, err); });
+                multi.suspend(|| {
+                    eprintln!("{}\n{:?}", payload, err);
+                });
                 stats.fail_json += 1;
                 continue;
             }
@@ -283,13 +288,20 @@ fn main() {
                 }
             }
             None => {
-                multi.suspend(|| { eprintln!("Detected rank: {:?}", e.rank); });
+                multi.suspend(|| {
+                    eprintln!("Detected rank: {:?}", e.rank);
+                });
                 expected_rank = Some(e.rank);
             }
         };
 
         // TODO: borrow only here
-        let compile_id_dir = e.compile_id.clone().map_or("unknown".to_string(), |e: CompileId| format!("{}_{}_{}", e.frame_id, e.frame_compile_id, e.attempt));
+        let compile_id_dir = e
+            .compile_id
+            .clone()
+            .map_or("unknown".to_string(), |e: CompileId| {
+                format!("{}_{}_{}", e.frame_id, e.frame_compile_id, e.attempt)
+            });
 
         let subdir = out_path.join(&compile_id_dir);
         fs::create_dir_all(&subdir).unwrap();
@@ -317,11 +329,17 @@ fn main() {
     tt.add_template("index.html", TEMPLATE_INDEX).unwrap();
     let index_context = IndexContext {
         css: CSS,
-        directory: directory.drain().map(|(x, y)| (x.map_or("(unknown)".to_string(), |e| e.to_string()), y)).collect(),
+        directory: directory
+            .drain()
+            .map(|(x, y)| (x.map_or("(unknown)".to_string(), |e| e.to_string()), y))
+            .collect(),
         stack_trie_html: stack_trie.to_string(),
     };
-    fs::write(out_path.join("index.html"), tt.render("index.html", &index_context).unwrap()).unwrap();
+    fs::write(
+        out_path.join("index.html"),
+        tt.render("index.html", &index_context).unwrap(),
+    )
+    .unwrap();
 
     opener::open(out_path.join("index.html")).unwrap();
-
 }
