@@ -1,16 +1,16 @@
-use clap::{Parser};
-use regex::Regex;
+use clap::Parser;
 use core::hash::BuildHasherDefault;
 use fxhash::{FxHashMap, FxHasher};
 use indexmap::IndexMap;
+use regex::Regex;
 use std::fs::File;
 use std::io::{self, BufRead, Write};
 use std::path::PathBuf;
-use std::mem;
-use std::fmt;
+
 use indicatif::{MultiProgress, ProgressBar, ProgressStyle};
-use std::time::{Instant};
 use serde::Deserialize;
+use std::fmt;
+use std::time::Instant;
 
 pub type FxIndexMap<K, V> = IndexMap<K, V, BuildHasherDefault<FxHasher>>;
 
@@ -32,7 +32,7 @@ impl StackTrieNode {
     fn insert(&mut self, mut stack: StackSummary, compile_id: String) {
         let mut cur = self;
         for frame in stack.drain(..) {
-            cur = cur.children.entry(frame).or_insert_with(|| StackTrieNode::default());
+            cur = cur.children.entry(frame).or_default();
         }
         cur.terminal.push(compile_id);
     }
@@ -42,11 +42,23 @@ impl StackTrieNode {
             let star = node.terminal.join("");
             if self.children.len() > 1 {
                 // If the node has multiple children, increase the indent and print a hyphen
-                println!("{:indent$}- {star}{}", "", frame, indent = indent, star = star);
+                println!(
+                    "{:indent$}- {star}{}",
+                    "",
+                    frame,
+                    indent = indent,
+                    star = star
+                );
                 node.print(indent + 2);
             } else {
                 // If the node has only one child, don't increase the indent and don't print a hyphen
-                println!("{:indent$}  {star}{}", "", frame, indent = indent, star = star);
+                println!(
+                    "{:indent$}  {star}{}",
+                    "",
+                    frame,
+                    indent = indent,
+                    star = star
+                );
                 node.print(indent);
             }
         }
@@ -75,16 +87,24 @@ fn simplify_filename<'a>(filename: &'a str) -> &'a str {
         return parts[1];
     }
     // TODO: generalize this
-    let parts: Vec<&'a str> = filename.split("1e322330-seed-nspid4026531836_cgpid26364902-ns-4026531840/").collect();
+    let parts: Vec<&'a str> = filename
+        .split("1e322330-seed-nspid4026531836_cgpid26364902-ns-4026531840/")
+        .collect();
     if parts.len() > 1 {
         return parts[1];
     }
-    return filename;
+    filename
 }
 
 impl fmt::Display for FrameSummary {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}:{} in {}", simplify_filename(&self.filename), self.line, self.name)
+        write!(
+            f,
+            "{}:{} in {}",
+            simplify_filename(&self.filename),
+            self.line,
+            self.name
+        )
     }
 }
 
@@ -127,7 +147,7 @@ fn main() {
     let mut stack_trie = StackTrieNode::default();
 
     let mut stats = Stats::default();
-    let mut mod_count: FxHashMap<String, i32> = FxHashMap::default();
+    let _mod_count: FxHashMap<String, i32> = FxHashMap::default();
 
     let mut bytes_read: u64 = 0;
 
@@ -145,7 +165,10 @@ fn main() {
         //spinner.set_message(format!("{:?} {:?}", slowest_time, fastest_time));
         let start = Instant::now();
 
-        let Some(caps) = re_glog.captures(&line) else { stats.fail_glog += 1; continue; };
+        let Some(caps) = re_glog.captures(&line) else {
+            stats.fail_glog += 1;
+            continue;
+        };
 
         let end = start.elapsed();
         if end < fastest_time {
@@ -157,11 +180,14 @@ fn main() {
         }
         let payload = &line[caps.name("payload").unwrap().start()..];
 
-        let Ok(envelope) = serde_json::from_str::<Envelope>(payload) else { stats.fail_json += 1; continue; };
+        let Ok(envelope) = serde_json::from_str::<Envelope>(payload) else {
+            stats.fail_json += 1;
+            continue;
+        };
 
         match expected_rank {
             Some(rank) => {
-                if (rank != envelope.rank) {
+                if rank != envelope.rank {
                     stats.other_rank += 1;
                     continue;
                 }
