@@ -4,21 +4,41 @@ use fxhash::{FxHashMap, FxHasher};
 use indexmap::IndexMap;
 use regex::Regex;
 use std::fs::File;
+use std::fs;
 use std::io::{self, BufRead};
 use std::path::PathBuf;
+use tinytemplate::TinyTemplate;
+use tempfile::{TempDir, tempdir};
 
 use indicatif::{MultiProgress, ProgressBar, ProgressStyle};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use std::fmt;
 use std::time::Instant;
 
 pub type FxIndexMap<K, V> = IndexMap<K, V, BuildHasherDefault<FxHasher>>;
+
+static CSS: &'static str = r#"
+body { font-family: monospace; }
+"#;
+
+static TEMPLATE_INDEX: &'static str = r#"
+<html>
+<style>
+{css}
+</style>
+<body>
+Hello World
+</body>
+</html>
+"#;
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
 #[command(propagate_version = true)]
 struct Cli {
     path: PathBuf,
+    #[arg(short)]
+    out: Option<PathBuf>,
 }
 
 #[derive(Default)]
@@ -120,9 +140,24 @@ struct Envelope {
     compile_stack: Option<StackSummary>,
 }
 
+#[derive(Debug, Serialize)]
+struct IndexContext {
+    css: &'static str,
+}
+
 fn main() {
     let cli = Cli::parse();
     let path = cli.path;
+
+    let mut mb_tempdir: Option<TempDir> = None;
+
+    let out_path = match &cli.out {
+        Some(path) => path.as_path(),
+        None => {
+            mb_tempdir = Some(tempdir().unwrap());
+            mb_tempdir.as_ref().unwrap().path()
+        }
+    };
 
     let file = File::open(path).unwrap();
     let metadata = file.metadata().unwrap();
@@ -183,7 +218,7 @@ fn main() {
         let envelope = match serde_json::from_str::<Envelope>(payload) {
             Ok(r) => r,
             Err(err) => {
-                multi.suspend(|| { println!("{}\n{:?}", payload, err); });
+                multi.suspend(|| { eprintln!("{}\n{:?}", payload, err); });
                 stats.fail_json += 1;
                 continue;
             }
@@ -197,6 +232,7 @@ fn main() {
                 }
             }
             None => {
+                multi.suspend(|| { eprintln!("Detected rank: {:?}", envelope.rank); });
                 expected_rank = Some(envelope.rank);
             }
         };
@@ -210,6 +246,14 @@ fn main() {
     pb.finish_with_message("done");
     spinner.finish();
 
-    println!("{:?}", stats);
+    eprintln!("{:?}", stats);
     stack_trie.print(0);
+
+    let mut tt = TinyTemplate::new();
+    tt.add_template("index.html", TEMPLATE_INDEX);
+    let index_context = IndexContext {
+        css: CSS,
+    };
+    fs::write(out_path.join("index.html"), tt.render("index.html", &index_context).unwrap()).unwrap();
+
 }

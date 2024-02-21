@@ -16,3 +16,5 @@ indicatif = "0.17.8"
 regex = "1.10.3"
 serde = { version = "1.0.197", features = ["serde_derive"] }
 serde_json = "1.0.114"
+tempfile = "3.10.0"
+tinytemplate = "1.2.1"
