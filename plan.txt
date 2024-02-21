@@ -88,7 +88,7 @@ use cases for the log parser
         - because I don't actually know what the model is doing (pdb style
           view?)
       - because there are so many values on the stack
-      - because this ia cursed model with lots of tiny tensors and lots of
+      - because this is a cursed model with lots of tiny tensors and lots of
         bytecodes and therefore traversal is terrible !!!
     - because the graph outputs are too big
       - because no one asked for tabular output
@@ -128,3 +128,16 @@ use cases for the log parser
 value added
 - download (all) the logs in the first place
 - put the result somewhere shareable
+- automatically process tlparse when someone posts a log for help
+
+
+meta plugin architecture
+- want the plugin to automatically run
+- choice: fbpkg distribution vs oss plus internal plugin
+  - choice: pyo3/maturin python plugin vs shelling out to executables
+- plugin goals:
+    telemetry
+    log downloading
+    - lg or tw command line tool
+    uploading
+    - manifold cli into https://www.internalfb.com/intern/wiki/Development_Environment/Persistent_Storage/#raw-manifold-path-for-a https://www.internalfb.com/intern/wiki/Manifold/Getting_Started/Manifold_CLI/

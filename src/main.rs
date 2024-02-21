@@ -1,4 +1,5 @@
 use clap::Parser;
+use std::fmt::{self, Formatter, Display};
 use core::hash::BuildHasherDefault;
 use fxhash::{FxHashMap, FxHasher};
 use indexmap::IndexMap;
@@ -8,11 +9,10 @@ use std::fs;
 use std::io::{self, BufRead};
 use std::path::PathBuf;
 use tinytemplate::TinyTemplate;
-use tempfile::{TempDir, tempdir};
+use opener;
 
 use indicatif::{MultiProgress, ProgressBar, ProgressStyle};
 use serde::{Deserialize, Serialize};
-use std::fmt;
 use std::time::Instant;
 
 pub type FxIndexMap<K, V> = IndexMap<K, V, BuildHasherDefault<FxHasher>>;
@@ -27,7 +27,7 @@ static TEMPLATE_INDEX: &'static str = r#"
 {css}
 </style>
 <body>
-Hello World
+{stack_trie_html | format_unescaped}
 </body>
 </html>
 "#;
@@ -39,6 +39,8 @@ struct Cli {
     path: PathBuf,
     #[arg(short)]
     out: Option<PathBuf>,
+    #[arg(long)]
+    overwrite: bool,
 }
 
 #[derive(Default)]
@@ -57,29 +59,37 @@ impl StackTrieNode {
         cur.terminal.push(compile_id);
     }
 
-    fn print(&self, indent: usize) {
+    fn to_html(&self) -> String {
+        let mut f = String::new();
+        self.build_html(&mut f, 0);
+        return f;
+    }
+
+    fn build_html(&self, f: &mut String, indent: usize) -> fmt::Result {
         for (frame, node) in self.children.iter() {
             let star = node.terminal.join("");
             if self.children.len() > 1 {
                 // If the node has multiple children, increase the indent and print a hyphen
-                println!(
-                    "{:indent$}- {star}{}",
+                write!(
+                    f,
+                    "{:indent$}- {star}",
                     "",
-                    frame,
                     indent = indent,
                     star = star
                 );
-                node.print(indent + 2);
+                tinytemplate::escape(frame, f);
+                node.fmt_html(f, indent + 2);
             } else {
                 // If the node has only one child, don't increase the indent and don't print a hyphen
-                println!(
-                    "{:indent$}  {star}{}",
+                write!(
+                    f,
+                    "{:indent$}  {star}",
                     "",
-                    frame,
                     indent = indent,
                     star = star
                 );
-                node.print(indent);
+                tinytemplate::escape(frame, f);
+                node.fmt_html(f, indent);
             }
         }
     }
@@ -143,21 +153,21 @@ struct Envelope {
 #[derive(Debug, Serialize)]
 struct IndexContext {
     css: &'static str,
+    stack_trie_html: String,
 }
 
 fn main() {
     let cli = Cli::parse();
     let path = cli.path;
+    let out_path = cli.out.unwrap_or(PathBuf::from("tl_out"));
 
-    let mut mb_tempdir: Option<TempDir> = None;
-
-    let out_path = match &cli.out {
-        Some(path) => path.as_path(),
-        None => {
-            mb_tempdir = Some(tempdir().unwrap());
-            mb_tempdir.as_ref().unwrap().path()
+    if out_path.exists() {
+        if !cli.overwrite {
+            panic!("{} already exists, pass --overwrite to overwrite", out_path.display());
         }
-    };
+        fs::remove_dir_all(&out_path).unwrap();
+    }
+    fs::create_dir(&out_path).unwrap();
 
     let file = File::open(path).unwrap();
     let metadata = file.metadata().unwrap();
@@ -253,7 +263,10 @@ fn main() {
     tt.add_template("index.html", TEMPLATE_INDEX);
     let index_context = IndexContext {
         css: CSS,
+        stack_trie_html: stack_trie.to_html(),
     };
     fs::write(out_path.join("index.html"), tt.render("index.html", &index_context).unwrap()).unwrap();
+
+    opener::open(out_path.join("index.html")).unwrap();
 
 }
