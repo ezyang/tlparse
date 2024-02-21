@@ -159,7 +159,7 @@ fn summary(path: &PathBuf) {
     let mut st = State::Scan;
 
     let re_envelope = Regex::new(concat!(
-        r"^(\[trainer\d+\]:)?(\[rank(?<rank>\d+)\]:)?",
+        r"^(\[trainer[^\]]+\]:)?(\[rank(?<rank>\d+)\]:)?",
         r"\[(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2}) ",
         r"(?<hour>\d{2}):(?<minute>\d{2}):(?<second>\d{2}),(?<millisecond>\d{3})\] ",
         r"(?<compile_id>(\[(?<frame_id>\d+)/(?<frame_compile_id>\d)+(_(?<restart>\d+))?\] )?)",
@@ -226,6 +226,7 @@ fn summary(path: &PathBuf) {
                     // TODO: make this configurable or automatically pick the rank with most log
                     // messages
                     Some(0) => {
+                        // println!("{}", line);
                         stats.ok += 1;
                         /*
                         if module == "torch._dynamo.guards.__guards" {
