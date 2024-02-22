@@ -3,6 +3,8 @@ use core::hash::BuildHasherDefault;
 use fxhash::{FxHashMap, FxHasher};
 use html_escape::encode_safe;
 use indexmap::IndexMap;
+use md5::{Md5, Digest};
+use base16ct;
 
 use regex::Regex;
 use std::fmt::{self, Display, Formatter};
@@ -140,6 +142,7 @@ struct Stats {
     other_rank: u64,
     fail_glog: u64,
     fail_json: u64,
+    fail_payload_md5: u64,
 }
 
 #[derive(Debug, Hash, Eq, PartialEq, Deserialize)]
@@ -183,9 +186,11 @@ struct Envelope {
     rank: Option<u32>,
     #[serde(flatten)]
     compile_id: Option<CompileId>,
+    #[serde(default)]
+    has_payload: Option<String>,
     // externally tagged union, one field per log type we recognize
     compile_stack: Option<StackSummary>,
-    dynamo_output_graph: Option<String>,
+    dynamo_output_graph: Option<bool>,
 }
 
 #[derive(Debug, Serialize)]
@@ -246,7 +251,9 @@ fn main() {
 
     let mut directory: FxHashMap<Option<CompileId>, Vec<PathBuf>> = FxHashMap::default();
 
-    for line in reader.lines() {
+    let mut iter = reader.lines().peekable();
+
+    while let Some(line) = iter.next() {
         let line = line.unwrap();
         bytes_read += line.len() as u64;
         pb.set_position(bytes_read);
@@ -307,15 +314,40 @@ fn main() {
         fs::create_dir_all(&subdir).unwrap();
         let compile_directory = directory.entry(e.compile_id).or_default();
 
+        let mut payload = String::new();
+        if let Some(expect) = e.has_payload {
+            let mut first = true;
+            while let Some(Ok(payload_line)) = iter.next_if(|l| l.as_ref().map_or_else(|_| false, |l| l.starts_with('\t'))) {
+                // Careful! Distinguish between missing EOL and not
+                if !first {
+                    payload.push_str("\n");
+                }
+                first = false;
+                payload.push_str(&payload_line[1..]);
+            }
+            let mut hasher = Md5::new();
+            hasher.update(&payload);
+            let hash = hasher.finalize();
+            let mut expect_buf = [0u8; 16];
+            if let Ok(_) = base16ct::lower::decode(expect, &mut expect_buf) {
+                if expect_buf != &hash[..] {
+                    // TODO: error log
+                    stats.fail_payload_md5 += 1;
+                }
+            } else {
+                stats.fail_payload_md5 += 1;
+            }
+        }
+
         stats.ok += 1;
         if let Some(stack) = e.compile_stack {
             stack_trie.insert(stack, "* ".to_string()); // TODO: compile id
         };
 
-        if let Some(r) = e.dynamo_output_graph {
+        if let Some(_r) = e.dynamo_output_graph {
             let filename = "dynamo_output_graph.txt";
             let f = subdir.join(filename);
-            fs::write(&f, r).unwrap();
+            fs::write(&f, payload).unwrap();
             compile_directory.push(Path::new(&compile_id_dir).join(filename));
         };
     }
