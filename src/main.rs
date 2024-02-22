@@ -1,7 +1,7 @@
 use clap::Parser;
 use core::hash::BuildHasherDefault;
 use fxhash::{FxHashMap, FxHasher};
-use html_escape::encode_safe;
+use html_escape::encode_text;
 use indexmap::IndexMap;
 use md5::{Md5, Digest};
 use base16ct;
@@ -18,8 +18,12 @@ use tinytemplate::TinyTemplate;
 use indicatif::{MultiProgress, ProgressBar, ProgressStyle};
 use serde::{Deserialize, Serialize};
 use std::time::Instant;
+use std::sync::Mutex;
+use once_cell::sync::Lazy;
 
 pub type FxIndexMap<K, V> = IndexMap<K, V, BuildHasherDefault<FxHasher>>;
+
+static INTERN_TABLE: Lazy<Mutex<FxHashMap<u32, String>>> = Lazy::new(|| Mutex::new(FxHashMap::default()));
 
 static CSS: &str = r#"
 "#;
@@ -147,7 +151,7 @@ struct Stats {
 
 #[derive(Debug, Hash, Eq, PartialEq, Deserialize)]
 struct FrameSummary {
-    filename: String,
+    filename: u32,
     line: i32,
     name: String,
 }
@@ -169,12 +173,14 @@ fn simplify_filename<'a>(filename: &'a str) -> &'a str {
 
 impl fmt::Display for FrameSummary {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let intern_table = INTERN_TABLE.lock().unwrap();
+        let filename = intern_table.get(&self.filename).map_or("(unknown)", |s| s.as_str());
         write!(
             f,
             "{}:{} in {}",
-            encode_safe(simplify_filename(&self.filename)),
+            encode_text(simplify_filename(filename)),
             self.line,
-            encode_safe(&self.name)
+            encode_text(&self.name)
         )
     }
 }
@@ -191,6 +197,7 @@ struct Envelope {
     // externally tagged union, one field per log type we recognize
     compile_stack: Option<StackSummary>,
     dynamo_output_graph: Option<bool>,
+    str: Option<(String, u32)>,
 }
 
 #[derive(Debug, Serialize)]
@@ -250,6 +257,7 @@ fn main() {
     let mut expected_rank: Option<Option<u32>> = None;
 
     let mut directory: FxHashMap<Option<CompileId>, Vec<PathBuf>> = FxHashMap::default();
+    let mut intern_table: FxHashMap<u32, String> = FxHashMap::default();
 
     let mut iter = reader.lines().peekable();
 
@@ -342,6 +350,11 @@ fn main() {
         stats.ok += 1;
         if let Some(stack) = e.compile_stack {
             stack_trie.insert(stack, "* ".to_string()); // TODO: compile id
+        };
+
+        if let Some((s, i)) = e.str {
+            let mut intern_table = INTERN_TABLE.lock().unwrap();
+            intern_table.insert(i, s);
         };
 
         if let Some(_r) = e.dynamo_output_graph {
