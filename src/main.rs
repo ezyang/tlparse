@@ -1,10 +1,10 @@
+use base16ct;
 use clap::Parser;
 use core::hash::BuildHasherDefault;
 use fxhash::{FxHashMap, FxHasher};
 use html_escape::encode_text;
 use indexmap::IndexMap;
-use md5::{Md5, Digest};
-use base16ct;
+use md5::{Digest, Md5};
 
 use regex::Regex;
 use std::fmt::{self, Display, Formatter};
@@ -16,14 +16,15 @@ use std::path::PathBuf;
 use tinytemplate::TinyTemplate;
 
 use indicatif::{MultiProgress, ProgressBar, ProgressStyle};
-use serde::{Deserialize, Serialize};
-use std::time::Instant;
-use std::sync::Mutex;
 use once_cell::sync::Lazy;
+use serde::{Deserialize, Serialize};
+use std::sync::Mutex;
+use std::time::Instant;
 
 pub type FxIndexMap<K, V> = IndexMap<K, V, BuildHasherDefault<FxHasher>>;
 
-static INTERN_TABLE: Lazy<Mutex<FxHashMap<u32, String>>> = Lazy::new(|| Mutex::new(FxHashMap::default()));
+static INTERN_TABLE: Lazy<Mutex<FxHashMap<u32, String>>> =
+    Lazy::new(|| Mutex::new(FxHashMap::default()));
 
 static CSS: &str = r#"
 "#;
@@ -174,7 +175,9 @@ fn simplify_filename<'a>(filename: &'a str) -> &'a str {
 impl fmt::Display for FrameSummary {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let intern_table = INTERN_TABLE.lock().unwrap();
-        let filename = intern_table.get(&self.filename).map_or("(unknown)", |s| s.as_str());
+        let filename = intern_table
+            .get(&self.filename)
+            .map_or("(unknown)", |s| s.as_str());
         write!(
             f,
             "{}:{} in {}",
@@ -188,6 +191,17 @@ impl fmt::Display for FrameSummary {
 type StackSummary = Vec<FrameSummary>;
 
 #[derive(Debug, Deserialize)]
+struct OptimizeDdpSplitChildMetadata {
+    name: String,
+}
+
+#[derive(Debug, Deserialize)]
+enum SymInt {
+    Int(i64),
+    Symbol(String),
+}
+
+#[derive(Debug, Deserialize)]
 struct Envelope {
     rank: Option<u32>,
     #[serde(flatten)]
@@ -198,6 +212,16 @@ struct Envelope {
     compile_stack: Option<StackSummary>,
     dynamo_output_graph: Option<bool>,
     str: Option<(String, u32)>,
+    optimize_ddp_split_graph: Option<bool>,
+    optimize_ddp_split_child: Option<OptimizeDdpSplitChildMetadata>,
+    compiled_autograd_graph: Option<bool>,
+    dynamo_guards: Option<bool>,
+    dynamo_output_graph_sizes: Option<FxHashMap<String, Vec<SymInt>>>,
+    aot_forward_graph: Option<bool>,
+    aot_backward_graph: Option<bool>,
+    aot_joint_graph: Option<bool>,
+    inductor_post_grad_graph: Option<bool>,
+    inductor_output_code: Option<bool>,
 }
 
 #[derive(Debug, Serialize)]
@@ -257,7 +281,6 @@ fn main() {
     let mut expected_rank: Option<Option<u32>> = None;
 
     let mut directory: FxHashMap<Option<CompileId>, Vec<PathBuf>> = FxHashMap::default();
-    let mut intern_table: FxHashMap<u32, String> = FxHashMap::default();
 
     let mut iter = reader.lines().peekable();
 
@@ -320,12 +343,13 @@ fn main() {
 
         let subdir = out_path.join(&compile_id_dir);
         fs::create_dir_all(&subdir).unwrap();
-        let compile_directory = directory.entry(e.compile_id).or_default();
 
         let mut payload = String::new();
         if let Some(expect) = e.has_payload {
             let mut first = true;
-            while let Some(Ok(payload_line)) = iter.next_if(|l| l.as_ref().map_or_else(|_| false, |l| l.starts_with('\t'))) {
+            while let Some(Ok(payload_line)) =
+                iter.next_if(|l| l.as_ref().map_or_else(|_| false, |l| l.starts_with('\t')))
+            {
                 // Careful! Distinguish between missing EOL and not
                 if !first {
                     payload.push_str("\n");
@@ -348,21 +372,42 @@ fn main() {
         }
 
         stats.ok += 1;
-        if let Some(stack) = e.compile_stack {
-            stack_trie.insert(stack, "* ".to_string()); // TODO: compile id
-        };
 
         if let Some((s, i)) = e.str {
             let mut intern_table = INTERN_TABLE.lock().unwrap();
             intern_table.insert(i, s);
+            continue;
         };
 
-        if let Some(_r) = e.dynamo_output_graph {
-            let filename = "dynamo_output_graph.txt";
-            let f = subdir.join(filename);
-            fs::write(&f, payload).unwrap();
-            compile_directory.push(Path::new(&compile_id_dir).join(filename));
+        let compile_directory = directory.entry(e.compile_id).or_default();
+
+        if let Some(stack) = e.compile_stack {
+            stack_trie.insert(stack, "* ".to_string()); // TODO: compile id
         };
+
+        let mut write_dump = |filename: &str, sentinel: Option<bool>| {
+            if let Some(_r) = sentinel {
+                let f = subdir.join(filename);
+                fs::write(&f, &payload).unwrap();
+                compile_directory.push(Path::new(&compile_id_dir).join(filename));
+            }
+        };
+
+        write_dump("dynamo_output_graph.txt", e.dynamo_output_graph);
+        write_dump("optimize_ddp_split_graph.txt", e.optimize_ddp_split_graph);
+        write_dump("compiled_autograd_graph.txt", e.compiled_autograd_graph);
+        write_dump("aot_forward_graph.txt", e.aot_forward_graph);
+        write_dump("aot_backward_graph.txt", e.aot_backward_graph);
+        write_dump("aot_joint_graph.txt", e.aot_joint_graph);
+        write_dump("inductor_post_grad_graph.txt", e.inductor_post_grad_graph);
+        write_dump("inductor_output_code.txt", e.inductor_output_code);
+
+        if let Some(metadata) = e.optimize_ddp_split_child {
+            let filename = format!("optimize_ddp_split_child_{}.txt", metadata.name);
+            let f = subdir.join(&filename);
+            fs::write(&f, &payload).unwrap();
+            compile_directory.push(Path::new(&compile_id_dir).join(filename));
+        }
     }
     pb.finish_with_message("done");
     spinner.finish();
