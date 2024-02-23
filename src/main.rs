@@ -196,6 +196,7 @@ struct OptimizeDdpSplitChildMetadata {
 }
 
 #[derive(Debug, Deserialize)]
+#[serde(untagged)]
 enum SymInt {
     Int(i64),
     Symbol(String),
@@ -282,10 +283,19 @@ fn main() {
 
     let mut directory: FxHashMap<Option<CompileId>, Vec<PathBuf>> = FxHashMap::default();
 
-    let mut iter = reader.lines().peekable();
+    // NB: Sometimes, the log output we get from Logarithm stutters with a blank line.
+    // Filter them out, they're never valid (a blank line in payload will still be \t)
+    let mut iter = reader
+        .lines()
+        .enumerate()
+        .filter_map(|(i, l)| match l {
+            // 1-indexed line numbers please
+            Ok(l) if !l.is_empty() => Some((i + 1, l)),
+            _ => None,
+        })
+        .peekable();
 
-    while let Some(line) = iter.next() {
-        let line = line.unwrap();
+    while let Some((lineno, line)) = iter.next() {
         bytes_read += line.len() as u64;
         pb.set_position(bytes_read);
         spinner.set_message(format!("{:?}", stats));
@@ -293,6 +303,7 @@ fn main() {
         let start = Instant::now();
 
         let Some(caps) = re_glog.captures(&line) else {
+            eprintln!("fail_glog {}", lineno);
             stats.fail_glog += 1;
             continue;
         };
@@ -318,6 +329,12 @@ fn main() {
             }
         };
 
+        if let Some((s, i)) = e.str {
+            let mut intern_table = INTERN_TABLE.lock().unwrap();
+            intern_table.insert(i, s);
+            continue;
+        };
+
         match expected_rank {
             Some(rank) => {
                 if rank != e.rank {
@@ -337,7 +354,7 @@ fn main() {
         let compile_id_dir = e
             .compile_id
             .clone()
-            .map_or("unknown".to_string(), |e: CompileId| {
+            .map_or(format!("unknown_{}", lineno), |e: CompileId| {
                 format!("{}_{}_{}", e.frame_id, e.frame_compile_id, e.attempt)
             });
 
@@ -347,8 +364,8 @@ fn main() {
         let mut payload = String::new();
         if let Some(expect) = e.has_payload {
             let mut first = true;
-            while let Some(Ok(payload_line)) =
-                iter.next_if(|l| l.as_ref().map_or_else(|_| false, |l| l.starts_with('\t')))
+            while let Some((payload_lineno, payload_line)) =
+                iter.next_if(|(_, l)| l.starts_with('\t'))
             {
                 // Careful! Distinguish between missing EOL and not
                 if !first {
@@ -372,12 +389,6 @@ fn main() {
         }
 
         stats.ok += 1;
-
-        if let Some((s, i)) = e.str {
-            let mut intern_table = INTERN_TABLE.lock().unwrap();
-            intern_table.insert(i, s);
-            continue;
-        };
 
         let compile_directory = directory.entry(e.compile_id).or_default();
 
