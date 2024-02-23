@@ -141,3 +141,11 @@ meta plugin architecture
     - lg or tw command line tool
     uploading
     - manifold cli into https://www.internalfb.com/intern/wiki/Development_Environment/Persistent_Storage/#raw-manifold-path-for-a https://www.internalfb.com/intern/wiki/Manifold/Getting_Started/Manifold_CLI/
+
+
+
+feb 23 ideas
+- ddpoptimize split needs a context
+- post_grad_graph and output_code occasionally has no context; how to orient
+  in this situation :think:
+- would like to know code hash, so can generate links to files
