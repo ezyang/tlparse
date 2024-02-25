@@ -203,6 +203,24 @@ enum SymInt {
 }
 
 #[derive(Debug, Deserialize)]
+struct EmptyMetadata {}
+
+#[derive(Debug, Deserialize)]
+struct DynamoOutputGraphMetadata {
+    sizes: Option<FxHashMap<String, Vec<SymInt>>>,
+}
+
+#[derive(Debug, Deserialize)]
+struct DynamoStartMetadata {
+    stack: Option<StackSummary>,
+}
+
+#[derive(Debug, Deserialize)]
+struct InductorOutputCodeMetadata {
+    filename: Option<String>,
+}
+
+#[derive(Debug, Deserialize)]
 struct Envelope {
     rank: Option<u32>,
     #[serde(flatten)]
@@ -210,19 +228,18 @@ struct Envelope {
     #[serde(default)]
     has_payload: Option<String>,
     // externally tagged union, one field per log type we recognize
-    compile_stack: Option<StackSummary>,
-    dynamo_output_graph: Option<bool>,
+    dynamo_start: Option<DynamoStartMetadata>,
     str: Option<(String, u32)>,
-    optimize_ddp_split_graph: Option<bool>,
+    dynamo_output_graph: Option<DynamoOutputGraphMetadata>,
+    optimize_ddp_split_graph: Option<EmptyMetadata>,
     optimize_ddp_split_child: Option<OptimizeDdpSplitChildMetadata>,
-    compiled_autograd_graph: Option<bool>,
-    dynamo_guards: Option<bool>,
-    dynamo_output_graph_sizes: Option<FxHashMap<String, Vec<SymInt>>>,
-    aot_forward_graph: Option<bool>,
-    aot_backward_graph: Option<bool>,
-    aot_joint_graph: Option<bool>,
-    inductor_post_grad_graph: Option<bool>,
-    inductor_output_code: Option<bool>,
+    compiled_autograd_graph: Option<EmptyMetadata>,
+    dynamo_guards: Option<EmptyMetadata>,
+    aot_forward_graph: Option<EmptyMetadata>,
+    aot_backward_graph: Option<EmptyMetadata>,
+    aot_joint_graph: Option<EmptyMetadata>,
+    inductor_post_grad_graph: Option<EmptyMetadata>,
+    inductor_output_code: Option<InductorOutputCodeMetadata>,
 }
 
 #[derive(Debug, Serialize)]
@@ -390,13 +407,19 @@ fn main() {
 
         stats.ok += 1;
 
-        let compile_directory = directory.entry(e.compile_id).or_default();
+        // lol this clone, probably shouldn't use entry
+        let compile_directory = directory.entry(e.compile_id.clone()).or_default();
 
-        if let Some(stack) = e.compile_stack {
-            stack_trie.insert(stack, "* ".to_string()); // TODO: compile id
+        if let Some(m) = e.dynamo_start {
+            if let Some(stack) = m.stack {
+                stack_trie.insert(
+                    stack,
+                    e.compile_id.map_or("* ".to_string(), |c| c.to_string()),
+                );
+            };
         };
 
-        let mut write_dump = |filename: &str, sentinel: Option<bool>| {
+        let mut write_dump = |filename: &str, sentinel: Option<EmptyMetadata>| {
             if let Some(_r) = sentinel {
                 let f = subdir.join(filename);
                 fs::write(&f, &payload).unwrap();
@@ -404,14 +427,39 @@ fn main() {
             }
         };
 
-        write_dump("dynamo_output_graph.txt", e.dynamo_output_graph);
         write_dump("optimize_ddp_split_graph.txt", e.optimize_ddp_split_graph);
         write_dump("compiled_autograd_graph.txt", e.compiled_autograd_graph);
         write_dump("aot_forward_graph.txt", e.aot_forward_graph);
         write_dump("aot_backward_graph.txt", e.aot_backward_graph);
         write_dump("aot_joint_graph.txt", e.aot_joint_graph);
         write_dump("inductor_post_grad_graph.txt", e.inductor_post_grad_graph);
-        write_dump("inductor_output_code.txt", e.inductor_output_code);
+
+        if let Some(_metadata) = e.dynamo_output_graph {
+            // TODO: dump sizes
+            let filename = "dynamo_output_graph.txt";
+            let f = subdir.join(&filename);
+            fs::write(&f, &payload).unwrap();
+            compile_directory.push(Path::new(&compile_id_dir).join(filename));
+        }
+
+        if let Some(metadata) = e.inductor_output_code {
+            let filename = match metadata.filename {
+                Some(p) =>
+                // Bah, where's pattern guards when you need 'em
+                {
+                    match Path::new(&p).file_stem() {
+                        Some(stem) => {
+                            format!("inductor_output_code_{}.txt", stem.to_str().unwrap())
+                        }
+                        None => "inductor_output_code.txt".to_string(),
+                    }
+                }
+                None => "inductor_output_code.txt".to_string(),
+            };
+            let f = subdir.join(&filename);
+            fs::write(&f, &payload).unwrap();
+            compile_directory.push(Path::new(&compile_id_dir).join(filename));
+        }
 
         if let Some(metadata) = e.optimize_ddp_split_child {
             let filename = format!("optimize_ddp_split_child_{}.txt", metadata.name);
