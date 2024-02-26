@@ -18,6 +18,7 @@ use tinytemplate::TinyTemplate;
 use indicatif::{MultiProgress, ProgressBar, ProgressStyle};
 use once_cell::sync::Lazy;
 use serde::{Deserialize, Serialize};
+use std::process::ExitCode;
 use std::sync::Mutex;
 use std::time::Instant;
 
@@ -62,10 +63,16 @@ static TEMPLATE_INDEX: &str = r#"
 #[command(propagate_version = true)]
 struct Cli {
     path: PathBuf,
+    /// Output directory, defaults to `tl_out`
     #[arg(short)]
     out: Option<PathBuf>,
+    /// Delete out directory if it already exists
     #[arg(long)]
     overwrite: bool,
+    /// Return non-zero exit code if unrecognized log lines are found.  Mostly useful for unit
+    /// testing.
+    #[arg(long)]
+    strict: bool,
 }
 
 #[derive(Default)]
@@ -249,7 +256,7 @@ struct IndexContext {
     stack_trie_html: String,
 }
 
-fn main() {
+fn main() -> ExitCode {
     let cli = Cli::parse();
     let path = cli.path;
     let out_path = cli.out.unwrap_or(PathBuf::from("tl_out"));
@@ -491,4 +498,15 @@ fn main() {
     .unwrap();
 
     opener::open(out_path.join("index.html")).unwrap();
+
+    // other_rank is included here because you should only have logs from one rank when
+    // configured properly
+    if cli.strict
+        && (stats.fail_glog + stats.fail_json + stats.fail_payload_md5 + stats.other_rank > 0)
+    {
+        // Report something went wrong
+        ExitCode::from(1)
+    } else {
+        ExitCode::from(0)
+    }
 }
