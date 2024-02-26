@@ -41,7 +41,6 @@ jobs:
 
   windows:
     runs-on: windows-latest
-    strategy:
     steps:
       - uses: actions/checkout@v3
       - name: Build wheels
