@@ -1,3 +1,4 @@
+use anyhow::anyhow;
 use base16ct;
 use clap::Parser;
 use core::hash::BuildHasherDefault;
@@ -5,6 +6,7 @@ use fxhash::{FxHashMap, FxHasher};
 use html_escape::encode_text;
 use indexmap::IndexMap;
 use md5::{Digest, Md5};
+use std::ffi::{OsStr, OsString};
 
 use regex::Regex;
 use std::fmt::{self, Display, Formatter};
@@ -18,7 +20,6 @@ use tinytemplate::TinyTemplate;
 use indicatif::{MultiProgress, ProgressBar, ProgressStyle};
 use once_cell::sync::Lazy;
 use serde::{Deserialize, Serialize};
-use std::process::ExitCode;
 use std::sync::Mutex;
 use std::time::Instant;
 
@@ -64,8 +65,8 @@ static TEMPLATE_INDEX: &str = r#"
 struct Cli {
     path: PathBuf,
     /// Output directory, defaults to `tl_out`
-    #[arg(short)]
-    out: Option<PathBuf>,
+    #[arg(short, default_value = "tl_out")]
+    out: PathBuf,
     /// Delete out directory if it already exists
     #[arg(long)]
     overwrite: bool,
@@ -217,7 +218,7 @@ struct EmptyMetadata {}
 
 #[derive(Debug, Deserialize)]
 struct DynamoOutputGraphMetadata {
-    sizes: Option<FxHashMap<String, Vec<SymInt>>>,
+    _sizes: Option<FxHashMap<String, Vec<SymInt>>>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -227,7 +228,7 @@ struct DynamoStartMetadata {
 
 #[derive(Debug, Deserialize)]
 struct InductorOutputCodeMetadata {
-    filename: Option<String>,
+    filename: Option<PathBuf>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -244,7 +245,7 @@ struct Envelope {
     optimize_ddp_split_graph: Option<EmptyMetadata>,
     optimize_ddp_split_child: Option<OptimizeDdpSplitChildMetadata>,
     compiled_autograd_graph: Option<EmptyMetadata>,
-    dynamo_guards: Option<EmptyMetadata>,
+    _dynamo_guards: Option<EmptyMetadata>,
     aot_forward_graph: Option<EmptyMetadata>,
     aot_backward_graph: Option<EmptyMetadata>,
     aot_joint_graph: Option<EmptyMetadata>,
@@ -259,10 +260,10 @@ struct IndexContext {
     stack_trie_html: String,
 }
 
-fn main() -> ExitCode {
+fn main() -> anyhow::Result<()> {
     let cli = Cli::parse();
     let path = cli.path;
-    let out_path = cli.out.unwrap_or(PathBuf::from("tl_out"));
+    let out_path = cli.out;
 
     if out_path.exists() {
         if !cli.overwrite {
@@ -271,17 +272,17 @@ fn main() -> ExitCode {
                 out_path.display()
             );
         }
-        fs::remove_dir_all(&out_path).unwrap();
+        fs::remove_dir_all(&out_path)?;
     }
-    fs::create_dir(&out_path).unwrap();
+    fs::create_dir(&out_path)?;
 
-    let file = File::open(path).unwrap();
-    let metadata = file.metadata().unwrap();
+    let file = File::open(path)?;
+    let metadata = file.metadata()?;
     let file_size = metadata.len();
     let multi = MultiProgress::new();
     let pb = multi.add(ProgressBar::new(file_size));
     pb.set_style(ProgressStyle::default_bar()
-        .template("{spinner:.green} [{elapsed_precise}] [{wide_bar:.cyan/blue}] {bytes}/{total_bytes} [{bytes_per_sec}] ({eta})").unwrap()
+        .template("{spinner:.green} [{elapsed_precise}] [{wide_bar:.cyan/blue}] {bytes}/{total_bytes} [{bytes_per_sec}] ({eta})")?
         .progress_chars("#>-"));
     let spinner = multi.add(ProgressBar::new_spinner());
     let reader = io::BufReader::new(file);
@@ -292,8 +293,7 @@ fn main() -> ExitCode {
         r"(?<thread>\d+)",
         r"(?<pathname>[^:]+):(?<line>\d+)\] ",
         r"(?<payload>.)"
-    ))
-    .unwrap();
+    ))?;
 
     let mut stack_trie = StackTrieNode::default();
 
@@ -377,21 +377,26 @@ fn main() -> ExitCode {
             }
         };
 
-        // TODO: borrow only here
-        let compile_id_dir = e
+        let compile_id_dir: PathBuf = e
             .compile_id
-            .clone()
-            .map_or(format!("unknown_{}", lineno), |e: CompileId| {
-                format!("{}_{}_{}", e.frame_id, e.frame_compile_id, e.attempt)
-            });
+            .as_ref()
+            .map_or(
+                format!("unknown_{lineno}"),
+                |CompileId {
+                     frame_id,
+                     frame_compile_id,
+                     attempt,
+                 }| { format!("{frame_id}_{frame_compile_id}_{attempt}") },
+            )
+            .into();
 
         let subdir = out_path.join(&compile_id_dir);
-        fs::create_dir_all(&subdir).unwrap();
+        fs::create_dir_all(&subdir)?;
 
         let mut payload = String::new();
         if let Some(expect) = e.has_payload {
             let mut first = true;
-            while let Some((payload_lineno, payload_line)) =
+            while let Some((_payload_lineno, payload_line)) =
                 iter.next_if(|(_, l)| l.starts_with('\t'))
             {
                 // Careful! Distinguish between missing EOL and not
@@ -429,53 +434,55 @@ fn main() -> ExitCode {
             };
         };
 
-        let mut write_dump = |filename: &str, sentinel: Option<EmptyMetadata>| {
-            if let Some(_r) = sentinel {
-                let f = subdir.join(filename);
-                fs::write(&f, &payload).unwrap();
-                compile_directory.push(Path::new(&compile_id_dir).join(filename));
-            }
-        };
+        let mut write_dump =
+            |filename: &str, sentinel: Option<EmptyMetadata>| -> anyhow::Result<()> {
+                if sentinel.is_some() {
+                    let f = subdir.join(filename);
+                    fs::write(&f, &payload)?;
+                    compile_directory.push(compile_id_dir.join(filename));
+                }
+                Ok(())
+            };
 
-        write_dump("optimize_ddp_split_graph.txt", e.optimize_ddp_split_graph);
-        write_dump("compiled_autograd_graph.txt", e.compiled_autograd_graph);
-        write_dump("aot_forward_graph.txt", e.aot_forward_graph);
-        write_dump("aot_backward_graph.txt", e.aot_backward_graph);
-        write_dump("aot_joint_graph.txt", e.aot_joint_graph);
-        write_dump("inductor_post_grad_graph.txt", e.inductor_post_grad_graph);
+        write_dump("optimize_ddp_split_graph.txt", e.optimize_ddp_split_graph)?;
+        write_dump("compiled_autograd_graph.txt", e.compiled_autograd_graph)?;
+        write_dump("aot_forward_graph.txt", e.aot_forward_graph)?;
+        write_dump("aot_backward_graph.txt", e.aot_backward_graph)?;
+        write_dump("aot_joint_graph.txt", e.aot_joint_graph)?;
+        write_dump("inductor_post_grad_graph.txt", e.inductor_post_grad_graph)?;
 
-        if let Some(_metadata) = e.dynamo_output_graph {
+        if e.dynamo_output_graph.is_some() {
             // TODO: dump sizes
             let filename = "dynamo_output_graph.txt";
             let f = subdir.join(&filename);
-            fs::write(&f, &payload).unwrap();
-            compile_directory.push(Path::new(&compile_id_dir).join(filename));
+            fs::write(&f, &payload)?;
+            compile_directory.push(compile_id_dir.join(filename));
         }
 
         if let Some(metadata) = e.inductor_output_code {
-            let filename = match metadata.filename {
-                Some(p) =>
-                // Bah, where's pattern guards when you need 'em
-                {
-                    match Path::new(&p).file_stem() {
-                        Some(stem) => {
-                            format!("inductor_output_code_{}.txt", stem.to_str().unwrap())
-                        }
-                        None => "inductor_output_code.txt".to_string(),
-                    }
-                }
-                None => "inductor_output_code.txt".to_string(),
-            };
+            let filename = metadata
+                .filename
+                .as_ref()
+                .and_then(|p| Path::file_stem(p))
+                .map_or_else(
+                    || PathBuf::from("inductor_output_code.txt"),
+                    |stem| {
+                        let mut r = OsString::from("inductor_output_code_");
+                        r.push(stem);
+                        r.push(OsStr::new(".txt"));
+                        r.into()
+                    },
+                );
             let f = subdir.join(&filename);
-            fs::write(&f, &payload).unwrap();
-            compile_directory.push(Path::new(&compile_id_dir).join(filename));
+            fs::write(&f, &payload)?;
+            compile_directory.push(compile_id_dir.join(filename));
         }
 
         if let Some(metadata) = e.optimize_ddp_split_child {
             let filename = format!("optimize_ddp_split_child_{}.txt", metadata.name);
             let f = subdir.join(&filename);
-            fs::write(&f, &payload).unwrap();
-            compile_directory.push(Path::new(&compile_id_dir).join(filename));
+            fs::write(&f, &payload)?;
+            compile_directory.push(compile_id_dir.join(filename));
         }
     }
     pb.finish_with_message("done");
@@ -485,7 +492,7 @@ fn main() -> ExitCode {
 
     let mut tt = TinyTemplate::new();
     tt.add_formatter("format_unescaped", tinytemplate::format_unescaped);
-    tt.add_template("index.html", TEMPLATE_INDEX).unwrap();
+    tt.add_template("index.html", TEMPLATE_INDEX)?;
     let index_context = IndexContext {
         css: CSS,
         directory: directory
@@ -496,12 +503,11 @@ fn main() -> ExitCode {
     };
     fs::write(
         out_path.join("index.html"),
-        tt.render("index.html", &index_context).unwrap(),
-    )
-    .unwrap();
+        tt.render("index.html", &index_context)?,
+    )?;
 
     if !cli.no_browser {
-        opener::open(out_path.join("index.html")).unwrap();
+        opener::open(out_path.join("index.html"))?;
     }
 
     // other_rank is included here because you should only have logs from one rank when
@@ -510,8 +516,8 @@ fn main() -> ExitCode {
         && (stats.fail_glog + stats.fail_json + stats.fail_payload_md5 + stats.other_rank > 0)
     {
         // Report something went wrong
-        ExitCode::from(1)
-    } else {
-        ExitCode::from(0)
+        return Err(anyhow!("Something went wrong"));
     }
+
+    Ok(())
 }
