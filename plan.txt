@@ -149,3 +149,8 @@ feb 23 ideas
 - post_grad_graph and output_code occasionally has no context; how to orient
   in this situation :think:
 - would like to know code hash, so can generate links to files
+
+
+- recompile
+  - dynamic shape dimension changed
+  - just collect them all at once place
