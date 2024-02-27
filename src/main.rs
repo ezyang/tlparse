@@ -73,6 +73,9 @@ struct Cli {
     /// testing.
     #[arg(long)]
     strict: bool,
+    /// Don't open browser at the end
+    #[arg(long)]
+    no_browser: bool,
 }
 
 #[derive(Default)]
@@ -497,7 +500,9 @@ fn main() -> ExitCode {
     )
     .unwrap();
 
-    opener::open(out_path.join("index.html")).unwrap();
+    if !cli.no_browser {
+        opener::open(out_path.join("index.html")).unwrap();
+    }
 
     // other_rank is included here because you should only have logs from one rank when
     // configured properly
