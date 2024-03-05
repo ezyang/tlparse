@@ -31,6 +31,19 @@ static INTERN_TABLE: Lazy<Mutex<FxHashMap<u32, String>>> =
 static CSS: &str = r#"
 "#;
 
+static TEMPLATE_DYNAMO_GUARDS: &str = r#"
+<html>
+<body>
+<h2>Guards</h2>
+<ul>
+{{ for guard in guards }}
+    <li><code>{guard.code}</code></li>
+{{ endfor }}
+</ul>
+</body>
+</html>
+"#;
+
 static TEMPLATE_INDEX: &str = r#"
 <html>
 <style>
@@ -207,9 +220,10 @@ struct Stats {
     fail_glog: u64,
     fail_json: u64,
     fail_payload_md5: u64,
+    fail_dynamo_guards_json: u64,
 }
 
-#[derive(Debug, Hash, Eq, PartialEq, Deserialize)]
+#[derive(Debug, Hash, Eq, PartialEq, Deserialize, Serialize)]
 struct FrameSummary {
     filename: u32,
     line: i32,
@@ -293,12 +307,24 @@ struct Envelope {
     optimize_ddp_split_graph: Option<EmptyMetadata>,
     optimize_ddp_split_child: Option<OptimizeDdpSplitChildMetadata>,
     compiled_autograd_graph: Option<EmptyMetadata>,
-    _dynamo_guards: Option<EmptyMetadata>,
+    dynamo_guards: Option<EmptyMetadata>,
     aot_forward_graph: Option<EmptyMetadata>,
     aot_backward_graph: Option<EmptyMetadata>,
     aot_joint_graph: Option<EmptyMetadata>,
     inductor_post_grad_graph: Option<EmptyMetadata>,
     inductor_output_code: Option<InductorOutputCodeMetadata>,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+struct DynamoGuard {
+    code: String,
+    stack: Option<StackSummary>,
+    user_stack: Option<StackSummary>,
+}
+
+#[derive(Debug, Serialize)]
+struct DynamoGuardsContext {
+    guards: Vec<DynamoGuard>,
 }
 
 #[derive(Debug, Serialize)]
@@ -357,6 +383,11 @@ fn main() -> anyhow::Result<()> {
     let mut expected_rank: Option<Option<u32>> = None;
 
     let mut directory: FxHashMap<Option<CompileId>, Vec<PathBuf>> = FxHashMap::default();
+
+    let mut tt = TinyTemplate::new();
+    tt.add_formatter("format_unescaped", tinytemplate::format_unescaped);
+    tt.add_template("index.html", TEMPLATE_INDEX)?;
+    tt.add_template("dynamo_guards.html", TEMPLATE_DYNAMO_GUARDS)?;
 
     // NB: Sometimes, the log output we get from Logarithm stutters with a blank line.
     // Filter them out, they're never valid (a blank line in payload will still be \t)
@@ -477,7 +508,9 @@ fn main() -> anyhow::Result<()> {
             if let Some(stack) = m.stack {
                 stack_trie.insert(
                     stack,
-                    e.compile_id.map_or("(unknown) ".to_string(), |c| format!("<a href='#{cid}'>{cid}</a> ", cid=c)),
+                    e.compile_id.map_or("(unknown) ".to_string(), |c| {
+                        format!("<a href='#{cid}'>{cid}</a> ", cid = c)
+                    }),
                 );
             };
         };
@@ -505,6 +538,22 @@ fn main() -> anyhow::Result<()> {
             let f = subdir.join(&filename);
             fs::write(&f, &payload)?;
             compile_directory.push(compile_id_dir.join(filename));
+        }
+
+        if e.dynamo_guards.is_some() {
+            let filename = "dynamo_guards.html";
+            let f = subdir.join(&filename);
+            match serde_json::from_str::<Vec<DynamoGuard>>(payload.as_str()) {
+                Ok(guards) => {
+                    let guards_context = DynamoGuardsContext { guards: guards };
+                    fs::write(&f, tt.render("dynamo_guards.html", &guards_context)?)?;
+                    compile_directory.push(compile_id_dir.join(filename));
+                }
+                Err(err) => {
+                    eprintln!("{}", err);
+                    stats.fail_dynamo_guards_json += 1;
+                }
+            }
         }
 
         if let Some(metadata) = e.inductor_output_code {
@@ -538,9 +587,6 @@ fn main() -> anyhow::Result<()> {
 
     eprintln!("{:?}", stats);
 
-    let mut tt = TinyTemplate::new();
-    tt.add_formatter("format_unescaped", tinytemplate::format_unescaped);
-    tt.add_template("index.html", TEMPLATE_INDEX)?;
     let index_context = IndexContext {
         css: CSS,
         directory: directory
@@ -561,7 +607,12 @@ fn main() -> anyhow::Result<()> {
     // other_rank is included here because you should only have logs from one rank when
     // configured properly
     if cli.strict
-        && (stats.fail_glog + stats.fail_json + stats.fail_payload_md5 + stats.other_rank > 0)
+        && (stats.fail_glog
+            + stats.fail_json
+            + stats.fail_payload_md5
+            + stats.other_rank
+            + stats.fail_dynamo_guards_json
+            > 0)
     {
         // Report something went wrong
         return Err(anyhow!("Something went wrong"));
