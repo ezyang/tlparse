@@ -409,7 +409,7 @@ fn main() -> anyhow::Result<()> {
         let start = Instant::now();
 
         let Some(caps) = re_glog.captures(&line) else {
-            eprintln!("fail_glog {}", lineno);
+            eprintln!("Failed to parse glog prefix on line {}", lineno);
             stats.fail_glog += 1;
             continue;
         };
@@ -428,7 +428,7 @@ fn main() -> anyhow::Result<()> {
             Ok(r) => r,
             Err(err) => {
                 multi.suspend(|| {
-                    eprintln!("{}\n{:?}", payload, err);
+                    eprintln!("Failed to parse metadata JSON: {}\n{:?}", payload, err);
                 });
                 stats.fail_json += 1;
                 continue;
@@ -550,7 +550,7 @@ fn main() -> anyhow::Result<()> {
                     compile_directory.push(compile_id_dir.join(filename));
                 }
                 Err(err) => {
-                    eprintln!("{}", err);
+                    eprintln!("Failed to parse guards json: {}", err);
                     stats.fail_dynamo_guards_json += 1;
                 }
             }
