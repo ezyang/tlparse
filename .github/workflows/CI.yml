@@ -24,6 +24,9 @@ permissions:
 jobs:
   linux:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        target: [x86_64, x86, aarch64, armv7, s390x, ppc64le]
     steps:
       - uses: actions/checkout@v3
       - name: Build wheels
@@ -41,6 +44,9 @@ jobs:
 
   windows:
     runs-on: windows-latest
+    strategy:
+      matrix:
+        target: [x64, x86]
     steps:
       - uses: actions/checkout@v3
       - name: Build wheels
