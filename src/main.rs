@@ -1,15 +1,11 @@
 use anyhow::anyhow;
 use base16ct;
 use clap::Parser;
-use core::hash::BuildHasherDefault;
-use fxhash::{FxHashMap, FxHasher};
-use html_escape::encode_text;
-use indexmap::IndexMap;
+use fxhash::FxHashMap;
 use md5::{Digest, Md5};
 use std::ffi::{OsStr, OsString};
 
 use regex::Regex;
-use std::fmt::{self, Display, Formatter};
 use std::fs;
 use std::fs::File;
 use std::io::{self, BufRead};
@@ -18,112 +14,18 @@ use std::path::PathBuf;
 use tinytemplate::TinyTemplate;
 
 use indicatif::{MultiProgress, ProgressBar, ProgressStyle};
-use once_cell::sync::Lazy;
-use serde::{Deserialize, Serialize};
-use std::sync::Mutex;
 use std::time::Instant;
 
-pub type FxIndexMap<K, V> = IndexMap<K, V, BuildHasherDefault<FxHasher>>;
 
-static INTERN_TABLE: Lazy<Mutex<FxHashMap<u32, String>>> =
-    Lazy::new(|| Mutex::new(FxHashMap::default()));
-
-static CSS: &str = r#"
-"#;
-
-static TEMPLATE_DYNAMO_GUARDS: &str = r#"
-<html>
-<body>
-<h2>Guards</h2>
-<ul>
-{{ for guard in guards }}
-    <li><code>{guard.code}</code></li>
-{{ endfor }}
-</ul>
-</body>
-</html>
-"#;
-
-static TEMPLATE_INDEX: &str = r#"
-<html>
-<style>
-{css}
-</style>
-<body>
-<div>
-<h2>Stack trie</h2>
-<p>
-The <strong>stack trie</strong> is a way of getting a quick orientation on where all the
-compilations in a model take place, esp., if you are compiling a codebase you are unfamiliar with.
-It is a tree of stack frames, for all stacks that triggered PT2 compilation.  If only a single
-stack is in the tree, you will simply see a plain list of frames (most recent call last).  With
-multiple stacks, at every point where two stacks diverge from having a common prefix, we increase
-the indentation of the list and have a separate sub-list per sub-tree.
-</p>
-{stack_trie_html | format_unescaped}
-</div>
-<div>
-<h2>IR dumps</h2>
-<p>
-The <strong>IR dumps</strong> collected dumped intermediate products from various points of the PT2
-compilation process.  The products are organized by compile id, and then sorted in chronological
-order.
-</p>
-<p>
-A <strong>compile id</strong> uniquely identifies are particular compilation inside a PT2
-program.  It is traditionally written as <code>[x/y]</code>, where the <strong>frame id</strong> x
-identifies the particular Python frame which we are compiling, and <strong>frame compile
-id</strong> y identifies how many times we've recompiled this same frame.  For example,
-<code>[0/0]</code> refers to the very first frame compiled by PT2; <code>[0/1]</code> refers to the
-first recompilation of this frame, while <code>[1/0]</code> refers to a different frame, within
-distinct code cache, which we are compiling next (perhaps because of a graph break).  Although
-Dynamo treats distinct frames as completely unrelated, a frame compilation could overlap with another
-frame; for example, if you graph break in an inlined function, Dynamo will typically try to compile
-the nested frame again on an inner frame.  You can identify the hierarchical relationship between
-frames by looking at the stack trie above.
-</p>
-<p>
-In some situations, the compile id will have an extra signifier <code>[x/y_z]</code>, where z is the
-<strong>attempt</strong> for this particular (re)compilation.  Certain conditions will cause Dynamo to
-restart analysis, when Dynamo discovers that it needs to undo a decision it previously made.  The most
-common cause of recompilation is a graph break in an inlined function call, which forces to restart
-and avoid inlining the function in the first place.
-</p>
-<p>
-Here is a high level description of PT2's compilation phases, and the intermediate products each
-phase generates:
-</p>
-<ol>
-<li><em>Optional:</em> If compiled autograd is enabled, and we are processing a backward call, compiled autograd will trace the autograd graph from the autograd engine, and produce an FX graph <code>compiled_autograd_graph</code> that will be Dynamo traced.  Otherwise, Dynamo will directly trace user's bytecode.</li>
-<li>Dynamo symbolically evaluates the Python bytecode of a program, producing <code>dynamo_output_graph</code></li>
-<li><em>Optional:</em> If <code>optimize_ddp</code> is enabled, the DDPOptimizer will split the Dynamo output graph to improve pipelining communications.  Each split subgraph is <code>optimize_ddp_split_child_submod</code>, and the high level graph that plumbs the graphs together is <code>optimize_ddp_split_graph</code>.  If there are multiple splits, each subsequent build product will be produced multiple times, one for each split.</li>
-<li>AOTAutograd traces the (possibly split) Dynamo output graph, producing a <code>aot_joint_graph</code> if backwards is enabled.  It then partitions the graph into <code>aot_forward_graph</code> and <code>aot_backward_graph</code>.  If training is not needed, there may only be an <code>aot_forward_graph</code>.</li>
-<li>Inductor will apply some post grad FX passes, producing <code>inductor_post_grad_graph</code></li>
-<li>Inductor will perform code generation, producing the final <code>inductor_output_code</code> which will be executed at runtime.  This output is a valid Python program and can be directly run.</li>
-</ol>
-<p>
-Build products below:
-</p>
-<ul>
-{{ for compile_directory in directory }}
-    <li><a id="{compile_directory.0}">{compile_directory.0}</a>
-    <ul>
-        {{ for path in compile_directory.1 }}
-            <li><a href="{path}">{path}</a></li>
-        {{ endfor }}
-    </ul>
-    </li>
-{{ endfor }}
-</ul>
-</div>
-</body>
-</html>
-"#;
+use crate::types::*;
+use crate::templates::*;
+pub mod templates;
+pub mod types;
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
 #[command(propagate_version = true)]
-struct Cli {
+pub struct Cli {
     path: PathBuf,
     /// Output directory, defaults to `tl_out`
     #[arg(short, default_value = "tl_out")]
@@ -140,199 +42,6 @@ struct Cli {
     no_browser: bool,
 }
 
-#[derive(Default)]
-struct StackTrieNode {
-    terminal: Vec<String>,
-    // Ordered map so that when we print we roughly print in chronological order
-    children: FxIndexMap<FrameSummary, StackTrieNode>,
-}
-
-impl StackTrieNode {
-    fn insert(&mut self, mut stack: StackSummary, compile_id: String) {
-        let mut cur = self;
-        for frame in stack.drain(..) {
-            cur = cur.children.entry(frame).or_default();
-        }
-        cur.terminal.push(compile_id);
-    }
-
-    fn fmt_inner(&self, f: &mut Formatter, indent: usize) -> fmt::Result {
-        for (frame, node) in self.children.iter() {
-            let star = node.terminal.join("");
-            if self.children.len() > 1 {
-                // If the node has multiple children, increase the indent and print a hyphen
-                writeln!(
-                    f,
-                    "{:indent$}- {star}{}",
-                    "",
-                    frame,
-                    indent = indent,
-                    star = star
-                )?;
-                node.fmt_inner(f, indent + 2)?;
-            } else {
-                // If the node has only one child, don't increase the indent and don't print a hyphen
-                writeln!(
-                    f,
-                    "{:indent$}  {star}{}",
-                    "",
-                    frame,
-                    indent = indent,
-                    star = star
-                )?;
-                node.fmt_inner(f, indent)?;
-            }
-        }
-        Ok(())
-    }
-}
-
-impl Display for StackTrieNode {
-    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
-        write!(f, "<pre>")?;
-        self.fmt_inner(f, 0)?;
-        write!(f, "</pre>")?;
-        Ok(())
-    }
-}
-
-#[derive(Eq, PartialEq, Hash, Deserialize, Serialize, Debug, Clone)]
-struct CompileId {
-    frame_id: u32,
-    frame_compile_id: u32,
-    attempt: u32,
-}
-
-impl fmt::Display for CompileId {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "[{}/{}", self.frame_id, self.frame_compile_id)?;
-        if self.attempt != 0 {
-            write!(f, "_{}", self.attempt)?;
-        }
-        write!(f, "]")
-    }
-}
-
-#[derive(Default, Debug)]
-struct Stats {
-    ok: u64,
-    other_rank: u64,
-    fail_glog: u64,
-    fail_json: u64,
-    fail_payload_md5: u64,
-    fail_dynamo_guards_json: u64,
-}
-
-#[derive(Debug, Hash, Eq, PartialEq, Deserialize, Serialize)]
-struct FrameSummary {
-    filename: u32,
-    line: i32,
-    name: String,
-}
-
-fn simplify_filename<'a>(filename: &'a str) -> &'a str {
-    let parts: Vec<&'a str> = filename.split("#link-tree/").collect();
-    if parts.len() > 1 {
-        return parts[1];
-    }
-    // TODO: generalize this
-    let parts: Vec<&'a str> = filename
-        .split("1e322330-seed-nspid4026531836_cgpid26364902-ns-4026531840/")
-        .collect();
-    if parts.len() > 1 {
-        return parts[1];
-    }
-    filename
-}
-
-impl fmt::Display for FrameSummary {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let intern_table = INTERN_TABLE.lock().unwrap();
-        let filename = intern_table
-            .get(&self.filename)
-            .map_or("(unknown)", |s| s.as_str());
-        write!(
-            f,
-            "{}:{} in {}",
-            encode_text(simplify_filename(filename)),
-            self.line,
-            encode_text(&self.name)
-        )
-    }
-}
-
-type StackSummary = Vec<FrameSummary>;
-
-#[derive(Debug, Deserialize)]
-struct OptimizeDdpSplitChildMetadata {
-    name: String,
-}
-
-#[derive(Debug, Deserialize)]
-#[serde(untagged)]
-enum SymInt {
-    Int(i64),
-    Symbol(String),
-}
-
-#[derive(Debug, Deserialize)]
-struct EmptyMetadata {}
-
-#[derive(Debug, Deserialize)]
-struct DynamoOutputGraphMetadata {
-    _sizes: Option<FxHashMap<String, Vec<SymInt>>>,
-}
-
-#[derive(Debug, Deserialize)]
-struct DynamoStartMetadata {
-    stack: Option<StackSummary>,
-}
-
-#[derive(Debug, Deserialize)]
-struct InductorOutputCodeMetadata {
-    filename: Option<PathBuf>,
-}
-
-#[derive(Debug, Deserialize)]
-struct Envelope {
-    rank: Option<u32>,
-    #[serde(flatten)]
-    compile_id: Option<CompileId>,
-    #[serde(default)]
-    has_payload: Option<String>,
-    // externally tagged union, one field per log type we recognize
-    dynamo_start: Option<DynamoStartMetadata>,
-    str: Option<(String, u32)>,
-    dynamo_output_graph: Option<DynamoOutputGraphMetadata>,
-    optimize_ddp_split_graph: Option<EmptyMetadata>,
-    optimize_ddp_split_child: Option<OptimizeDdpSplitChildMetadata>,
-    compiled_autograd_graph: Option<EmptyMetadata>,
-    dynamo_guards: Option<EmptyMetadata>,
-    aot_forward_graph: Option<EmptyMetadata>,
-    aot_backward_graph: Option<EmptyMetadata>,
-    aot_joint_graph: Option<EmptyMetadata>,
-    inductor_post_grad_graph: Option<EmptyMetadata>,
-    inductor_output_code: Option<InductorOutputCodeMetadata>,
-}
-
-#[derive(Debug, Deserialize, Serialize)]
-struct DynamoGuard {
-    code: String,
-    stack: Option<StackSummary>,
-    user_stack: Option<StackSummary>,
-}
-
-#[derive(Debug, Serialize)]
-struct DynamoGuardsContext {
-    guards: Vec<DynamoGuard>,
-}
-
-#[derive(Debug, Serialize)]
-struct IndexContext {
-    css: &'static str,
-    directory: Vec<(String, Vec<PathBuf>)>,
-    stack_trie_html: String,
-}
 
 fn main() -> anyhow::Result<()> {
     let cli = Cli::parse();
