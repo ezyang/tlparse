@@ -154,3 +154,7 @@ feb 23 ideas
 - recompile
   - dynamic shape dimension changed
   - just collect them all at once place
+
+
+mar 19 ideas
+- print the nn module structure, whenever nn module is compiled
