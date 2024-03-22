@@ -1,73 +1,46 @@
 use anyhow::anyhow;
-use base16ct;
-use clap::Parser;
 use fxhash::FxHashMap;
 use md5::{Digest, Md5};
 use std::ffi::{OsStr, OsString};
 
 use regex::Regex;
-use std::fs;
 use std::fs::File;
 use std::io::{self, BufRead};
 use std::path::Path;
 use std::path::PathBuf;
 use tinytemplate::TinyTemplate;
-
 use indicatif::{MultiProgress, ProgressBar, ProgressStyle};
 use std::time::Instant;
 
 
 use crate::types::*;
 use crate::templates::*;
-pub mod templates;
-pub mod types;
 
-#[derive(Parser)]
-#[command(author, version, about, long_about = None)]
-#[command(propagate_version = true)]
-pub struct Cli {
-    path: PathBuf,
-    /// Output directory, defaults to `tl_out`
-    #[arg(short, default_value = "tl_out")]
-    out: PathBuf,
-    /// Delete out directory if it already exists
-    #[arg(long)]
-    overwrite: bool,
-    /// Return non-zero exit code if unrecognized log lines are found.  Mostly useful for unit
-    /// testing.
-    #[arg(long)]
-    strict: bool,
-    /// Don't open browser at the end
-    #[arg(long)]
-    no_browser: bool,
+mod templates;
+mod types;
+
+
+pub type ParseOutput = Vec<(PathBuf, String)>;
+
+pub struct ParseConfig {
+    pub strict: bool,
 }
 
-
-fn main() -> anyhow::Result<()> {
-    let cli = Cli::parse();
-    let path = cli.path;
-    let out_path = cli.out;
-
-    if out_path.exists() {
-        if !cli.overwrite {
-            panic!(
-                "{} already exists, pass --overwrite to overwrite",
-                out_path.display()
-            );
-        }
-        fs::remove_dir_all(&out_path)?;
-    }
-    fs::create_dir(&out_path)?;
-
+pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOutput> {
+    let strict = config.strict;
     let file = File::open(path)?;
     let metadata = file.metadata()?;
     let file_size = metadata.len();
+
+    // TODO: abstract out this spinner to not be part of the library
+    // Instead, add a callback trait for CLIs to implement
     let multi = MultiProgress::new();
     let pb = multi.add(ProgressBar::new(file_size));
     pb.set_style(ProgressStyle::default_bar()
         .template("{spinner:.green} [{elapsed_precise}] [{wide_bar:.cyan/blue}] {bytes}/{total_bytes} [{bytes_per_sec}] ({eta})")?
         .progress_chars("#>-"));
     let spinner = multi.add(ProgressBar::new_spinner());
+
     let reader = io::BufReader::new(file);
 
     let re_glog = Regex::new(concat!(
@@ -92,6 +65,9 @@ fn main() -> anyhow::Result<()> {
     let mut expected_rank: Option<Option<u32>> = None;
 
     let mut directory: FxHashMap<Option<CompileId>, Vec<PathBuf>> = FxHashMap::default();
+
+    // Store results in an output Vec<PathBuf, String>
+    let mut output : Vec<(PathBuf, String)> = Vec::new();
 
     let mut tt = TinyTemplate::new();
     tt.add_formatter("format_unescaped", tinytemplate::format_unescaped);
@@ -129,7 +105,6 @@ fn main() -> anyhow::Result<()> {
         }
         if end > slowest_time {
             slowest_time = end;
-            //println!("{}", line);
         }
         let payload = &line[caps.name("payload").unwrap().start()..];
 
@@ -178,8 +153,7 @@ fn main() -> anyhow::Result<()> {
             )
             .into();
 
-        let subdir = out_path.join(&compile_id_dir);
-        fs::create_dir_all(&subdir)?;
+        let subdir = &compile_id_dir;
 
         let mut payload = String::new();
         if let Some(expect) = e.has_payload {
@@ -189,7 +163,7 @@ fn main() -> anyhow::Result<()> {
             {
                 // Careful! Distinguish between missing EOL and not
                 if !first {
-                    payload.push_str("\n");
+                    payload.push('\n');
                 }
                 first = false;
                 payload.push_str(&payload_line[1..]);
@@ -198,8 +172,8 @@ fn main() -> anyhow::Result<()> {
             hasher.update(&payload);
             let hash = hasher.finalize();
             let mut expect_buf = [0u8; 16];
-            if let Ok(_) = base16ct::lower::decode(expect, &mut expect_buf) {
-                if expect_buf != &hash[..] {
+            if base16ct::lower::decode(expect, &mut expect_buf).is_ok() {
+                if expect_buf != hash[..] {
                     // TODO: error log
                     stats.fail_payload_md5 += 1;
                 }
@@ -224,38 +198,38 @@ fn main() -> anyhow::Result<()> {
             };
         };
 
-        let mut write_dump =
+        let mut output_dump =
             |filename: &str, sentinel: Option<EmptyMetadata>| -> anyhow::Result<()> {
                 if sentinel.is_some() {
                     let f = subdir.join(filename);
-                    fs::write(&f, &payload)?;
+                    output.push((f, payload.clone()));
                     compile_directory.push(compile_id_dir.join(filename));
                 }
                 Ok(())
             };
 
-        write_dump("optimize_ddp_split_graph.txt", e.optimize_ddp_split_graph)?;
-        write_dump("compiled_autograd_graph.txt", e.compiled_autograd_graph)?;
-        write_dump("aot_forward_graph.txt", e.aot_forward_graph)?;
-        write_dump("aot_backward_graph.txt", e.aot_backward_graph)?;
-        write_dump("aot_joint_graph.txt", e.aot_joint_graph)?;
-        write_dump("inductor_post_grad_graph.txt", e.inductor_post_grad_graph)?;
+        output_dump("optimize_ddp_split_graph.txt", e.optimize_ddp_split_graph)?;
+        output_dump("compiled_autograd_graph.txt", e.compiled_autograd_graph)?;
+        output_dump("aot_forward_graph.txt", e.aot_forward_graph)?;
+        output_dump("aot_backward_graph.txt", e.aot_backward_graph)?;
+        output_dump("aot_joint_graph.txt", e.aot_joint_graph)?;
+        output_dump("inductor_post_grad_graph.txt", e.inductor_post_grad_graph)?;
 
         if e.dynamo_output_graph.is_some() {
             // TODO: dump sizes
             let filename = "dynamo_output_graph.txt";
-            let f = subdir.join(&filename);
-            fs::write(&f, &payload)?;
+            let f = subdir.join(filename);
+            output.push((f, payload.clone()));
             compile_directory.push(compile_id_dir.join(filename));
         }
 
         if e.dynamo_guards.is_some() {
             let filename = "dynamo_guards.html";
-            let f = subdir.join(&filename);
+            let f = subdir.join(filename);
             match serde_json::from_str::<Vec<DynamoGuard>>(payload.as_str()) {
                 Ok(guards) => {
-                    let guards_context = DynamoGuardsContext { guards: guards };
-                    fs::write(&f, tt.render("dynamo_guards.html", &guards_context)?)?;
+                    let guards_context = DynamoGuardsContext { guards };
+                    output.push((f, tt.render("dynamo_guards.html", &guards_context)?));
                     compile_directory.push(compile_id_dir.join(filename));
                 }
                 Err(err) => {
@@ -280,14 +254,14 @@ fn main() -> anyhow::Result<()> {
                     },
                 );
             let f = subdir.join(&filename);
-            fs::write(&f, &payload)?;
+            output.push((f, payload.clone()));
             compile_directory.push(compile_id_dir.join(filename));
         }
 
         if let Some(metadata) = e.optimize_ddp_split_child {
             let filename = format!("optimize_ddp_split_child_{}.txt", metadata.name);
             let f = subdir.join(&filename);
-            fs::write(&f, &payload)?;
+            output.push((f, payload.clone()));
             compile_directory.push(compile_id_dir.join(filename));
         }
     }
@@ -304,18 +278,11 @@ fn main() -> anyhow::Result<()> {
             .collect(),
         stack_trie_html: stack_trie.to_string(),
     };
-    fs::write(
-        out_path.join("index.html"),
-        tt.render("index.html", &index_context)?,
-    )?;
-
-    if !cli.no_browser {
-        opener::open(out_path.join("index.html"))?;
-    }
+    output.push((PathBuf::from("index.html"), tt.render("index.html", &index_context)?));
 
     // other_rank is included here because you should only have logs from one rank when
     // configured properly
-    if cli.strict
+    if strict
         && (stats.fail_glog
             + stats.fail_json
             + stats.fail_payload_md5
@@ -327,5 +294,5 @@ fn main() -> anyhow::Result<()> {
         return Err(anyhow!("Something went wrong"));
     }
 
-    Ok(())
+    Ok(output)
 }
