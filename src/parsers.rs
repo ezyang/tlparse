@@ -189,7 +189,7 @@ impl StructuredLogParser for OptimizeDdpSplitChildParser {
 }
 
 // Register your parser here
-pub fn all_parsers<'t>(tt: &'t TinyTemplate<'t>) -> Vec<Box<dyn StructuredLogParser + 't>> {
+pub fn default_parsers<'t>(tt: &'t TinyTemplate<'t>) -> Vec<Box<dyn StructuredLogParser + 't>> {
     // We need to use Box wrappers here because vecs in Rust need to have known size
     let result : Vec<Box<dyn StructuredLogParser>> = vec![
         Box::new(SentinelFileParser::new("optimize_ddp_split_graph", |e| e.optimize_ddp_split_graph.as_ref())),

@@ -24,6 +24,7 @@ fn test_parse_simple() {
     let path = Path::new("tests/inputs/simple.log").to_path_buf();
     let config = tlparse::ParseConfig {
         strict: true,
+        custom_parsers: vec![],
     };
     let output = tlparse::parse_path(&path, config);
     assert!(output.is_ok());

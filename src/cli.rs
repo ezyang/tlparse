@@ -45,6 +45,7 @@ fn main() -> anyhow::Result<()> {
 
     let config = ParseConfig {
         strict: cli.strict,
+        custom_parsers: Vec::new(),
     };
 
     let output = parse_path(&path, config)?;

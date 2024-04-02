@@ -13,7 +13,7 @@ use std::time::Instant;
 
 use crate::types::*;
 use crate::templates::*;
-use crate::parsers::all_parsers;
+use crate::parsers::default_parsers;
 mod parsers;
 mod templates;
 mod types;
@@ -21,6 +21,7 @@ mod types;
 
 pub struct ParseConfig {
     pub strict: bool,
+    pub custom_parsers: Vec<Box<dyn crate::parsers::StructuredLogParser>>,
 }
 
 pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOutput> {
@@ -66,7 +67,7 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
     // Store results in an output Vec<PathBuf, String>
     let mut output : Vec<(PathBuf, String)> = Vec::new();
 
-    let mut tt = TinyTemplate::new();
+    let mut tt : TinyTemplate = TinyTemplate::new();
     tt.add_formatter("format_unescaped", tinytemplate::format_unescaped);
     tt.add_template("index.html", TEMPLATE_INDEX)?;
     tt.add_template("dynamo_guards.html", TEMPLATE_DYNAMO_GUARDS)?;
@@ -83,7 +84,8 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
         })
         .peekable();
 
-    let all_parsers = all_parsers(&tt);
+    let mut all_parsers = default_parsers(&tt);
+    all_parsers.extend(config.custom_parsers);
 
     while let Some((lineno, line)) = iter.next() {
         bytes_read += line.len() as u64;
