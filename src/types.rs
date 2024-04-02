@@ -10,6 +10,8 @@ use once_cell::sync::Lazy;
 use serde::{Deserialize, Serialize};
 use std::sync::Mutex;
 
+pub type ParseOutput = Vec<(PathBuf, String)>;
+
 pub type FxIndexMap<K, V> = IndexMap<K, V, BuildHasherDefault<FxHasher>>;
 
 pub static INTERN_TABLE: Lazy<Mutex<FxHashMap<u32, String>>> =
@@ -167,6 +169,15 @@ pub struct DynamoStartMetadata {
 #[derive(Debug, Deserialize)]
 pub struct InductorOutputCodeMetadata {
     pub filename: Option<PathBuf>,
+}
+
+pub enum Metadata<'e> {
+    Empty(&'e EmptyMetadata),
+    DynamoOutputGraph(&'e DynamoOutputGraphMetadata),
+    #[allow(dead_code)]
+    DynamoStart(&'e DynamoStartMetadata),
+    #[allow(dead_code)]
+    InductorOutputCode(&'e InductorOutputCodeMetadata),
 }
 
 #[derive(Debug, Deserialize)]

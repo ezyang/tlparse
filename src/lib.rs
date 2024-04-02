@@ -15,12 +15,11 @@ use std::time::Instant;
 
 use crate::types::*;
 use crate::templates::*;
-
+use crate::parsers::all_parsers;
+mod parsers;
 mod templates;
 mod types;
 
-
-pub type ParseOutput = Vec<(PathBuf, String)>;
 
 pub struct ParseConfig {
     pub strict: bool,
@@ -85,6 +84,8 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
             _ => None,
         })
         .peekable();
+
+    let all_parsers = all_parsers();
 
     while let Some((lineno, line)) = iter.next() {
         bytes_read += line.len() as u64;
@@ -156,7 +157,7 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
         let subdir = &compile_id_dir;
 
         let mut payload = String::new();
-        if let Some(expect) = e.has_payload {
+        if let Some(ref expect) = e.has_payload {
             let mut first = true;
             while let Some((_payload_lineno, payload_line)) =
                 iter.next_if(|(_, l)| l.starts_with('\t'))
@@ -185,8 +186,21 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
         stats.ok += 1;
 
         // lol this clone, probably shouldn't use entry
+        // TODO: output should be able to generate this without explicitly creating
         let compile_directory = directory.entry(e.compile_id.clone()).or_default();
 
+        for parser in &all_parsers {
+            if let Some(md) = parser.get_metadata(&e) {
+                let results = parser.parse(lineno, md, e.rank, &e.compile_id, &payload)?;
+                for (filename, out) in results {
+                    output.push((filename.clone(), out));
+                    compile_directory.push(filename);
+                }
+            }
+        }
+
+
+        // TODO: implement these as StructuredLogParseres
         if let Some(m) = e.dynamo_start {
             if let Some(stack) = m.stack {
                 stack_trie.insert(
@@ -197,31 +211,6 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
                 );
             };
         };
-
-        let mut output_dump =
-            |filename: &str, sentinel: Option<EmptyMetadata>| -> anyhow::Result<()> {
-                if sentinel.is_some() {
-                    let f = subdir.join(filename);
-                    output.push((f, payload.clone()));
-                    compile_directory.push(compile_id_dir.join(filename));
-                }
-                Ok(())
-            };
-
-        output_dump("optimize_ddp_split_graph.txt", e.optimize_ddp_split_graph)?;
-        output_dump("compiled_autograd_graph.txt", e.compiled_autograd_graph)?;
-        output_dump("aot_forward_graph.txt", e.aot_forward_graph)?;
-        output_dump("aot_backward_graph.txt", e.aot_backward_graph)?;
-        output_dump("aot_joint_graph.txt", e.aot_joint_graph)?;
-        output_dump("inductor_post_grad_graph.txt", e.inductor_post_grad_graph)?;
-
-        if e.dynamo_output_graph.is_some() {
-            // TODO: dump sizes
-            let filename = "dynamo_output_graph.txt";
-            let f = subdir.join(filename);
-            output.push((f, payload.clone()));
-            compile_directory.push(compile_id_dir.join(filename));
-        }
 
         if e.dynamo_guards.is_some() {
             let filename = "dynamo_guards.html";
