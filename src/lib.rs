@@ -1,12 +1,10 @@
 use anyhow::anyhow;
 use fxhash::FxHashMap;
 use md5::{Digest, Md5};
-use std::ffi::{OsStr, OsString};
 
 use regex::Regex;
 use std::fs::File;
 use std::io::{self, BufRead};
-use std::path::Path;
 use std::path::PathBuf;
 use tinytemplate::TinyTemplate;
 use indicatif::{MultiProgress, ProgressBar, ProgressStyle};
@@ -15,12 +13,11 @@ use std::time::Instant;
 
 use crate::types::*;
 use crate::templates::*;
-
+use crate::parsers::all_parsers;
+mod parsers;
 mod templates;
 mod types;
 
-
-pub type ParseOutput = Vec<(PathBuf, String)>;
 
 pub struct ParseConfig {
     pub strict: bool,
@@ -86,6 +83,8 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
         })
         .peekable();
 
+    let all_parsers = all_parsers(&tt);
+
     while let Some((lineno, line)) = iter.next() {
         bytes_read += line.len() as u64;
         pb.set_position(bytes_read);
@@ -140,23 +139,8 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
             }
         };
 
-        let compile_id_dir: PathBuf = e
-            .compile_id
-            .as_ref()
-            .map_or(
-                format!("unknown_{lineno}"),
-                |CompileId {
-                     frame_id,
-                     frame_compile_id,
-                     attempt,
-                 }| { format!("{frame_id}_{frame_compile_id}_{attempt}") },
-            )
-            .into();
-
-        let subdir = &compile_id_dir;
-
         let mut payload = String::new();
-        if let Some(expect) = e.has_payload {
+        if let Some(ref expect) = e.has_payload {
             let mut first = true;
             while let Some((_payload_lineno, payload_line)) =
                 iter.next_if(|(_, l)| l.starts_with('\t'))
@@ -185,8 +169,39 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
         stats.ok += 1;
 
         // lol this clone, probably shouldn't use entry
+        // TODO: output should be able to generate this without explicitly creating
         let compile_directory = directory.entry(e.compile_id.clone()).or_default();
 
+        for parser in &all_parsers {
+            if let Some(md) = parser.get_metadata(&e) {
+                let results = parser.parse(lineno, md, e.rank, &e.compile_id, &payload);
+                match results {
+                    Ok(results) => {
+                        for (filename, out) in results {
+                            output.push((filename.clone(), out));
+                            compile_directory.push(filename);
+                        }
+                    }
+                    Err(err) => {
+                        match  parser.name() {
+                            "dynamo_guards" => {
+                                eprintln!("Failed to parse guards json: {}", err);
+                                stats.fail_dynamo_guards_json += 1;
+                            }
+                            name => {
+                                eprintln!("Parser {name} failed: {err}");
+                                stats.fail_parser += 1;
+                            }
+                        }
+                    }
+                }
+
+            }
+        }
+
+        // TODO: implement this as StructuredLogParser
+        // This one is hard because it consumes the stack, and
+        // I don't want to clone the stack when passing it as reference
         if let Some(m) = e.dynamo_start {
             if let Some(stack) = m.stack {
                 stack_trie.insert(
@@ -198,72 +213,6 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
             };
         };
 
-        let mut output_dump =
-            |filename: &str, sentinel: Option<EmptyMetadata>| -> anyhow::Result<()> {
-                if sentinel.is_some() {
-                    let f = subdir.join(filename);
-                    output.push((f, payload.clone()));
-                    compile_directory.push(compile_id_dir.join(filename));
-                }
-                Ok(())
-            };
-
-        output_dump("optimize_ddp_split_graph.txt", e.optimize_ddp_split_graph)?;
-        output_dump("compiled_autograd_graph.txt", e.compiled_autograd_graph)?;
-        output_dump("aot_forward_graph.txt", e.aot_forward_graph)?;
-        output_dump("aot_backward_graph.txt", e.aot_backward_graph)?;
-        output_dump("aot_joint_graph.txt", e.aot_joint_graph)?;
-        output_dump("inductor_post_grad_graph.txt", e.inductor_post_grad_graph)?;
-
-        if e.dynamo_output_graph.is_some() {
-            // TODO: dump sizes
-            let filename = "dynamo_output_graph.txt";
-            let f = subdir.join(filename);
-            output.push((f, payload.clone()));
-            compile_directory.push(compile_id_dir.join(filename));
-        }
-
-        if e.dynamo_guards.is_some() {
-            let filename = "dynamo_guards.html";
-            let f = subdir.join(filename);
-            match serde_json::from_str::<Vec<DynamoGuard>>(payload.as_str()) {
-                Ok(guards) => {
-                    let guards_context = DynamoGuardsContext { guards };
-                    output.push((f, tt.render("dynamo_guards.html", &guards_context)?));
-                    compile_directory.push(compile_id_dir.join(filename));
-                }
-                Err(err) => {
-                    eprintln!("Failed to parse guards json: {}", err);
-                    stats.fail_dynamo_guards_json += 1;
-                }
-            }
-        }
-
-        if let Some(metadata) = e.inductor_output_code {
-            let filename = metadata
-                .filename
-                .as_ref()
-                .and_then(|p| Path::file_stem(p))
-                .map_or_else(
-                    || PathBuf::from("inductor_output_code.txt"),
-                    |stem| {
-                        let mut r = OsString::from("inductor_output_code_");
-                        r.push(stem);
-                        r.push(OsStr::new(".txt"));
-                        r.into()
-                    },
-                );
-            let f = subdir.join(&filename);
-            output.push((f, payload.clone()));
-            compile_directory.push(compile_id_dir.join(filename));
-        }
-
-        if let Some(metadata) = e.optimize_ddp_split_child {
-            let filename = format!("optimize_ddp_split_child_{}.txt", metadata.name);
-            let f = subdir.join(&filename);
-            output.push((f, payload.clone()));
-            compile_directory.push(compile_id_dir.join(filename));
-        }
     }
     pb.finish_with_message("done");
     spinner.finish();
@@ -288,6 +237,7 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
             + stats.fail_payload_md5
             + stats.other_rank
             + stats.fail_dynamo_guards_json
+            + stats.fail_parser
             > 0)
     {
         // Report something went wrong
