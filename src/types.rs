@@ -142,15 +142,15 @@ impl fmt::Display for FrameSummary {
 pub type StackSummary = Vec<FrameSummary>;
 
 #[derive(Debug, Deserialize)]
-pub struct OptimizeDdpSplitChildMetadata {
-    pub name: String,
-}
-
-#[derive(Debug, Deserialize)]
 #[serde(untagged)]
 pub enum SymInt {
     Int(i64),
     Symbol(String),
+}
+
+#[derive(Debug, Deserialize)]
+pub struct OptimizeDdpSplitChildMetadata {
+    pub name: String,
 }
 
 #[derive(Debug, Deserialize)]
@@ -176,8 +176,8 @@ pub enum Metadata<'e> {
     DynamoOutputGraph(&'e DynamoOutputGraphMetadata),
     #[allow(dead_code)]
     DynamoStart(&'e DynamoStartMetadata),
-    #[allow(dead_code)]
     InductorOutputCode(&'e InductorOutputCodeMetadata),
+    OptimizeDdpSplitChild(&'e OptimizeDdpSplitChildMetadata),
 }
 
 #[derive(Debug, Deserialize)]

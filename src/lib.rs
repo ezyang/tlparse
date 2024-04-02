@@ -1,12 +1,10 @@
 use anyhow::anyhow;
 use fxhash::FxHashMap;
 use md5::{Digest, Md5};
-use std::ffi::{OsStr, OsString};
 
 use regex::Regex;
 use std::fs::File;
 use std::io::{self, BufRead};
-use std::path::Path;
 use std::path::PathBuf;
 use tinytemplate::TinyTemplate;
 use indicatif::{MultiProgress, ProgressBar, ProgressStyle};
@@ -85,7 +83,7 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
         })
         .peekable();
 
-    let all_parsers = all_parsers();
+    let all_parsers = all_parsers(&tt);
 
     while let Some((lineno, line)) = iter.next() {
         bytes_read += line.len() as u64;
@@ -141,21 +139,6 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
             }
         };
 
-        let compile_id_dir: PathBuf = e
-            .compile_id
-            .as_ref()
-            .map_or(
-                format!("unknown_{lineno}"),
-                |CompileId {
-                     frame_id,
-                     frame_compile_id,
-                     attempt,
-                 }| { format!("{frame_id}_{frame_compile_id}_{attempt}") },
-            )
-            .into();
-
-        let subdir = &compile_id_dir;
-
         let mut payload = String::new();
         if let Some(ref expect) = e.has_payload {
             let mut first = true;
@@ -199,8 +182,9 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
             }
         }
 
-
-        // TODO: implement these as StructuredLogParseres
+        // TODO: implement this as StructuredLogParser
+        // This one is hard because it consumes the stack, and
+        // I don't want to clone the stack when passing it as reference
         if let Some(m) = e.dynamo_start {
             if let Some(stack) = m.stack {
                 stack_trie.insert(
@@ -212,47 +196,6 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
             };
         };
 
-        if e.dynamo_guards.is_some() {
-            let filename = "dynamo_guards.html";
-            let f = subdir.join(filename);
-            match serde_json::from_str::<Vec<DynamoGuard>>(payload.as_str()) {
-                Ok(guards) => {
-                    let guards_context = DynamoGuardsContext { guards };
-                    output.push((f, tt.render("dynamo_guards.html", &guards_context)?));
-                    compile_directory.push(compile_id_dir.join(filename));
-                }
-                Err(err) => {
-                    eprintln!("Failed to parse guards json: {}", err);
-                    stats.fail_dynamo_guards_json += 1;
-                }
-            }
-        }
-
-        if let Some(metadata) = e.inductor_output_code {
-            let filename = metadata
-                .filename
-                .as_ref()
-                .and_then(|p| Path::file_stem(p))
-                .map_or_else(
-                    || PathBuf::from("inductor_output_code.txt"),
-                    |stem| {
-                        let mut r = OsString::from("inductor_output_code_");
-                        r.push(stem);
-                        r.push(OsStr::new(".txt"));
-                        r.into()
-                    },
-                );
-            let f = subdir.join(&filename);
-            output.push((f, payload.clone()));
-            compile_directory.push(compile_id_dir.join(filename));
-        }
-
-        if let Some(metadata) = e.optimize_ddp_split_child {
-            let filename = format!("optimize_ddp_split_child_{}.txt", metadata.name);
-            let f = subdir.join(&filename);
-            output.push((f, payload.clone()));
-            compile_directory.push(compile_id_dir.join(filename));
-        }
     }
     pb.finish_with_message("done");
     spinner.finish();
