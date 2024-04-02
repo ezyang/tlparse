@@ -99,6 +99,7 @@ pub struct Stats {
     pub fail_json: u64,
     pub fail_payload_md5: u64,
     pub fail_dynamo_guards_json: u64,
+    pub fail_parser: u64,
 }
 
 #[derive(Debug, Hash, Eq, PartialEq, Deserialize, Serialize)]
@@ -171,6 +172,7 @@ pub struct InductorOutputCodeMetadata {
     pub filename: Option<PathBuf>,
 }
 
+#[derive(Debug)]
 pub enum Metadata<'e> {
     Empty(&'e EmptyMetadata),
     DynamoOutputGraph(&'e DynamoOutputGraphMetadata),

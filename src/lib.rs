@@ -174,11 +174,28 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
 
         for parser in &all_parsers {
             if let Some(md) = parser.get_metadata(&e) {
-                let results = parser.parse(lineno, md, e.rank, &e.compile_id, &payload)?;
-                for (filename, out) in results {
-                    output.push((filename.clone(), out));
-                    compile_directory.push(filename);
+                let results = parser.parse(lineno, md, e.rank, &e.compile_id, &payload);
+                match results {
+                    Ok(results) => {
+                        for (filename, out) in results {
+                            output.push((filename.clone(), out));
+                            compile_directory.push(filename);
+                        }
+                    }
+                    Err(err) => {
+                        match  parser.name() {
+                            "dynamo_guards" => {
+                                eprintln!("Failed to parse guards json: {}", err);
+                                stats.fail_dynamo_guards_json += 1;
+                            }
+                            name => {
+                                eprintln!("Parser {name} failed: {err}");
+                                stats.fail_parser += 1;
+                            }
+                        }
+                    }
                 }
+
             }
         }
 
@@ -220,6 +237,7 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
             + stats.fail_payload_md5
             + stats.other_rank
             + stats.fail_dynamo_guards_json
+            + stats.fail_parser
             > 0)
     {
         // Report something went wrong
