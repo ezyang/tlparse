@@ -1,18 +1,21 @@
 use crate::types::*;
 use std::path::PathBuf;
 
+/**
+ * StructuredLogParser
+ * Parses a structured log and returns a vec of file outputs.
+ * Implement this trait to add your own analyses.
+ */
 pub trait StructuredLogParser {
     // If this returns Some value, the parser will be run on that metadata.
-    // Otherwise, it will be skipped
-
-    // 'e is the lifetime of the envelope
+    // Otherwise, it will be skipped. 'e is the lifetime of the envelope.
     fn get_metadata<'e>(&self, e: &'e Envelope) -> Option<Metadata<'e>>;
     fn parse<'e>(&self,
-        lineno: usize,
-        metadata: Metadata<'e>,
-        rank: Option<u32>,
-        compile_id: &Option<CompileId>,
-        payload: &str
+        lineno: usize, // Line number from log
+        metadata: Metadata<'e>, // Metadata from get_metadata
+        rank: Option<u32>, // Rank of the log
+        compile_id: &Option<CompileId>, // Compile ID of the envelope
+        payload: &str // Payload from the log (empty string when None)
     ) -> anyhow::Result<ParseOutput>;
 }
 
@@ -39,6 +42,9 @@ fn simple_file_output(
     Ok(Vec::from([(f, String::from(payload))]))
 }
 
+/**
+ * Parser for simple output dumps where the metadata is a sentinel {}
+ */
 pub struct SentinelFileParser {
     filename: &'static str,
     get_sentinel: fn (&Envelope) -> Option<&EmptyMetadata>,
@@ -61,7 +67,8 @@ impl StructuredLogParser for SentinelFileParser {
         simple_file_output(self.filename, lineno, compile_id, payload)
     }
 }
-// Same as above, but can log the size of the graph
+
+// Same as SentinelFileParser, but can log the size of the graph
 pub struct DynamoOutputGraphParser;
 impl StructuredLogParser for DynamoOutputGraphParser {
     fn get_metadata<'e>(&self, e: &'e Envelope) -> Option<Metadata<'e>> {
@@ -80,6 +87,7 @@ impl StructuredLogParser for DynamoOutputGraphParser {
 
 // Register your parser here
 pub fn all_parsers() -> Vec<Box<dyn StructuredLogParser>> {
+    // We need to use Box wrappers here because vecs in Rust need to have known size
     let result : Vec<Box<dyn StructuredLogParser>> = vec![
         Box::new(SentinelFileParser::new("optimize_ddp_split_graph.txt", |e| e.optimize_ddp_split_graph.as_ref())),
         Box::new(SentinelFileParser::new("compiled_autograd_graph.txt", |e| e.compiled_autograd_graph.as_ref())),
