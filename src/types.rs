@@ -172,6 +172,31 @@ pub struct InductorOutputCodeMetadata {
     pub filename: Option<PathBuf>,
 }
 
+#[derive(Debug, Deserialize, Serialize)]
+pub struct CompilationMetricsMetadata {
+    // Other information like frame_key, co_name, etc. are already in envelope
+    cache_size: Option<u64>,
+    accumulated_cache_size: Option<u64>,
+    guard_count: Option<u64>,
+    shape_env_guard_count: Option<u64>,
+    graph_op_count: Option<u64>,
+    graph_node_count: Option<u64>,
+    graph_input_count: Option<u64>,
+    start_time: Option<f64>,
+    entire_frame_compile_time_s: Option<f64>,
+    backend_compile_time_s: Option<f64>,
+    inductor_compile_time_s: Option<f64>,
+    code_gen_time_s: Option<f64>,
+    fail_type: Option<String>,
+    fail_reason: Option<String>,
+    fail_user_frame_filename: Option<String>,
+    fail_user_frame_lineno: Option<u32>,
+    non_compliant_ops: Option<Vec<String>>,
+    compliant_custom_ops: Option<Vec<String>>,
+    restart_reasons: Option<Vec<String>>,
+    dynamo_time_before_restart_s: Option<f64>,
+}
+
 #[derive(Debug)]
 pub enum Metadata<'e> {
     Empty(&'e EmptyMetadata),
@@ -180,7 +205,9 @@ pub enum Metadata<'e> {
     DynamoStart(&'e DynamoStartMetadata),
     InductorOutputCode(&'e InductorOutputCodeMetadata),
     OptimizeDdpSplitChild(&'e OptimizeDdpSplitChildMetadata),
+    CompilationMetrics(&'e CompilationMetricsMetadata),
 }
+
 
 #[derive(Debug, Deserialize)]
 pub struct Envelope {
@@ -202,6 +229,7 @@ pub struct Envelope {
     pub aot_joint_graph: Option<EmptyMetadata>,
     pub inductor_post_grad_graph: Option<EmptyMetadata>,
     pub inductor_output_code: Option<InductorOutputCodeMetadata>,
+    pub compilation_metrics: Option<CompilationMetricsMetadata>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]

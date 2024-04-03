@@ -188,6 +188,34 @@ impl StructuredLogParser for OptimizeDdpSplitChildParser {
     }
 }
 
+pub struct CompilationMetricsParser<'t> {
+    tt: &'t TinyTemplate<'t>,
+}
+impl StructuredLogParser for CompilationMetricsParser<'_> {
+    fn name(&self) -> &'static str {
+        "compilation_metrics"
+    }
+    fn get_metadata<'e>(&self, e: &'e Envelope) -> Option<Metadata<'e>> {
+        e.compilation_metrics.as_ref().map(|m| Metadata::CompilationMetrics(m))
+    }
+    fn parse<'e>(&self,
+            lineno: usize,
+            metrics: Metadata<'e>,
+            _rank: Option<u32>,
+            compile_id: &Option<CompileId>,
+            _payload: &str
+    ) -> anyhow::Result<ParseOutput> {
+        let filename = format!("{}.html", self.name());
+        if let Metadata::CompilationMetrics(m) = metrics {
+            let output = self.tt.render(&filename, &m)?;
+            simple_file_output(&filename, lineno, compile_id, &output)
+        } else {
+            Err(anyhow::anyhow!("Expected CompilationMetrics metadata"))
+        }
+
+    }
+}
+
 // Register your parser here
 pub fn default_parsers<'t>(tt: &'t TinyTemplate<'t>) -> Vec<Box<dyn StructuredLogParser + 't>> {
     // We need to use Box wrappers here because vecs in Rust need to have known size
@@ -202,6 +230,7 @@ pub fn default_parsers<'t>(tt: &'t TinyTemplate<'t>) -> Vec<Box<dyn StructuredLo
         Box::new(DynamoGuardParser { tt }),
         Box::new(InductorOutputCodeParser),
         Box::new(OptimizeDdpSplitChildParser),
+        Box::new(CompilationMetricsParser { tt }), // TODO: use own tt instances
     ];
 
     result
