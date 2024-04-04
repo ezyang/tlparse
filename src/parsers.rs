@@ -207,7 +207,11 @@ impl StructuredLogParser for CompilationMetricsParser<'_> {
     ) -> anyhow::Result<ParseOutput> {
         let filename = format!("{}.html", self.name());
         if let Metadata::CompilationMetrics(m) = metrics {
-            let output = self.tt.render(&filename, &m)?;
+            let id = compile_id.clone().map_or("(unknown) ".to_string(), |c| {
+                format!("{cid} ", cid = c)
+            });
+            let context = CompilationMetricsContext { css:crate::CSS, m: &m, compile_id: id };
+            let output = self.tt.render(&filename, &context)?;
             simple_file_output(&filename, lineno, compile_id, &output)
         } else {
             Err(anyhow::anyhow!("Expected CompilationMetrics metadata"))

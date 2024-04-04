@@ -198,6 +198,13 @@ pub struct CompilationMetricsMetadata {
 }
 
 #[derive(Debug, Serialize)]
+pub struct CompilationMetricsContext<'e> {
+    pub m : &'e CompilationMetricsMetadata,
+    pub css: &'static str,
+    pub compile_id: String,
+}
+
+#[derive(Debug, Serialize)]
 pub enum FailureReason {
     Failure((String, String, String, u32)), // (failure type, failure reason, user frame filename, user frame lineno)
     Restart(String), // restart reason

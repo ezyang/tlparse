@@ -145,56 +145,61 @@ pub static TEMPLATE_FAILURES_AND_RESTARTS: &str = r#"
 pub static TEMPLATE_COMPILATION_METRICS : &str = r#"
 <html>
 <head>
+    <style>
+    {css}
+    </style>
     <title>Compilation Metrics</title>
 </head>
 <body>
-    <h1>Compilation Info</h1>
+    <h1>Compilation Info for {compile_id}</h1>
     <h2>Dynamo Output:</h2>
     <object data="dynamo_output_graph.txt" style="width:80%; height:auto">
     <a href="dynamo_output_graph.txt"> dynamo_output_graph.txt </a>
     </object>
     <h2>Compile Time(seconds)</h2>
-    <p>Entire Frame <abbr title="Total time spent in convert_frame function">[?]</abbr>: {entire_frame_compile_time_s}</div>
-    <p>Backend <abbr title="Time spent running the backend compiler">[?]</abbr>: {backend_compile_time_s}</div>
-    {{ if inductor_compile_time_s }}
-    <p>Inductor <abbr title="Total time spent running inductor">[?]</abbr>: {inductor_compile_time_s}</div>
+    <p>Entire Frame <abbr title="Total time spent in convert_frame function">[?]</abbr>: {m.entire_frame_compile_time_s}</div>
+    <p>Backend <abbr title="Time spent running the backend compiler">[?]</abbr>: {m.backend_compile_time_s}</div>
+    {{ if m.inductor_compile_time_s }}
+    <p>Inductor <abbr title="Total time spent running inductor">[?]</abbr>: {m.inductor_compile_time_s}</div>
     {{ endif }}
-    {{ if code_gen_time_s }}
-    <p>Code Gen Time: {code_gen_time_s}</p>
+    {{ if m.code_gen_time_s }}
+    <p>Code Gen Time: {m.code_gen_time_s}</p>
     {{ endif}}
-    <div>Dynamo Time Before Restart <abbr title="Total time spent restarting dynamo analysis">[?]</abbr>: {dynamo_time_before_restart_s}</div>
+    <div>Dynamo Time Before Restart <abbr title="Total time spent restarting dynamo analysis">[?]</abbr>: {m.dynamo_time_before_restart_s}</div>
     <h2>Restarts and Failures</h2>
-    {{ if fail_type }}
-    <p>Failure Exception: {fail_type}</p>
-    <p>Failure Reason: {fail_reason}</p>
-    <p>In file {fail_user_frame_filename}, line {fail_user_frame_lineno}</p>
+    {{ if m.fail_type }}
+    <p>Failure Exception: {m.fail_type}</p>
+    <p>Failure Reason: {m.fail_reason}</p>
+    {{ if m.fail_user_frame_filename }}
+    <p>In file {m.fail_user_frame_filename}, line {m.fail_user_frame_lineno}</p>
+    {{ endif}}
     {{ else }}
     <p> No failures! </p>
     {{ endif }}
-    {{ if restart_reasons }}
+    {{ if m.restart_reasons }}
     <p>Restart Reasons:<p>
-    {{ for restart_reason in restart_reasons }}
-     <li> <code> {restart_reason } </code> </li>
+    {{ for restart_reason in m.restart_reasons }}
+     <li> <code> {restart_reason} </code> </li>
     {{ endfor }}
     {{ else }}
     <p> No restarts! </p>
     {{ endif }}
     <h2>Cache Metrics</h2>
-    <p>Cache Size: {cache_size}</p>
-    <p>Accumulated Cache Size: {accumulated_cache_size}</p>
+    <p>Cache Size: {m.cache_size}</p>
+    <p>Accumulated Cache Size: {m.accumulated_cache_size}</p>
     <h2>Graph Metrics</h2>
-    <p><a href='dynamo_guards.html'>Guard</a> Count: {guard_count}</p>
-    <p>Shape Env Guards: {shape_env_guard_count}</p>
-    <p>Graph Ops: {graph_op_count}</p>
-    <p>Graph Nodes: {graph_node_count}</p>
-    <p>Graph Inputs: {graph_input_count}</p>
+    <p><a href='dynamo_guards.html'>Guard</a> Count: {m.guard_count}</p>
+    <p>Shape Env Guards: {m.shape_env_guard_count}</p>
+    <p>Graph Ops: {m.graph_op_count}</p>
+    <p>Graph Nodes: {m.graph_node_count}</p>
+    <p>Graph Inputs: {m.graph_input_count}</p>
     <h2> Custom Ops </h2>
     <p> Compliant Custom Ops:</p>
-    {{ for op in compliant_custom_ops }}
+    {{ for op in m.compliant_custom_ops }}
     <li> <code> {op} </code> </li>
     {{ endfor }}
     <p> Non-Compliant Custom Ops:</p>
-    {{ for op in non_compliant_ops }}
+    {{ for op in m.non_compliant_ops }}
     <li> <code> {op} </code> </li>
     {{ endfor }}
 </body>
