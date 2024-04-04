@@ -71,6 +71,8 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
     tt.add_formatter("format_unescaped", tinytemplate::format_unescaped);
     tt.add_template("index.html", TEMPLATE_INDEX)?;
     tt.add_template("dynamo_guards.html", TEMPLATE_DYNAMO_GUARDS)?;
+    tt.add_template("compilation_metrics.html", TEMPLATE_COMPILATION_METRICS)?;
+
 
     // NB: Sometimes, the log output we get from Logarithm stutters with a blank line.
     // Filter them out, they're never valid (a blank line in payload will still be \t)
