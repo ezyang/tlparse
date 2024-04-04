@@ -175,26 +175,55 @@ pub struct InductorOutputCodeMetadata {
 #[derive(Debug, Deserialize, Serialize)]
 pub struct CompilationMetricsMetadata {
     // Other information like frame_key, co_name, etc. are already in envelope
-    cache_size: Option<u64>,
-    accumulated_cache_size: Option<u64>,
-    guard_count: Option<u64>,
-    shape_env_guard_count: Option<u64>,
-    graph_op_count: Option<u64>,
-    graph_node_count: Option<u64>,
-    graph_input_count: Option<u64>,
-    start_time: Option<f64>,
-    entire_frame_compile_time_s: Option<f64>,
-    backend_compile_time_s: Option<f64>,
-    inductor_compile_time_s: Option<f64>,
-    code_gen_time_s: Option<f64>,
-    fail_type: Option<String>,
-    fail_reason: Option<String>,
-    fail_user_frame_filename: Option<String>,
-    fail_user_frame_lineno: Option<u32>,
-    non_compliant_ops: Option<Vec<String>>,
-    compliant_custom_ops: Option<Vec<String>>,
-    restart_reasons: Option<Vec<String>>,
-    dynamo_time_before_restart_s: Option<f64>,
+    pub cache_size: Option<u64>,
+    pub accumulated_cache_size: Option<u64>,
+    pub guard_count: Option<u64>,
+    pub shape_env_guard_count: Option<u64>,
+    pub graph_op_count: Option<u64>,
+    pub graph_node_count: Option<u64>,
+    pub graph_input_count: Option<u64>,
+    pub start_time: Option<f64>,
+    pub entire_frame_compile_time_s: Option<f64>,
+    pub backend_compile_time_s: Option<f64>,
+    pub inductor_compile_time_s: Option<f64>,
+    pub code_gen_time_s: Option<f64>,
+    pub fail_type: Option<String>,
+    pub fail_reason: Option<String>,
+    pub fail_user_frame_filename: Option<String>,
+    pub fail_user_frame_lineno: Option<u32>,
+    pub non_compliant_ops: Option<Vec<String>>,
+    pub compliant_custom_ops: Option<Vec<String>>,
+    pub restart_reasons: Option<Vec<String>>,
+    pub dynamo_time_before_restart_s: Option<f64>,
+}
+
+#[derive(Debug, Serialize)]
+pub enum FailureReason {
+    Failure((String, String, String, u32)), // (failure type, failure reason, user frame filename, user frame lineno)
+    Restart(String), // restart reason
+}
+impl Display for FailureReason {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            FailureReason::Failure((failure_type, failure_reason, user_frame_filename, user_frame_lineno)) => {
+                let failure_type = encode_text(failure_type);
+                let failure_reason = encode_text(failure_reason);
+                let user_frame_filename = encode_text(user_frame_filename);
+                write!(f, "<td><pre>{failure_type}</pre></td>
+                           <td><pre>{failure_reason}</pre></td>
+                           <td><pre>{user_frame_filename}:{user_frame_lineno}</pre></td>
+                          ")
+            }
+            FailureReason::Restart(restart_reason) => write!(f, r#"<td> RestartAnalysis </td><td><pre>{restart_reason}</pre></td><td>Not availble for restarts(yet)!</td>"#),
+        }
+    }
+}
+
+#[derive(Debug, Serialize)]
+pub struct RestartsAndFailuresContext {
+    // Serialized versions of (CompileId, FailureReason)
+    pub failures: Vec<(String, String)>,
+    pub css: &'static str,
 }
 
 #[derive(Debug)]
@@ -249,4 +278,5 @@ pub struct IndexContext {
     pub css: &'static str,
     pub directory: Vec<(String, Vec<PathBuf>)>,
     pub stack_trie_html: String,
+    pub num_breaks: usize,
 }

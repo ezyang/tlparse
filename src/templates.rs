@@ -33,6 +33,13 @@ the indentation of the list and have a separate sub-list per sub-tree.
 {stack_trie_html | format_unescaped}
 </div>
 <div>
+{{ if num_breaks }}
+<h2> Failures and Restarts </h2>
+<p>
+Various issues may cause Dynamo to restart its analysis or give up on compilation entirely, causing graph breaks and fallbacks to eager mode.
+This run had <strong><a href="failures_and_restarts.html">{num_breaks} restart(s) and/or compilation failure(s)</a></strong>.
+</p>
+{{ endif }}
 <h2>IR dumps</h2>
 <p>
 The <strong>IR dumps</strong> collected dumped intermediate products from various points of the PT2
@@ -86,6 +93,51 @@ Build products below:
 {{ endfor }}
 </ul>
 </div>
+</body>
+</html>
+"#;
+
+pub static TEMPLATE_FAILURES_CSS : &str = r#"
+table {
+    width: 90%;
+    border-collapse: collapse;
+    margin: 20px 0;
+}
+table, th, td {
+    border: 1px solid #999;
+    padding: 10px;
+    text-align: left;
+}
+th {
+    background-color: #d3d3d3;
+    font-weight: bold;
+}
+tr:nth-child(odd) {
+    background-color: #f2f2f2;
+}
+a {
+    color: #0066cc;
+    text-decoration: none;
+}
+a:hover {
+    text-decoration: underline;
+}
+"#;
+
+pub static TEMPLATE_FAILURES_AND_RESTARTS: &str = r#"
+<html>
+<head>
+    <style>
+    {css}
+    </style>
+</head>
+<body>
+    <h1>Failures and Restarts</h1>
+    <table>
+    <tr> <th> Compile Id </th> <th> Failure Type </th> <th> Failure Description </th> <th> Failure Source (compilation failures only) </th> </tr>
+    {{ for failure in failures }}
+    <tr> <td> {failure.0 | format_unescaped} </td>{failure.1 | format_unescaped}</tr>
+    {{ endfor }}
 </body>
 </html>
 "#;

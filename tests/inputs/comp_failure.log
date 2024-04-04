@@ -1,0 +1,19 @@
+V0404 09:04:28.542000 140560297141248 torch/_logging/structured.py:19] {"str": ["/data/users/jjwu/a/pytorch/test/dynamo/test_misc.py", 0]}
+V0404 09:04:28.543000 140560297141248 torch/_logging/structured.py:19] {"str": ["/data/users/jjwu/a/pytorch/torch/_dynamo/test_case.py", 1]}
+V0404 09:04:28.543000 140560297141248 torch/_logging/structured.py:19] {"str": ["/data/users/jjwu/a/pytorch/torch/testing/_internal/common_utils.py", 2]}
+V0404 09:04:28.543000 140560297141248 torch/_logging/structured.py:19] {"str": ["/data/users/jjwu/a/pytorch-env/lib/python3.10/unittest/main.py", 3]}
+V0404 09:04:28.543000 140560297141248 torch/_logging/structured.py:19] {"str": ["/data/users/jjwu/a/pytorch-env/lib/python3.10/unittest/runner.py", 4]}
+V0404 09:04:28.543000 140560297141248 torch/_logging/structured.py:19] {"str": ["/data/users/jjwu/a/pytorch-env/lib/python3.10/unittest/suite.py", 5]}
+V0404 09:04:28.543000 140560297141248 torch/_logging/structured.py:19] {"str": ["/data/users/jjwu/a/pytorch-env/lib/python3.10/unittest/case.py", 6]}
+V0404 09:04:28.543000 140560297141248 torch/_logging/structured.py:19] {"str": ["/data/users/jjwu/a/pytorch/torch/_dynamo/eval_frame.py", 7]}
+V0404 09:04:28.543000 140560297141248 torch/_dynamo/convert_frame.py:672] {"dynamo_start": {"stack": [{"line": 10079, "name": "<module>", "filename": 0}, {"line": 41, "name": "run_tests", "filename": 1}, {"line": 1167, "name": "run_tests", "filename": 2}, {"line": 101, "name": "__init__", "filename": 3}, {"line": 271, "name": "runTests", "filename": 3}, {"line": 184, "name": "run", "filename": 4}, {"line": 84, "name": "__call__", "filename": 5}, {"line": 122, "name": "run", "filename": 5}, {"line": 84, "name": "__call__", "filename": 5}, {"line": 122, "name": "run", "filename": 5}, {"line": 650, "name": "__call__", "filename": 6}, {"line": 2868, "name": "run", "filename": 2}, {"line": 2840, "name": "_run_custom", "filename": 2}, {"line": 591, "name": "run", "filename": 6}, {"line": 549, "name": "_callTestMethod", "filename": 6}, {"line": 2741, "name": "wrapper", "filename": 2}, {"line": 9599, "name": "test_graph_break_compilation_metrics_on_failure", "filename": 0}, {"line": 410, "name": "_fn", "filename": 7}]}, "frame_id": 0, "frame_compile_id": 0, "attempt": 0}
+V0404 09:04:28.552000 140560297141248 torch/_dynamo/output_graph.py:1139] {"dynamo_output_graph": {"sizes": {"l_x_": [4, 4], "sin": [4, 4]}}, "frame_id": 0, "frame_compile_id": 0, "attempt": 0, "has_payload": "c42a102d057a4af133785f9775eefaef"}
+	class GraphModule(torch.nn.Module):
+	    def forward(self, L_x_ : torch.Tensor):
+	        l_x_ = L_x_
+	        
+	        # File: /data/users/jjwu/a/pytorch/test/dynamo/test_misc.py:9590 in fn, code: return x.sin()
+	        sin = l_x_.sin();  l_x_ = None
+	        return (sin,)
+	        
+V0404 09:04:28.553000 140560297141248 torch/_dynamo/utils.py:685] {"compilation_metrics": {"frame_key": "1", "co_name": "fn", "co_filename": "/data/users/jjwu/a/pytorch/test/dynamo/test_misc.py", "co_firstlineno": 9589, "cache_size": 0, "accumulated_cache_size": 0, "guard_count": null, "shape_env_guard_count": null, "graph_op_count": null, "graph_node_count": null, "graph_input_count": null, "start_time": 1712246668.5434601, "entire_frame_compile_time_s": null, "backend_compile_time_s": null, "inductor_compile_time_s": null, "code_gen_time_s": null, "fail_type": "<class 'torch._dynamo.exc.BackendCompilerFailed'>", "fail_reason": "backend='broken_backend' raised:\nRuntimeError: broken backend", "fail_user_frame_filename": null, "fail_user_frame_lineno": null, "non_compliant_ops": [], "compliant_custom_ops": [], "restart_reasons": [], "dynamo_time_before_restart_s": 0.009927034378051758}, "frame_id": 0, "frame_compile_id": 0, "attempt": 0}

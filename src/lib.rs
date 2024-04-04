@@ -70,9 +70,11 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
     let mut tt : TinyTemplate = TinyTemplate::new();
     tt.add_formatter("format_unescaped", tinytemplate::format_unescaped);
     tt.add_template("index.html", TEMPLATE_INDEX)?;
+    tt.add_template("failures_and_restarts.html", TEMPLATE_FAILURES_AND_RESTARTS)?;
     tt.add_template("dynamo_guards.html", TEMPLATE_DYNAMO_GUARDS)?;
     tt.add_template("compilation_metrics.html", TEMPLATE_COMPILATION_METRICS)?;
 
+    let mut breaks = RestartsAndFailuresContext { css:TEMPLATE_FAILURES_CSS, failures: Vec::new() };
 
     // NB: Sometimes, the log output we get from Logarithm stutters with a blank line.
     // Filter them out, they're never valid (a blank line in payload will still be \t)
@@ -203,9 +205,42 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
             }
         }
 
-        // TODO: implement this as StructuredLogParser
-        // This one is hard because it consumes the stack, and
-        // I don't want to clone the stack when passing it as reference
+        if let Some(m) = e.compilation_metrics {
+            let compile_id_dir: PathBuf = e.compile_id
+            .as_ref()
+            .map_or(
+                format!("unknown_{lineno}"),
+                |CompileId {
+                     frame_id,
+                     frame_compile_id,
+                     attempt,
+                 }| { format!("{frame_id}_{frame_compile_id}_{attempt}") },
+            )
+            .into();
+
+            let id = e.compile_id.clone().map_or("(unknown) ".to_string(), |c| {
+                format!("<a href='{}/compilation_metrics.html'>{cid}</a> ", compile_id_dir.display(), cid = c)
+            });
+            if let Some(rr) = m.restart_reasons {
+                for restart in rr {
+                    breaks.failures.push((id.clone(), format!("{}", FailureReason::Restart(restart))));
+                }
+            }
+            if let Some(f) = m.fail_type {
+                let reason = m.fail_reason.ok_or_else(||  anyhow::anyhow!("Fail reason not found"))?;
+                let user_frame_filename = m.fail_user_frame_filename.unwrap_or(String::from("N/A"));
+                let user_frame_lineno = m.fail_user_frame_lineno.unwrap_or(0);
+                let failure_reason = FailureReason::Failure((
+                    f.clone(),
+                    reason.clone(),
+                    user_frame_filename.clone(),
+                    user_frame_lineno.clone(),
+
+                ));
+                breaks.failures.push((id.clone(), format!("{failure_reason}")));
+            }
+        }
+
         if let Some(m) = e.dynamo_start {
             if let Some(stack) = m.stack {
                 stack_trie.insert(
@@ -218,6 +253,7 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
         };
 
     }
+    output.push((PathBuf::from("failures_and_restarts.html"), tt.render("failures_and_restarts.html", &breaks)?));
     pb.finish_with_message("done");
     spinner.finish();
 
@@ -230,6 +266,7 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
             .map(|(x, y)| (x.map_or("(unknown)".to_string(), |e| e.to_string()), y))
             .collect(),
         stack_trie_html: stack_trie.to_string(),
+        num_breaks: breaks.failures.len(),
     };
     output.push((PathBuf::from("index.html"), tt.render("index.html", &index_context)?));
 
