@@ -168,10 +168,10 @@ pub static TEMPLATE_COMPILATION_METRICS : &str = r#"
     <div>Dynamo Time Before Restart <abbr title="Total time spent restarting dynamo analysis">[?]</abbr>: {m.dynamo_time_before_restart_s}</div>
     <h2>Restarts and Failures</h2>
     {{ if m.fail_type }}
-    <p>Failure Exception: {m.fail_type}</p>
-    <p>Failure Reason: {m.fail_reason}</p>
+    <p>Failure Exception: <pre>{m.fail_type}</pre></p>
+    <p>Failure Reason: <pre>{m.fail_reason}</pre></p>
     {{ if m.fail_user_frame_filename }}
-    <p>In file {m.fail_user_frame_filename}, line {m.fail_user_frame_lineno}</p>
+    <p>In file <pre>{m.fail_user_frame_filename}</pre>, line {m.fail_user_frame_lineno}</p>
     {{ endif}}
     {{ else }}
     <p> No failures! </p>
