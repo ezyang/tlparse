@@ -157,6 +157,11 @@ pub struct OptimizeDdpSplitChildMetadata {
 pub struct EmptyMetadata {}
 
 #[derive(Debug, Deserialize)]
+pub struct GraphDumpMetadata {
+    pub name: String,
+}
+
+#[derive(Debug, Deserialize)]
 pub struct DynamoOutputGraphMetadata {
     _sizes: Option<FxHashMap<String, Vec<SymInt>>>,
 }
@@ -246,6 +251,7 @@ pub struct RestartsAndFailuresContext {
 #[derive(Debug)]
 pub enum Metadata<'e> {
     Empty(&'e EmptyMetadata),
+    GraphDump(&'e GraphDumpMetadata),
     DynamoOutputGraph(&'e DynamoOutputGraphMetadata),
     #[allow(dead_code)]
     DynamoStart(&'e DynamoStartMetadata),
@@ -275,6 +281,7 @@ pub struct Envelope {
     pub inductor_post_grad_graph: Option<EmptyMetadata>,
     pub inductor_output_code: Option<InductorOutputCodeMetadata>,
     pub compilation_metrics: Option<CompilationMetricsMetadata>,
+    pub graph_dump: Option<GraphDumpMetadata>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]

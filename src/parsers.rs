@@ -95,6 +95,38 @@ impl StructuredLogParser for SentinelFileParser {
     }
 }
 
+/**
+ * Generic parser for graph_dump entries
+ */
+pub struct GraphDumpParser;
+impl StructuredLogParser for GraphDumpParser {
+    fn name(&self) -> &'static str {
+        "graph_dump" // ToDO: more specific?
+    }
+    fn get_metadata<'e>(&self, e: &'e Envelope) -> Option<Metadata<'e>> {
+        e.graph_dump.as_ref().map(|m| Metadata::GraphDump(m))
+    }
+    fn parse<'e>(
+        &self,
+        lineno: usize,
+        metadata: Metadata<'e>,
+        _rank: Option<u32>,
+        compile_id: &Option<CompileId>,
+        payload: &str,
+    ) -> anyhow::Result<ParseOutput> {
+        if let Metadata::GraphDump(metadata) = metadata {
+            let filename: PathBuf = {
+                let mut r = OsString::from(&metadata.name);
+                r.push(OsStr::new(".txt"));
+                r.into()
+            };
+            simple_file_output(&filename.to_string_lossy(), lineno, compile_id, payload)
+        } else {
+            Err(anyhow::anyhow!("Expected GraphDump metadata"))
+        }
+    }
+}
+
 // Same as SentinelFileParser, but can log the size of the graph
 pub struct DynamoOutputGraphParser;
 impl StructuredLogParser for DynamoOutputGraphParser {
