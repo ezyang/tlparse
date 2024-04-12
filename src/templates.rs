@@ -97,7 +97,7 @@ Build products below:
 </html>
 "#;
 
-pub static TEMPLATE_FAILURES_CSS : &str = r#"
+pub static TEMPLATE_FAILURES_CSS: &str = r#"
 table {
     width: 90%;
     border-collapse: collapse;
@@ -142,7 +142,7 @@ pub static TEMPLATE_FAILURES_AND_RESTARTS: &str = r#"
 </html>
 "#;
 
-pub static TEMPLATE_COMPILATION_METRICS : &str = r#"
+pub static TEMPLATE_COMPILATION_METRICS: &str = r#"
 <html>
 <head>
     <style>

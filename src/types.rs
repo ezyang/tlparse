@@ -3,7 +3,7 @@ use fxhash::{FxHashMap, FxHasher};
 use html_escape::encode_text;
 use indexmap::IndexMap;
 
-use std::fmt::{self, Display,Formatter};
+use std::fmt::{self, Display, Formatter};
 use std::path::PathBuf;
 
 use once_cell::sync::Lazy;
@@ -16,7 +16,6 @@ pub type FxIndexMap<K, V> = IndexMap<K, V, BuildHasherDefault<FxHasher>>;
 
 pub static INTERN_TABLE: Lazy<Mutex<FxHashMap<u32, String>>> =
     Lazy::new(|| Mutex::new(FxHashMap::default()));
-
 
 #[derive(Default)]
 pub struct StackTrieNode {
@@ -199,7 +198,7 @@ pub struct CompilationMetricsMetadata {
 
 #[derive(Debug, Serialize)]
 pub struct CompilationMetricsContext<'e> {
-    pub m : &'e CompilationMetricsMetadata,
+    pub m: &'e CompilationMetricsMetadata,
     pub css: &'static str,
     pub compile_id: String,
 }
@@ -207,21 +206,32 @@ pub struct CompilationMetricsContext<'e> {
 #[derive(Debug, Serialize)]
 pub enum FailureReason {
     Failure((String, String, String, u32)), // (failure type, failure reason, user frame filename, user frame lineno)
-    Restart(String), // restart reason
+    Restart(String),                        // restart reason
 }
 impl Display for FailureReason {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            FailureReason::Failure((failure_type, failure_reason, user_frame_filename, user_frame_lineno)) => {
+            FailureReason::Failure((
+                failure_type,
+                failure_reason,
+                user_frame_filename,
+                user_frame_lineno,
+            )) => {
                 let failure_type = encode_text(failure_type);
                 let failure_reason = encode_text(failure_reason);
                 let user_frame_filename = encode_text(user_frame_filename);
-                write!(f, "<td><pre>{failure_type}</pre></td>
+                write!(
+                    f,
+                    "<td><pre>{failure_type}</pre></td>
                            <td><pre>{failure_reason}</pre></td>
                            <td><pre>{user_frame_filename}:{user_frame_lineno}</pre></td>
-                          ")
+                          "
+                )
             }
-            FailureReason::Restart(restart_reason) => write!(f, r#"<td> RestartAnalysis </td><td><pre>{restart_reason}</pre></td><td>Not availble for restarts(yet)!</td>"#),
+            FailureReason::Restart(restart_reason) => write!(
+                f,
+                r#"<td> RestartAnalysis </td><td><pre>{restart_reason}</pre></td><td>Not availble for restarts(yet)!</td>"#
+            ),
         }
     }
 }
@@ -243,7 +253,6 @@ pub enum Metadata<'e> {
     OptimizeDdpSplitChild(&'e OptimizeDdpSplitChildMetadata),
     CompilationMetrics(&'e CompilationMetricsMetadata),
 }
-
 
 #[derive(Debug, Deserialize)]
 pub struct Envelope {

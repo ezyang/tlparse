@@ -2,22 +2,20 @@ use anyhow::anyhow;
 use fxhash::FxHashMap;
 use md5::{Digest, Md5};
 
+use indicatif::{MultiProgress, ProgressBar, ProgressStyle};
 use regex::Regex;
 use std::fs::File;
 use std::io::{self, BufRead};
 use std::path::PathBuf;
-use tinytemplate::TinyTemplate;
-use indicatif::{MultiProgress, ProgressBar, ProgressStyle};
 use std::time::Instant;
+use tinytemplate::TinyTemplate;
 
-
-use crate::types::*;
-use crate::templates::*;
 use crate::parsers::default_parsers;
+use crate::templates::*;
+use crate::types::*;
 mod parsers;
 mod templates;
 mod types;
-
 
 pub struct ParseConfig {
     pub strict: bool,
@@ -65,16 +63,19 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
     let mut directory: FxHashMap<Option<CompileId>, Vec<PathBuf>> = FxHashMap::default();
 
     // Store results in an output Vec<PathBuf, String>
-    let mut output : Vec<(PathBuf, String)> = Vec::new();
+    let mut output: Vec<(PathBuf, String)> = Vec::new();
 
-    let mut tt : TinyTemplate = TinyTemplate::new();
+    let mut tt: TinyTemplate = TinyTemplate::new();
     tt.add_formatter("format_unescaped", tinytemplate::format_unescaped);
     tt.add_template("index.html", TEMPLATE_INDEX)?;
     tt.add_template("failures_and_restarts.html", TEMPLATE_FAILURES_AND_RESTARTS)?;
     tt.add_template("dynamo_guards.html", TEMPLATE_DYNAMO_GUARDS)?;
     tt.add_template("compilation_metrics.html", TEMPLATE_COMPILATION_METRICS)?;
 
-    let mut breaks = RestartsAndFailuresContext { css:TEMPLATE_FAILURES_CSS, failures: Vec::new() };
+    let mut breaks = RestartsAndFailuresContext {
+        css: TEMPLATE_FAILURES_CSS,
+        failures: Vec::new(),
+    };
 
     // NB: Sometimes, the log output we get from Logarithm stutters with a blank line.
     // Filter them out, they're never valid (a blank line in payload will still be \t)
@@ -188,46 +189,52 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
                             compile_directory.push(filename);
                         }
                     }
-                    Err(err) => {
-                        match  parser.name() {
-                            "dynamo_guards" => {
-                                eprintln!("Failed to parse guards json: {}", err);
-                                stats.fail_dynamo_guards_json += 1;
-                            }
-                            name => {
-                                eprintln!("Parser {name} failed: {err}");
-                                stats.fail_parser += 1;
-                            }
+                    Err(err) => match parser.name() {
+                        "dynamo_guards" => {
+                            eprintln!("Failed to parse guards json: {}", err);
+                            stats.fail_dynamo_guards_json += 1;
                         }
-                    }
+                        name => {
+                            eprintln!("Parser {name} failed: {err}");
+                            stats.fail_parser += 1;
+                        }
+                    },
                 }
-
             }
         }
 
         if let Some(m) = e.compilation_metrics {
-            let compile_id_dir: PathBuf = e.compile_id
-            .as_ref()
-            .map_or(
-                format!("unknown_{lineno}"),
-                |CompileId {
-                     frame_id,
-                     frame_compile_id,
-                     attempt,
-                 }| { format!("{frame_id}_{frame_compile_id}_{attempt}") },
-            )
-            .into();
+            let compile_id_dir: PathBuf = e
+                .compile_id
+                .as_ref()
+                .map_or(
+                    format!("unknown_{lineno}"),
+                    |CompileId {
+                         frame_id,
+                         frame_compile_id,
+                         attempt,
+                     }| { format!("{frame_id}_{frame_compile_id}_{attempt}") },
+                )
+                .into();
 
             let id = e.compile_id.clone().map_or("(unknown) ".to_string(), |c| {
-                format!("<a href='{}/compilation_metrics.html'>{cid}</a> ", compile_id_dir.display(), cid = c)
+                format!(
+                    "<a href='{}/compilation_metrics.html'>{cid}</a> ",
+                    compile_id_dir.display(),
+                    cid = c
+                )
             });
             if let Some(rr) = m.restart_reasons {
                 for restart in rr {
-                    breaks.failures.push((id.clone(), format!("{}", FailureReason::Restart(restart))));
+                    breaks
+                        .failures
+                        .push((id.clone(), format!("{}", FailureReason::Restart(restart))));
                 }
             }
             if let Some(f) = m.fail_type {
-                let reason = m.fail_reason.ok_or_else(||  anyhow::anyhow!("Fail reason not found"))?;
+                let reason = m
+                    .fail_reason
+                    .ok_or_else(|| anyhow::anyhow!("Fail reason not found"))?;
                 let user_frame_filename = m.fail_user_frame_filename.unwrap_or(String::from("N/A"));
                 let user_frame_lineno = m.fail_user_frame_lineno.unwrap_or(0);
                 let failure_reason = FailureReason::Failure((
@@ -235,9 +242,10 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
                     reason.clone(),
                     user_frame_filename.clone(),
                     user_frame_lineno.clone(),
-
                 ));
-                breaks.failures.push((id.clone(), format!("{failure_reason}")));
+                breaks
+                    .failures
+                    .push((id.clone(), format!("{failure_reason}")));
             }
         }
 
@@ -251,9 +259,11 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
                 );
             };
         };
-
     }
-    output.push((PathBuf::from("failures_and_restarts.html"), tt.render("failures_and_restarts.html", &breaks)?));
+    output.push((
+        PathBuf::from("failures_and_restarts.html"),
+        tt.render("failures_and_restarts.html", &breaks)?,
+    ));
     pb.finish_with_message("done");
     spinner.finish();
 
@@ -268,7 +278,10 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
         stack_trie_html: stack_trie.to_string(),
         num_breaks: breaks.failures.len(),
     };
-    output.push((PathBuf::from("index.html"), tt.render("index.html", &index_context)?));
+    output.push((
+        PathBuf::from("index.html"),
+        tt.render("index.html", &index_context)?,
+    ));
 
     // other_rank is included here because you should only have logs from one rank when
     // configured properly
