@@ -1,12 +1,12 @@
-use tlparse;
-use std::path::Path;
 use std::collections::HashMap;
+use std::path::Path;
 use std::path::PathBuf;
+use tlparse;
 
 fn prefix_exists(map: &HashMap<PathBuf, String>, prefix: &str) -> bool {
-    map.keys().any(|key| key.to_str().map_or(false, |s| s.starts_with(prefix)))
+    map.keys()
+        .any(|key| key.to_str().map_or(false, |s| s.starts_with(prefix)))
 }
-
 
 #[test]
 fn test_parse_simple() {
@@ -17,7 +17,7 @@ fn test_parse_simple() {
         "failures_and_restarts.html",
         "0_0_0/inductor_post_grad_graph.txt",
         "0_0_0/inductor_output_code", // This always has an output hash, so we use prefixes instead of full
-        "0_0_0/dynamo_guards.html"
+        "0_0_0/dynamo_guards.html",
     ];
     // Read the test file
     // simple.log was generated from the following:
@@ -32,7 +32,11 @@ fn test_parse_simple() {
     let map: HashMap<PathBuf, String> = output.unwrap().into_iter().collect();
     // Check all files are present
     for prefix in expected_files {
-        assert!(prefix_exists(&map, prefix), "{} not found in output", prefix);
+        assert!(
+            prefix_exists(&map, prefix),
+            "{} not found in output",
+            prefix
+        );
     }
 }
 
@@ -64,7 +68,11 @@ fn test_parse_compilation_metrics() {
     let map: HashMap<PathBuf, String> = output.unwrap().into_iter().collect();
     // Check all files are present
     for prefix in expected_files {
-        assert!(prefix_exists(&map, prefix), "{} not found in output", prefix);
+        assert!(
+            prefix_exists(&map, prefix),
+            "{} not found in output",
+            prefix
+        );
     }
 }
 
@@ -89,6 +97,10 @@ fn test_parse_compilation_failures() {
     let map: HashMap<PathBuf, String> = output.unwrap().into_iter().collect();
     // Check all files are present
     for prefix in expected_files {
-        assert!(prefix_exists(&map, prefix), "{} not found in output", prefix);
+        assert!(
+            prefix_exists(&map, prefix),
+            "{} not found in output",
+            prefix
+        );
     }
 }

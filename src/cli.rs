@@ -3,8 +3,7 @@ use clap::Parser;
 use std::fs;
 use std::path::PathBuf;
 
-use tlparse::{ParseConfig, parse_path};
-
+use tlparse::{parse_path, ParseConfig};
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
@@ -25,7 +24,6 @@ pub struct Cli {
     #[arg(long)]
     no_browser: bool,
 }
-
 
 fn main() -> anyhow::Result<()> {
     let cli = Cli::parse();
