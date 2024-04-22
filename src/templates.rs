@@ -216,3 +216,24 @@ pub static TEMPLATE_COMPILATION_METRICS: &str = r#"
 </body>
 </html>
 "#;
+
+pub static TEMPLATE_AOT_AUTOGRAD_BACKWARD_COMPILATION_METRICS: &str = r#"
+<html>
+<head>
+    <style>
+    {css}
+    </style>
+    <title>AOT Autograd Backward Compilation Metrics</title>
+</head>
+<body>
+    <h1>Compilation Info for {compile_id}</h1>
+    <h2>Failures</h2>
+    {{ if m.fail_type }}
+    <p>Failure Exception: <pre>{m.fail_type}</pre></p>
+    <p>Failure Reason: <pre>{m.fail_reason}</pre></p>
+    {{ else }}
+    <p> No failures! </p>
+    {{ endif }}
+</body>
+</html>
+"#;
