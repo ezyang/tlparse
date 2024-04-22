@@ -93,6 +93,17 @@ Build products below:
 {{ endfor }}
 </ul>
 </div>
+{{ if has_unknown_stack_trie }}
+<div>
+<h2>Unknown stacks</h2>
+<p>
+  Sometimes, logs are made without a compile id.  This makes it difficult to correlate related
+  logs.  This stack trie shows all places where log entries occurred without compile context; to
+  fix, look an appropriate place in the stack where compile id should have been specified.
+</p>
+{unknown_stack_trie_html | format_unescaped}
+</div>
+{{ endif }}
 </body>
 </html>
 "#;

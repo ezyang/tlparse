@@ -33,6 +33,10 @@ impl StackTrieNode {
         cur.terminal.push(compile_id);
     }
 
+    pub fn is_empty(&self) -> bool {
+        return self.children.is_empty() && self.terminal.is_empty();
+    }
+
     pub fn fmt_inner(&self, f: &mut Formatter, indent: usize) -> fmt::Result {
         for (frame, node) in self.children.iter() {
             let star = node.terminal.join("");
@@ -267,6 +271,7 @@ pub struct Envelope {
     pub compile_id: Option<CompileId>,
     #[serde(default)]
     pub has_payload: Option<String>,
+    pub stack: Option<StackSummary>,
     // externally tagged union, one field per log type we recognize
     pub dynamo_start: Option<DynamoStartMetadata>,
     pub str: Option<(String, u32)>,
@@ -301,5 +306,7 @@ pub struct IndexContext {
     pub css: &'static str,
     pub directory: Vec<(String, Vec<(PathBuf, i32)>)>,
     pub stack_trie_html: String,
+    pub unknown_stack_trie_html: String,
+    pub has_unknown_stack_trie: bool,
     pub num_breaks: usize,
 }

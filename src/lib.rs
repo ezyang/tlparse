@@ -48,6 +48,7 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
     ))?;
 
     let mut stack_trie = StackTrieNode::default();
+    let mut unknown_stack_trie = StackTrieNode::default();
 
     let mut stats = Stats::default();
     let _mod_count: FxHashMap<String, i32> = FxHashMap::default();
@@ -206,6 +207,10 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
             }
         }
 
+        if let Some(stack) = e.stack {
+            unknown_stack_trie.insert(stack, "*".to_string());
+        }
+
         if let Some(m) = e.compilation_metrics {
             let compile_id_dir: PathBuf = e
                 .compile_id
@@ -279,6 +284,8 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
             .map(|(x, y)| (x.map_or("(unknown)".to_string(), |e| e.to_string()), y))
             .collect(),
         stack_trie_html: stack_trie.to_string(),
+        unknown_stack_trie_html: unknown_stack_trie.to_string(),
+        has_unknown_stack_trie: !unknown_stack_trie.is_empty(),
         num_breaks: breaks.failures.len(),
     };
     output.push((
