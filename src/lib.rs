@@ -72,6 +72,10 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
     tt.add_template("failures_and_restarts.html", TEMPLATE_FAILURES_AND_RESTARTS)?;
     tt.add_template("dynamo_guards.html", TEMPLATE_DYNAMO_GUARDS)?;
     tt.add_template("compilation_metrics.html", TEMPLATE_COMPILATION_METRICS)?;
+    tt.add_template(
+        "aot_autograd_backward_compilation_metrics.html",
+        TEMPLATE_AOT_AUTOGRAD_BACKWARD_COMPILATION_METRICS,
+    )?;
 
     let mut output_count = 0;
 

@@ -205,6 +205,21 @@ pub struct CompilationMetricsMetadata {
     pub dynamo_time_before_restart_s: Option<f64>,
 }
 
+#[derive(Debug, Deserialize, Serialize)]
+pub struct AOTAutogradBackwardCompilationMetricsMetadata {
+    pub start_time: Option<f64>,
+    pub elapsed_time: Option<f64>, // technically redundant with envelope
+    pub fail_type: Option<String>,
+    pub fail_reason: Option<String>,
+}
+
+#[derive(Debug, Serialize)]
+pub struct AOTAutogradBackwardCompilationMetricsContext<'e> {
+    pub m: &'e AOTAutogradBackwardCompilationMetricsMetadata,
+    pub css: &'static str,
+    pub compile_id: String,
+}
+
 #[derive(Debug, Serialize)]
 pub struct CompilationMetricsContext<'e> {
     pub m: &'e CompilationMetricsMetadata,
@@ -262,6 +277,7 @@ pub enum Metadata<'e> {
     InductorOutputCode(&'e InductorOutputCodeMetadata),
     OptimizeDdpSplitChild(&'e OptimizeDdpSplitChildMetadata),
     CompilationMetrics(&'e CompilationMetricsMetadata),
+    AOTAutogradBackwardCompilationMetrics(&'e AOTAutogradBackwardCompilationMetricsMetadata),
 }
 
 #[derive(Debug, Deserialize)]
@@ -286,6 +302,8 @@ pub struct Envelope {
     pub inductor_post_grad_graph: Option<EmptyMetadata>,
     pub inductor_output_code: Option<InductorOutputCodeMetadata>,
     pub compilation_metrics: Option<CompilationMetricsMetadata>,
+    pub aot_autograd_backward_compilation_metrics:
+        Option<AOTAutogradBackwardCompilationMetricsMetadata>,
     pub graph_dump: Option<GraphDumpMetadata>,
 }
 
