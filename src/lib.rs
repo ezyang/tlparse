@@ -79,8 +79,6 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
 
     let mut output_count = 0;
 
-    let mut output_count = 0;
-
     let mut breaks = RestartsAndFailuresContext {
         css: TEMPLATE_FAILURES_CSS,
         failures: Vec::new(),
