@@ -60,7 +60,7 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
 
     let mut expected_rank: Option<Option<u32>> = None;
 
-    let mut directory: FxHashMap<Option<CompileId>, Vec<PathBuf>> = FxHashMap::default();
+    let mut directory: FxIndexMap<Option<CompileId>, Vec<PathBuf>> = FxIndexMap::default();
 
     // Store results in an output Vec<PathBuf, String>
     let mut output: Vec<(PathBuf, String)> = Vec::new();
@@ -272,7 +272,7 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
     let index_context = IndexContext {
         css: CSS,
         directory: directory
-            .drain()
+            .drain(..)
             .map(|(x, y)| (x.map_or("(unknown)".to_string(), |e| e.to_string()), y))
             .collect(),
         stack_trie_html: stack_trie.to_string(),
