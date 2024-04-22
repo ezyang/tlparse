@@ -282,6 +282,46 @@ impl StructuredLogParser for CompilationMetricsParser<'_> {
     }
 }
 
+pub struct AOTAutogradBackwardCompilationMetricsParser<'t> {
+    tt: &'t TinyTemplate<'t>,
+}
+impl StructuredLogParser for AOTAutogradBackwardCompilationMetricsParser<'_> {
+    fn name(&self) -> &'static str {
+        "aot_autograd_backward_compilation_metrics"
+    }
+    fn get_metadata<'e>(&self, e: &'e Envelope) -> Option<Metadata<'e>> {
+        e.aot_autograd_backward_compilation_metrics
+            .as_ref()
+            .map(|m| Metadata::AOTAutogradBackwardCompilationMetrics(m))
+    }
+    fn parse<'e>(
+        &self,
+        lineno: usize,
+        metrics: Metadata<'e>,
+        _rank: Option<u32>,
+        compile_id: &Option<CompileId>,
+        _payload: &str,
+    ) -> anyhow::Result<ParseOutput> {
+        let filename = format!("{}.html", self.name());
+        if let Metadata::AOTAutogradBackwardCompilationMetrics(m) = metrics {
+            let id = compile_id
+                .clone()
+                .map_or("(unknown) ".to_string(), |c| format!("{cid} ", cid = c));
+            let context = AOTAutogradBackwardCompilationMetricsContext {
+                css: crate::CSS,
+                m: &m,
+                compile_id: id,
+            };
+            let output = self.tt.render(&filename, &context)?;
+            simple_file_output(&filename, lineno, compile_id, &output)
+        } else {
+            Err(anyhow::anyhow!(
+                "Expected AOTAutogradBackwardCompilationMetrics metadata"
+            ))
+        }
+    }
+}
+
 // Register your parser here
 pub fn default_parsers<'t>(tt: &'t TinyTemplate<'t>) -> Vec<Box<dyn StructuredLogParser + 't>> {
     // We need to use Box wrappers here because vecs in Rust need to have known size
@@ -310,6 +350,7 @@ pub fn default_parsers<'t>(tt: &'t TinyTemplate<'t>) -> Vec<Box<dyn StructuredLo
         Box::new(InductorOutputCodeParser),
         Box::new(OptimizeDdpSplitChildParser),
         Box::new(CompilationMetricsParser { tt }), // TODO: use own tt instances
+        Box::new(AOTAutogradBackwardCompilationMetricsParser { tt }), // TODO: use own tt instances
     ];
 
     result
