@@ -60,7 +60,7 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
 
     let mut expected_rank: Option<Option<u32>> = None;
 
-    let mut directory: FxIndexMap<Option<CompileId>, Vec<PathBuf>> = FxIndexMap::default();
+    let mut directory: FxIndexMap<Option<CompileId>, Vec<(PathBuf, i32)>> = FxIndexMap::default();
 
     // Store results in an output Vec<PathBuf, String>
     let mut output: Vec<(PathBuf, String)> = Vec::new();
@@ -71,6 +71,8 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
     tt.add_template("failures_and_restarts.html", TEMPLATE_FAILURES_AND_RESTARTS)?;
     tt.add_template("dynamo_guards.html", TEMPLATE_DYNAMO_GUARDS)?;
     tt.add_template("compilation_metrics.html", TEMPLATE_COMPILATION_METRICS)?;
+
+    let mut output_count = 0;
 
     let mut breaks = RestartsAndFailuresContext {
         css: TEMPLATE_FAILURES_CSS,
@@ -186,7 +188,8 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
                     Ok(results) => {
                         for (filename, out) in results {
                             output.push((filename.clone(), out));
-                            compile_directory.push(filename);
+                            compile_directory.push((filename, output_count));
+                            output_count += 1;
                         }
                     }
                     Err(err) => match parser.name() {

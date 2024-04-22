@@ -299,7 +299,7 @@ pub struct DynamoGuardsContext {
 #[derive(Debug, Serialize)]
 pub struct IndexContext {
     pub css: &'static str,
-    pub directory: Vec<(String, Vec<PathBuf>)>,
+    pub directory: Vec<(String, Vec<(PathBuf, i32)>)>,
     pub stack_trie_html: String,
     pub num_breaks: usize,
 }
