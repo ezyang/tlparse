@@ -85,8 +85,8 @@ Build products below:
 {{ for compile_directory in directory }}
     <li><a id="{compile_directory.0}">{compile_directory.0}</a>
     <ul>
-        {{ for path in compile_directory.1 }}
-            <li><a href="{path}">{path}</a></li>
+        {{ for path_idx in compile_directory.1 }}
+            <li><a href="{path_idx.0}">{path_idx.0}</a> ({path_idx.1})</li>
         {{ endfor }}
     </ul>
     </li>
