@@ -20,6 +20,10 @@ pub struct Cli {
     /// testing.
     #[arg(long)]
     strict: bool,
+    /// Return non-zero exit code if some log lines do not have associated compile id.  Used for
+    /// unit testing
+    #[arg(long)]
+    strict_compile_id: bool,
     /// Don't open browser at the end
     #[arg(long)]
     no_browser: bool,
@@ -43,6 +47,7 @@ fn main() -> anyhow::Result<()> {
 
     let config = ParseConfig {
         strict: cli.strict,
+        strict_compile_id: cli.strict_compile_id,
         custom_parsers: Vec::new(),
     };
 

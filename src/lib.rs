@@ -19,6 +19,7 @@ mod types;
 
 pub struct ParseConfig {
     pub strict: bool,
+    pub strict_compile_id: bool,
     pub custom_parsers: Vec<Box<dyn crate::parsers::StructuredLogParser>>,
 }
 
@@ -281,6 +282,8 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
 
     eprintln!("{:?}", stats);
 
+    let has_unknown_compile_id = directory.contains_key(&None);
+
     let index_context = IndexContext {
         css: CSS,
         directory: directory
@@ -310,6 +313,10 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
     {
         // Report something went wrong
         return Err(anyhow!("Something went wrong"));
+    }
+
+    if config.strict_compile_id && has_unknown_compile_id {
+        return Err(anyhow!("Some log entries did not have compile id"));
     }
 
     Ok(output)
