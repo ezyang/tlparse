@@ -310,6 +310,7 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
 
     let index_context = IndexContext {
         css: CSS,
+        javascript: JAVASCRIPT,
         directory: directory
             .drain(..)
             .map(|(x, y)| (x.map_or("(unknown)".to_string(), |e| e.to_string()), y))

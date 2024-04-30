@@ -45,23 +45,15 @@ impl StackTrieNode {
                 // If the node has multiple children, increase the indent and print a hyphen
                 writeln!(
                     f,
-                    "{:indent$}- {star}{}",
-                    "",
+                    "<li><span onclick='toggleList(this)' class='marker'></span>{star}{}<ul>",
                     frame,
-                    indent = indent,
                     star = star
                 )?;
                 node.fmt_inner(f, indent + 2)?;
+                write!(f, "</ul></li>")?;
             } else {
                 // If the node has only one child, don't increase the indent and don't print a hyphen
-                writeln!(
-                    f,
-                    "{:indent$}  {star}{}",
-                    "",
-                    frame,
-                    indent = indent,
-                    star = star
-                )?;
+                writeln!(f, "<li>{star}{}</li>", frame, star = star)?;
                 node.fmt_inner(f, indent)?;
             }
         }
@@ -71,9 +63,11 @@ impl StackTrieNode {
 
 impl Display for StackTrieNode {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
-        write!(f, "<pre>")?;
+        write!(f, "<div class='stack-trie'>")?;
+        write!(f, "<ul>")?;
         self.fmt_inner(f, 0)?;
-        write!(f, "</pre>")?;
+        write!(f, "</ul>")?;
+        write!(f, "</div>")?;
         Ok(())
     }
 }
@@ -330,6 +324,7 @@ pub struct DynamoGuardsContext {
 #[derive(Debug, Serialize)]
 pub struct IndexContext {
     pub css: &'static str,
+    pub javascript: &'static str,
     pub directory: Vec<(String, Vec<(PathBuf, i32)>)>,
     pub stack_trie_html: String,
     pub unknown_stack_trie_html: String,
