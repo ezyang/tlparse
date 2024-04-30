@@ -1,4 +1,29 @@
 pub static CSS: &str = r#"
+.stack-trie { white-space: nowrap; font-family: monospace; }
+.stack-trie ul { padding-left: 1ch;  }
+.stack-trie li { margin-left: 1ch; list-style-type: none;  }
+.stack-trie .marker {
+  cursor: pointer;
+}
+.stack-trie .marker.collapsed::before {
+  content: "+ ";
+}
+.stack-trie .marker:not(.collapsed)::before {
+  content: "- ";
+}
+"#;
+
+pub static JAVASCRIPT: &str = r#"
+  function toggleList(toggleItem) {
+    const listItem = toggleItem.parentNode;
+    const nestedList = listItem.querySelector('ul');
+    if (nestedList) {
+      nestedList.style.display = nestedList.style.display === 'none' ? 'block' : 'none';
+
+      // Toggle the collapse/expand indicator
+      toggleItem.classList.toggle('collapsed');
+    }
+  }
 "#;
 
 pub static TEMPLATE_DYNAMO_GUARDS: &str = r#"
@@ -17,8 +42,11 @@ pub static TEMPLATE_DYNAMO_GUARDS: &str = r#"
 pub static TEMPLATE_INDEX: &str = r#"
 <html>
 <style>
-{css}
+{css | format_unescaped}
 </style>
+<script>
+{javascript | format_unescaped}
+</script>
 <body>
 <div>
 <h2>Stack trie</h2>
