@@ -11,6 +11,9 @@ pub static CSS: &str = r#"
 .stack-trie .marker:not(.collapsed)::before {
   content: "- ";
 }
+.stack-trie .missing { background-color: #CCCCCC; }
+.stack-trie .error { background-color: #FFBBBB; }
+.stack-trie .empty { background-color: #FFFF88; }
 "#;
 
 pub static JAVASCRIPT: &str = r#"
