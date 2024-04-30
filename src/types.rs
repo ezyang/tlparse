@@ -58,15 +58,18 @@ impl StackTrieNode {
             let mut star = String::new();
             for t in &node.terminal {
                 if let Some(c) = t {
-                    let ok_class = metrics_index.get(t).map_or("missing", |m| {
+                    let ok_class = metrics_index.get(t).map_or("status-missing", |m| {
                         if m.iter().any(|n| n.fail_type.is_some()) {
-                            "error"
+                            "status-error"
+                        } else if m.iter().any(|n| n.graph_op_count.unwrap_or(0) == 0) {
+                            "status-empty"
+                        } else if m
+                            .iter()
+                            .any(|n| !n.restart_reasons.as_ref().map_or(false, |o| o.is_empty()))
+                        {
+                            "status-break"
                         } else {
-                            if m.iter().any(|n| n.graph_op_count.unwrap_or(0) > 0) {
-                                "ok"
-                            } else {
-                                "empty"
-                            }
+                            "status-ok"
                         }
                     });
                     write!(

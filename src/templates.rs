@@ -11,9 +11,13 @@ pub static CSS: &str = r#"
 .stack-trie .marker:not(.collapsed)::before {
   content: "- ";
 }
-.stack-trie .missing { background-color: #CCCCCC; }
-.stack-trie .error { background-color: #FFBBBB; }
-.stack-trie .empty { background-color: #FFFF88; }
+.stack-trie a { text-decoration: none; }
+.stack-trie a:hover { text-decoration: underline; }
+.status-missing { background-color: purple; color: white; }
+.status-error { background-color: red; color: white; }
+.status-empty { background-color: white; color: black; }
+.status-ok { background-color: green; color: white; }
+.status-break { background-color: lime; color: black; }
 "#;
 
 pub static JAVASCRIPT: &str = r#"
@@ -60,6 +64,14 @@ It is a tree of stack frames, for all stacks that triggered PT2 compilation.  If
 stack is in the tree, you will simply see a plain list of frames (most recent call last).  With
 multiple stacks, at every point where two stacks diverge from having a common prefix, we increase
 the indentation of the list and have a separate sub-list per sub-tree.
+</p>
+<p>
+Links to particular compilation are color coded by status:
+<span class="status-ok">[Success]</span>,
+<span class="status-break">[Success with restart (e.g., graph break)]</span>,
+<span class="status-empty">[Empty graph]</span>,
+<span class="status-error">[Error]</span>,
+<span class="status-missing">[Metrics were missing]</span>
 </p>
 {stack_trie_html | format_unescaped}
 </div>
