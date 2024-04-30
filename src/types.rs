@@ -2,6 +2,7 @@ use core::hash::BuildHasherDefault;
 use fxhash::{FxHashMap, FxHasher};
 use html_escape::encode_text;
 use indexmap::IndexMap;
+use regex::Regex;
 
 use std::fmt::{self, Display, Formatter};
 use std::path::PathBuf;
@@ -117,14 +118,13 @@ fn simplify_filename<'a>(filename: &'a str) -> &'a str {
     if parts.len() > 1 {
         return parts[1];
     }
-    // TODO: generalize this
-    let parts: Vec<&'a str> = filename
-        .split("1e322330-seed-nspid4026531836_cgpid26364902-ns-4026531840/")
-        .collect();
-    if parts.len() > 1 {
-        return parts[1];
+    let re = Regex::new(r"\d+e\d+-seed-nspid\d+_cgpid\d+-ns-\d+/").unwrap();
+    if let Some(captures) = re.captures(filename) {
+        if let Some(capture) = captures.get(0) {
+            return &filename[capture.end()..];
+        }
     }
-    filename
+    return filename;
 }
 
 impl fmt::Display for FrameSummary {
