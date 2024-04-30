@@ -23,6 +23,29 @@ pub struct ParseConfig {
     pub custom_parsers: Vec<Box<dyn crate::parsers::StructuredLogParser>>,
 }
 
+fn maybe_remove_suffix(frames: &mut Vec<FrameSummary>) {
+    let target_frames = [
+        ("torch/_dynamo/convert_frame.py", "catch_errors"),
+        ("torch/_dynamo/convert_frame.py", "_convert_frame"),
+        ("torch/_dynamo/convert_frame.py", "_convert_frame_assert"),
+    ];
+
+    let len = frames.len();
+    if len >= target_frames.len() {
+        let suffix = &frames[len - target_frames.len()..];
+        if suffix
+            .iter()
+            .zip(target_frames.iter())
+            .all(|(frame, target)| {
+                simplify_filename(unintern_str(frame.filename).as_ref()) == target.0
+                    && frame.name == target.1
+            })
+        {
+            frames.truncate(len - 3);
+        }
+    }
+}
+
 pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOutput> {
     let strict = config.strict;
     let file = File::open(path)?;
@@ -263,7 +286,8 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
         }
 
         if let Some(m) = e.dynamo_start {
-            if let Some(stack) = m.stack {
+            if let Some(mut stack) = m.stack {
+                maybe_remove_suffix(&mut stack);
                 stack_trie.insert(
                     stack,
                     e.compile_id.map_or("(unknown) ".to_string(), |c| {

@@ -108,12 +108,12 @@ pub struct Stats {
 
 #[derive(Debug, Hash, Eq, PartialEq, Deserialize, Serialize)]
 pub struct FrameSummary {
-    filename: u32,
-    line: i32,
-    name: String,
+    pub filename: u32,
+    pub line: i32,
+    pub name: String,
 }
 
-fn simplify_filename<'a>(filename: &'a str) -> &'a str {
+pub fn simplify_filename<'a>(filename: &'a str) -> &'a str {
     let parts: Vec<&'a str> = filename.split("#link-tree/").collect();
     if parts.len() > 1 {
         return parts[1];
@@ -125,6 +125,14 @@ fn simplify_filename<'a>(filename: &'a str) -> &'a str {
         }
     }
     return filename;
+}
+
+pub fn unintern_str(interned_str: u32) -> String {
+    let intern_table = INTERN_TABLE.lock().unwrap();
+    let filename = intern_table
+        .get(&interned_str)
+        .map_or("(unknown)", |s| s.as_str());
+    return filename.to_string();
 }
 
 impl fmt::Display for FrameSummary {
