@@ -87,6 +87,8 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
 
     let mut directory: FxIndexMap<Option<CompileId>, Vec<(PathBuf, i32)>> = FxIndexMap::default();
 
+    let mut metrics_index: CompilationMetricsIndex = FxIndexMap::default();
+
     // Store results in an output Vec<PathBuf, String>
     let mut output: Vec<(PathBuf, String)> = Vec::new();
 
@@ -236,7 +238,7 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
         }
 
         if let Some(stack) = e.stack {
-            unknown_stack_trie.insert(stack, "*".to_string());
+            unknown_stack_trie.insert(stack, None);
         }
 
         if let Some(m) = e.compilation_metrics {
@@ -260,18 +262,23 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
                     cid = c
                 )
             });
-            if let Some(rr) = m.restart_reasons {
+            if let Some(rr) = m.restart_reasons.as_ref() {
                 for restart in rr {
-                    breaks
-                        .failures
-                        .push((id.clone(), format!("{}", FailureReason::Restart(restart))));
+                    breaks.failures.push((
+                        id.clone(),
+                        format!("{}", FailureReason::Restart(restart.clone())),
+                    ));
                 }
             }
-            if let Some(f) = m.fail_type {
+            if let Some(f) = m.fail_type.as_ref() {
                 let reason = m
                     .fail_reason
+                    .clone()
                     .ok_or_else(|| anyhow::anyhow!("Fail reason not found"))?;
-                let user_frame_filename = m.fail_user_frame_filename.unwrap_or(String::from("N/A"));
+                let user_frame_filename = m
+                    .fail_user_frame_filename
+                    .clone()
+                    .unwrap_or(String::from("N/A"));
                 let user_frame_lineno = m.fail_user_frame_lineno.unwrap_or(0);
                 let failure_reason = FailureReason::Failure((
                     f.clone(),
@@ -283,17 +290,17 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
                     .failures
                     .push((id.clone(), format!("{failure_reason}")));
             }
+            let mut cid = e.compile_id.clone();
+            if let Some(c) = cid.as_mut() {
+                c.attempt = 0;
+            }
+            metrics_index.entry(cid).or_default().push(m);
         }
 
         if let Some(m) = e.dynamo_start {
             if let Some(mut stack) = m.stack {
                 maybe_remove_suffix(&mut stack);
-                stack_trie.insert(
-                    stack,
-                    e.compile_id.map_or("(unknown) ".to_string(), |c| {
-                        format!("<a href='#{cid}'>{cid}</a> ", cid = c)
-                    }),
-                );
+                stack_trie.insert(stack, e.compile_id.clone());
             };
         };
     }
@@ -315,8 +322,8 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
             .drain(..)
             .map(|(x, y)| (x.map_or("(unknown)".to_string(), |e| e.to_string()), y))
             .collect(),
-        stack_trie_html: stack_trie.to_string(),
-        unknown_stack_trie_html: unknown_stack_trie.to_string(),
+        stack_trie_html: stack_trie.fmt(&metrics_index).unwrap(),
+        unknown_stack_trie_html: unknown_stack_trie.fmt(&metrics_index).unwrap(),
         has_unknown_stack_trie: !unknown_stack_trie.is_empty(),
         num_breaks: breaks.failures.len(),
     };
