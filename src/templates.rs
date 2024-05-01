@@ -210,6 +210,8 @@ pub static TEMPLATE_COMPILATION_METRICS: &str = r#"
     <object data="dynamo_output_graph.txt" style="width:80%; height:auto">
     <a href="dynamo_output_graph.txt"> dynamo_output_graph.txt </a>
     </object>
+    <h2>Stack</h2>
+    {stack_html | format_unescaped}
     <h2>Compile Time(seconds)</h2>
     <p>Entire Frame <abbr title="Total time spent in convert_frame function">[?]</abbr>: {m.entire_frame_compile_time_s}</div>
     <p>Backend <abbr title="Time spent running the backend compiler">[?]</abbr>: {m.backend_compile_time_s}</div>
