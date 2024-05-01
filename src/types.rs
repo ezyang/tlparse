@@ -13,6 +13,7 @@ use std::sync::Mutex;
 
 pub type ParseOutput = Vec<(PathBuf, String)>;
 pub type CompilationMetricsIndex = FxIndexMap<Option<CompileId>, Vec<CompilationMetricsMetadata>>;
+pub type StackIndex = FxHashMap<Option<CompileId>, StackSummary>; // NB: attempt is always 0 here
 
 pub type FxIndexMap<K, V> = IndexMap<K, V, BuildHasherDefault<FxHasher>>;
 
@@ -35,11 +36,21 @@ impl StackTrieNode {
         cur.terminal.push(compile_id);
     }
 
+    pub fn insert_no_terminal(&mut self, mut stack: StackSummary) {
+        let mut cur = self;
+        for frame in stack.drain(..) {
+            cur = cur.children.entry(frame).or_default();
+        }
+    }
+
     pub fn is_empty(&self) -> bool {
         return self.children.is_empty() && self.terminal.is_empty();
     }
 
-    pub fn fmt(&self, metrics_index: &CompilationMetricsIndex) -> Result<String, fmt::Error> {
+    pub fn fmt(
+        &self,
+        metrics_index: Option<&CompilationMetricsIndex>,
+    ) -> Result<String, fmt::Error> {
         let mut f = String::new();
         write!(f, "<div class='stack-trie'>")?;
         write!(f, "<ul>")?;
@@ -52,25 +63,26 @@ impl StackTrieNode {
     pub fn fmt_inner(
         &self,
         f: &mut String,
-        metrics_index: &CompilationMetricsIndex,
+        mb_metrics_index: Option<&CompilationMetricsIndex>,
     ) -> fmt::Result {
         for (frame, node) in self.children.iter() {
             let mut star = String::new();
             for t in &node.terminal {
                 if let Some(c) = t {
-                    let ok_class = metrics_index.get(t).map_or("status-missing", |m| {
-                        if m.iter().any(|n| n.fail_type.is_some()) {
-                            "status-error"
-                        } else if m.iter().any(|n| n.graph_op_count.unwrap_or(0) == 0) {
-                            "status-empty"
-                        } else if m
-                            .iter()
-                            .any(|n| !n.restart_reasons.as_ref().map_or(false, |o| o.is_empty()))
-                        {
-                            "status-break"
-                        } else {
-                            "status-ok"
-                        }
+                    let ok_class = mb_metrics_index.map_or("status-missing", |metrics_index| {
+                        metrics_index.get(t).map_or("status-missing", |m| {
+                            if m.iter().any(|n| n.fail_type.is_some()) {
+                                "status-error"
+                            } else if m.iter().any(|n| n.graph_op_count.unwrap_or(0) == 0) {
+                                "status-empty"
+                            } else if m.iter().any(|n| {
+                                !n.restart_reasons.as_ref().map_or(false, |o| o.is_empty())
+                            }) {
+                                "status-break"
+                            } else {
+                                "status-ok"
+                            }
+                        })
                     });
                     write!(
                         star,
@@ -91,12 +103,12 @@ impl StackTrieNode {
                     frame,
                     star = star
                 )?;
-                node.fmt_inner(f, metrics_index)?;
+                node.fmt_inner(f, mb_metrics_index)?;
                 write!(f, "</ul></li>")?;
             } else {
                 // If the node has only one child, don't increase the indent and don't print a hyphen
                 writeln!(f, "<li>{star}{}</li>", frame, star = star)?;
-                node.fmt_inner(f, metrics_index)?;
+                node.fmt_inner(f, mb_metrics_index)?;
             }
         }
         Ok(())
@@ -131,7 +143,7 @@ pub struct Stats {
     pub fail_parser: u64,
 }
 
-#[derive(Debug, Hash, Eq, PartialEq, Deserialize, Serialize)]
+#[derive(Debug, Hash, Eq, PartialEq, Deserialize, Serialize, Clone)]
 pub struct FrameSummary {
     pub filename: u32,
     pub line: i32,
@@ -258,6 +270,7 @@ pub struct CompilationMetricsContext<'e> {
     pub m: &'e CompilationMetricsMetadata,
     pub css: &'static str,
     pub compile_id: String,
+    pub stack_html: String,
 }
 
 #[derive(Debug, Serialize)]
