@@ -374,4 +374,5 @@ pub struct IndexContext {
     pub unknown_stack_trie_html: String,
     pub has_unknown_stack_trie: bool,
     pub num_breaks: usize,
+    pub custom_header_html: String,
 }
