@@ -22,6 +22,18 @@ pub struct ParseConfig {
     pub strict: bool,
     pub strict_compile_id: bool,
     pub custom_parsers: Vec<Box<dyn crate::parsers::StructuredLogParser>>,
+    pub custom_header_html: String,
+}
+
+impl Default for ParseConfig {
+    fn default() -> Self {
+        Self {
+            strict: false,
+            strict_compile_id: false,
+            custom_parsers: Vec::default(),
+            custom_header_html: String::default(),
+        }
+    }
 }
 
 fn maybe_remove_suffix(frames: &mut Vec<FrameSummary>) {
@@ -323,6 +335,7 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
     let index_context = IndexContext {
         css: CSS,
         javascript: JAVASCRIPT,
+        custom_header_html: config.custom_header_html,
         directory: directory
             .drain(..)
             .map(|(x, y)| (x.map_or("(unknown)".to_string(), |e| e.to_string()), y))

@@ -27,6 +27,9 @@ pub struct Cli {
     /// Don't open browser at the end
     #[arg(long)]
     no_browser: bool,
+    /// Some custom HTML to append to the top of report
+    #[arg(long)]
+    custom_header_html: String,
 }
 
 fn main() -> anyhow::Result<()> {
@@ -49,6 +52,7 @@ fn main() -> anyhow::Result<()> {
         strict: cli.strict,
         strict_compile_id: cli.strict_compile_id,
         custom_parsers: Vec::new(),
+        custom_header_html: cli.custom_header_html,
     };
 
     let output = parse_path(&path, config)?;
