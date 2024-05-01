@@ -4,7 +4,7 @@ use html_escape::encode_text;
 use indexmap::IndexMap;
 use regex::Regex;
 
-use std::fmt::{self, Display, Formatter};
+use std::fmt::{self, Display, Write};
 use std::path::PathBuf;
 
 use once_cell::sync::Lazy;
@@ -12,6 +12,7 @@ use serde::{Deserialize, Serialize};
 use std::sync::Mutex;
 
 pub type ParseOutput = Vec<(PathBuf, String)>;
+pub type CompilationMetricsIndex = FxIndexMap<Option<CompileId>, Vec<CompilationMetricsMetadata>>;
 
 pub type FxIndexMap<K, V> = IndexMap<K, V, BuildHasherDefault<FxHasher>>;
 
@@ -20,13 +21,13 @@ pub static INTERN_TABLE: Lazy<Mutex<FxHashMap<u32, String>>> =
 
 #[derive(Default)]
 pub struct StackTrieNode {
-    terminal: Vec<String>,
+    terminal: Vec<Option<CompileId>>,
     // Ordered map so that when we print we roughly print in chronological order
     children: FxIndexMap<FrameSummary, StackTrieNode>,
 }
 
 impl StackTrieNode {
-    pub fn insert(&mut self, mut stack: StackSummary, compile_id: String) {
+    pub fn insert(&mut self, mut stack: StackSummary, compile_id: Option<CompileId>) {
         let mut cur = self;
         for frame in stack.drain(..) {
             cur = cur.children.entry(frame).or_default();
@@ -38,9 +39,50 @@ impl StackTrieNode {
         return self.children.is_empty() && self.terminal.is_empty();
     }
 
-    pub fn fmt_inner(&self, f: &mut Formatter, indent: usize) -> fmt::Result {
+    pub fn fmt(&self, metrics_index: &CompilationMetricsIndex) -> Result<String, fmt::Error> {
+        let mut f = String::new();
+        write!(f, "<div class='stack-trie'>")?;
+        write!(f, "<ul>")?;
+        self.fmt_inner(&mut f, metrics_index)?;
+        write!(f, "</ul>")?;
+        write!(f, "</div>")?;
+        Ok(f)
+    }
+
+    pub fn fmt_inner(
+        &self,
+        f: &mut String,
+        metrics_index: &CompilationMetricsIndex,
+    ) -> fmt::Result {
         for (frame, node) in self.children.iter() {
-            let star = node.terminal.join("");
+            let mut star = String::new();
+            for t in &node.terminal {
+                if let Some(c) = t {
+                    let ok_class = metrics_index.get(t).map_or("status-missing", |m| {
+                        if m.iter().any(|n| n.fail_type.is_some()) {
+                            "status-error"
+                        } else if m.iter().any(|n| n.graph_op_count.unwrap_or(0) == 0) {
+                            "status-empty"
+                        } else if m
+                            .iter()
+                            .any(|n| !n.restart_reasons.as_ref().map_or(false, |o| o.is_empty()))
+                        {
+                            "status-break"
+                        } else {
+                            "status-ok"
+                        }
+                    });
+                    write!(
+                        star,
+                        "<a href='#{cid}' class='{ok_class}'>{cid}</a> ",
+                        cid = c,
+                        ok_class = ok_class
+                    )?;
+                } else {
+                    write!(star, "(unknown) ")?;
+                }
+            }
+
             if self.children.len() > 1 {
                 // If the node has multiple children, increase the indent and print a hyphen
                 writeln!(
@@ -49,25 +91,14 @@ impl StackTrieNode {
                     frame,
                     star = star
                 )?;
-                node.fmt_inner(f, indent + 2)?;
+                node.fmt_inner(f, metrics_index)?;
                 write!(f, "</ul></li>")?;
             } else {
                 // If the node has only one child, don't increase the indent and don't print a hyphen
                 writeln!(f, "<li>{star}{}</li>", frame, star = star)?;
-                node.fmt_inner(f, indent)?;
+                node.fmt_inner(f, metrics_index)?;
             }
         }
-        Ok(())
-    }
-}
-
-impl Display for StackTrieNode {
-    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
-        write!(f, "<div class='stack-trie'>")?;
-        write!(f, "<ul>")?;
-        self.fmt_inner(f, 0)?;
-        write!(f, "</ul>")?;
-        write!(f, "</div>")?;
         Ok(())
     }
 }
