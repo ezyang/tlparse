@@ -1,4 +1,5 @@
 use crate::types::*;
+use std::cell::RefCell;
 use std::ffi::{OsStr, OsString};
 use std::path::Path;
 use std::path::PathBuf;
@@ -246,6 +247,7 @@ impl StructuredLogParser for OptimizeDdpSplitChildParser {
 
 pub struct CompilationMetricsParser<'t> {
     tt: &'t TinyTemplate<'t>,
+    stack_index: &'t RefCell<StackIndex>,
 }
 impl StructuredLogParser for CompilationMetricsParser<'_> {
     fn name(&self) -> &'static str {
@@ -269,10 +271,24 @@ impl StructuredLogParser for CompilationMetricsParser<'_> {
             let id = compile_id
                 .clone()
                 .map_or("(unknown) ".to_string(), |c| format!("{cid} ", cid = c));
+            let mut cid = compile_id.clone();
+            if let Some(c) = cid.as_mut() {
+                c.attempt = 0;
+            }
+            let stack_html = self
+                .stack_index
+                .borrow()
+                .get(&cid)
+                .map_or("".to_string(), |stack| {
+                    let mut trie = StackTrieNode::default();
+                    trie.insert_no_terminal(stack.to_vec());
+                    trie.fmt(None).unwrap()
+                });
             let context = CompilationMetricsContext {
                 css: crate::CSS,
                 m: &m,
                 compile_id: id,
+                stack_html: stack_html,
             };
             let output = self.tt.render(&filename, &context)?;
             simple_file_output(&filename, lineno, compile_id, &output)
@@ -323,7 +339,10 @@ impl StructuredLogParser for AOTAutogradBackwardCompilationMetricsParser<'_> {
 }
 
 // Register your parser here
-pub fn default_parsers<'t>(tt: &'t TinyTemplate<'t>) -> Vec<Box<dyn StructuredLogParser + 't>> {
+pub fn default_parsers<'t>(
+    tt: &'t TinyTemplate<'t>,
+    stack_index: &'t RefCell<StackIndex>,
+) -> Vec<Box<dyn StructuredLogParser + 't>> {
     // We need to use Box wrappers here because vecs in Rust need to have known size
     let result: Vec<Box<dyn StructuredLogParser>> = vec![
         Box::new(SentinelFileParser::new("optimize_ddp_split_graph", |e| {
@@ -349,7 +368,7 @@ pub fn default_parsers<'t>(tt: &'t TinyTemplate<'t>) -> Vec<Box<dyn StructuredLo
         Box::new(DynamoGuardParser { tt }),
         Box::new(InductorOutputCodeParser),
         Box::new(OptimizeDdpSplitChildParser),
-        Box::new(CompilationMetricsParser { tt }), // TODO: use own tt instances
+        Box::new(CompilationMetricsParser { tt, stack_index }), // TODO: use own tt instances
         Box::new(AOTAutogradBackwardCompilationMetricsParser { tt }), // TODO: use own tt instances
     ];
 

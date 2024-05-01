@@ -4,6 +4,7 @@ use md5::{Digest, Md5};
 
 use indicatif::{MultiProgress, ProgressBar, ProgressStyle};
 use regex::Regex;
+use std::cell::RefCell;
 use std::fs::File;
 use std::io::{self, BufRead};
 use std::path::PathBuf;
@@ -88,6 +89,7 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
     let mut directory: FxIndexMap<Option<CompileId>, Vec<(PathBuf, i32)>> = FxIndexMap::default();
 
     let mut metrics_index: CompilationMetricsIndex = FxIndexMap::default();
+    let stack_index: RefCell<StackIndex> = RefCell::new(FxHashMap::default());
 
     // Store results in an output Vec<PathBuf, String>
     let mut output: Vec<(PathBuf, String)> = Vec::new();
@@ -122,7 +124,7 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
         })
         .peekable();
 
-    let mut all_parsers = default_parsers(&tt);
+    let mut all_parsers = default_parsers(&tt, &stack_index);
     all_parsers.extend(config.custom_parsers);
 
     while let Some((lineno, line)) = iter.next() {
@@ -300,6 +302,9 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
         if let Some(m) = e.dynamo_start {
             if let Some(mut stack) = m.stack {
                 maybe_remove_suffix(&mut stack);
+                stack_index
+                    .borrow_mut()
+                    .insert(e.compile_id.clone(), stack.clone());
                 stack_trie.insert(stack, e.compile_id.clone());
             };
         };
@@ -322,8 +327,8 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
             .drain(..)
             .map(|(x, y)| (x.map_or("(unknown)".to_string(), |e| e.to_string()), y))
             .collect(),
-        stack_trie_html: stack_trie.fmt(&metrics_index).unwrap(),
-        unknown_stack_trie_html: unknown_stack_trie.fmt(&metrics_index).unwrap(),
+        stack_trie_html: stack_trie.fmt(Some(&metrics_index)).unwrap(),
+        unknown_stack_trie_html: unknown_stack_trie.fmt(Some(&metrics_index)).unwrap(),
         has_unknown_stack_trie: !unknown_stack_trie.is_empty(),
         num_breaks: breaks.failures.len(),
     };
