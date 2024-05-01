@@ -56,6 +56,7 @@ pub static TEMPLATE_INDEX: &str = r#"
 </script>
 <body>
 <div>
+{custom_header_html | format_unescaped}
 <h2>Stack trie</h2>
 <p>
 The <strong>stack trie</strong> is a way of getting a quick orientation on where all the
