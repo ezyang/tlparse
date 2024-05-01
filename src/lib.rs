@@ -54,7 +54,7 @@ fn maybe_remove_convert_frame_suffixes(frames: &mut Vec<FrameSummary>) {
                     && frame.name == target.1
             })
         {
-            frames.truncate(len - target_farmes.len());
+            frames.truncate(len - target_frames.len());
         }
     }
 }
@@ -313,7 +313,7 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
 
         if let Some(m) = e.dynamo_start {
             if let Some(mut stack) = m.stack {
-                maybe_remove_suffix(&mut stack);
+                maybe_remove_convert_frame_suffixes(&mut stack);
                 stack_index
                     .borrow_mut()
                     .insert(e.compile_id.clone(), stack.clone());
