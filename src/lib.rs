@@ -1,4 +1,4 @@
-use anyhow::anyhow;
+use anyhow::{anyhow, bail};
 use fxhash::FxHashMap;
 use md5::{Digest, Md5};
 
@@ -61,6 +61,9 @@ fn maybe_remove_convert_frame_suffixes(frames: &mut Vec<FrameSummary>) {
 
 pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOutput> {
     let strict = config.strict;
+    if !path.is_file() {
+        bail!("{} is not a file", path.display())
+    }
     let file = File::open(path)?;
     let metadata = file.metadata()?;
     let file_size = metadata.len();
