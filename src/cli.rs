@@ -28,7 +28,7 @@ pub struct Cli {
     #[arg(long)]
     no_browser: bool,
     /// Some custom HTML to append to the top of report
-    #[arg(long)]
+    #[arg(long, default_value = "")]
     custom_header_html: String,
 }
 
