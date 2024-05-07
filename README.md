@@ -15,7 +15,7 @@ tlparse /tmp/my_traced_log -o tl_out/
 # Adding custom parsers
 You can extend tlparse with custom parsers which take existing structured log data and output any file. To do so, first implement StructuredLogParser with your own trait:
 
-```
+```Rust
 pub struct MyCustomParser;
 impl StructuredLogParser for MyCustomParser {
     fn name(&self) -> &'static str {
