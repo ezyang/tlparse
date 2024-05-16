@@ -215,7 +215,7 @@ impl StructuredLogParser for InductorOutputCodeParser {
             // Generate HTML output and handle potential errors
             let html_payload = match generate_html_output(payload) {
                 Ok(html) => html,
-                Err(_e) => return Err(anyhow::anyhow!("Failed to parse html")),
+                Err(_e) => return Err(anyhow::anyhow!("Failed to parse inductor code to html")),
             };
             simple_file_output(
                 &filename.to_string_lossy(),
@@ -229,7 +229,7 @@ impl StructuredLogParser for InductorOutputCodeParser {
     }
 }
 
-fn generate_html_output(payload: &str) -> Result<String, syntect::Error> {
+fn generate_html_output(payload: &str) -> Result<String, anyhow::Error> {
     let syntax_set = SyntaxSet::load_defaults_newlines();
     let theme_set = ThemeSet::load_defaults();
     let syntax = syntax_set.find_syntax_by_extension("py").unwrap();
@@ -237,9 +237,13 @@ fn generate_html_output(payload: &str) -> Result<String, syntect::Error> {
         &payload,
         &syntax_set,
         &syntax,
-        &theme_set.themes["base16-ocean.dark"],
+        &theme_set.themes["InspiredGitHub"],
     );
-    html
+    let wrapped_html = format!(
+        "<div style=\"padding: 10px; border: 1px solid #ffffff; border-radius: 5px; background-color: #ffffff;\">{}</div>",
+        html.unwrap()
+    );
+    Ok(wrapped_html)
 }
 
 pub struct OptimizeDdpSplitChildParser;
