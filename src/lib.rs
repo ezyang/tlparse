@@ -12,6 +12,7 @@ use std::time::Instant;
 use tinytemplate::TinyTemplate;
 
 use crate::parsers::default_parsers;
+use crate::parsers::ParserOutput;
 use crate::templates::*;
 use crate::types::*;
 mod parsers;
@@ -101,7 +102,10 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
 
     let mut expected_rank: Option<Option<u32>> = None;
 
-    let mut directory: FxIndexMap<Option<CompileId>, Vec<(PathBuf, i32)>> = FxIndexMap::default();
+    // Each entry is a compile id => (link, rendered name, output number)
+    // For files, link and rendered name are the same
+    // For links, you can specify a custom name for the link
+    let mut directory: FxIndexMap<Option<CompileId>, Vec<(String, String, i32)>> = FxIndexMap::default();
 
     let mut metrics_index: CompilationMetricsIndex = FxIndexMap::default();
     let stack_index: RefCell<StackIndex> = RefCell::new(FxHashMap::default());
@@ -234,10 +238,19 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
                 let results = parser.parse(lineno, md, e.rank, &e.compile_id, &payload);
                 match results {
                     Ok(results) => {
-                        for (filename, out) in results {
-                            output.push((filename.clone(), out));
-                            compile_directory.push((filename, output_count));
-                            output_count += 1;
+                        for parser_result in results {
+                            match parser_result  {
+                                ParserOutput::File(filename, out) => {
+                                    output.push((filename.clone(), out));
+                                    let filename_str = format!("{}", filename.to_string_lossy());
+                                    compile_directory.push((filename_str.clone(), filename_str, output_count));
+                                    output_count += 1;
+                                }
+                                ParserOutput::Link(name, url) => {
+                                    compile_directory.push((url, name, output_count));
+                                    output_count += 1;
+                                }
+                            }
                         }
                     }
                     Err(err) => match parser.name() {

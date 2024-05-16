@@ -1,0 +1,160 @@
+V0516 11:47:27.901000 139733182882816 torch/_logging/structured.py:19] {"str": ["/home/jjwu/tmp.py", 0]}
+V0516 11:47:27.901000 139733182882816 torch/_logging/structured.py:19] {"str": ["/data/users/jjwu/a/pytorch/torch/nn/modules/module.py", 1]}
+V0516 11:47:27.901000 139733182882816 torch/_logging/structured.py:19] {"str": ["/data/users/jjwu/a/pytorch/torch/_dynamo/eval_frame.py", 2]}
+V0516 11:47:27.901000 139733182882816 torch/_dynamo/convert_frame.py:792] {"dynamo_start": {"stack": [{"line": 15, "name": "<module>", "filename": 0}, {"line": 1532, "name": "_wrapped_call_impl", "filename": 1}, {"line": 1541, "name": "_call_impl", "filename": 1}, {"line": 414, "name": "_fn", "filename": 2}, {"line": 1532, "name": "_wrapped_call_impl", "filename": 1}, {"line": 1541, "name": "_call_impl", "filename": 1}]}, "frame_id": 0, "frame_compile_id": 0, "attempt": 0}
+V0516 11:47:27.920000 139733182882816 torch/_dynamo/output_graph.py:1278] {"dynamo_output_graph": {"sizes": {"l_x_": [2], "g_global_state_tensor_": [2], "l__self___param": [2], "y": [2], "add": [2], "add_1": [2]}}, "frame_id": 0, "frame_compile_id": 0, "attempt": 0, "has_payload": "2fcc93b1b49f2b51f2f307ab841be828"}
+	class GraphModule(torch.nn.Module):
+	    def forward(self, L_x_: "f32[2][1]cpu", G_global_state_tensor_: "f32[2][1]cpu"):
+	        l_x_ = L_x_
+	        g_global_state_tensor_ = G_global_state_tensor_
+	        
+	        # File: /home/jjwu/tmp.py:8 in forward, code: y = torch.sin(self.param)
+	        l__self___param: "f32[2][1]cpu" = self.L__self___param
+	        y: "f32[2][1]cpu" = torch.sin(l__self___param);  l__self___param = None
+	        
+	        # File: /home/jjwu/tmp.py:9 in forward, code: return y+ x + global_state_tensor
+	        add: "f32[2][1]cpu" = y + l_x_;  y = l_x_ = None
+	        add_1: "f32[2][1]cpu" = add + g_global_state_tensor_;  add = g_global_state_tensor_ = None
+	        return (add_1,)
+	        
+V0516 11:47:27.930000 139733182882816 torch/_functorch/aot_autograd.py:887] {"link": {"name": "manifold_url", "url": "https://www.google.com"}, "frame_id": 0, "frame_compile_id": 0, "attempt": 0}
+V0516 11:47:27.945000 139733182882816 torch/_functorch/_aot_autograd/dispatch_and_compile_graph.py:191] {"aot_forward_graph": {}, "frame_id": 0, "frame_compile_id": 0, "attempt": 0, "has_payload": "1beb7268ed1533c825d47635b0110b80"}
+	class <lambda>(torch.nn.Module):
+	    def forward(self, arg0_1: "f32[2]", arg1_1: "f32[2]", arg2_1: "f32[2]"):
+	        # File: /home/jjwu/tmp.py:8 in forward, code: y = torch.sin(self.param)
+	        sin: "f32[2]" = torch.ops.aten.sin.default(arg0_1);  arg0_1 = None
+	        
+	        # File: /home/jjwu/tmp.py:9 in forward, code: return y+ x + global_state_tensor
+	        add: "f32[2]" = torch.ops.aten.add.Tensor(sin, arg1_1);  sin = arg1_1 = None
+	        add_1: "f32[2]" = torch.ops.aten.add.Tensor(add, arg2_1);  add = arg2_1 = None
+	        return (add_1,)
+	        
+V0516 11:47:29.040000 139733182882816 torch/_inductor/compile_fx.py:742] {"inductor_post_grad_graph": {}, "frame_id": 0, "frame_compile_id": 0, "attempt": 0, "has_payload": "1beb7268ed1533c825d47635b0110b80"}
+	class <lambda>(torch.nn.Module):
+	    def forward(self, arg0_1: "f32[2]", arg1_1: "f32[2]", arg2_1: "f32[2]"):
+	        # File: /home/jjwu/tmp.py:8 in forward, code: y = torch.sin(self.param)
+	        sin: "f32[2]" = torch.ops.aten.sin.default(arg0_1);  arg0_1 = None
+	        
+	        # File: /home/jjwu/tmp.py:9 in forward, code: return y+ x + global_state_tensor
+	        add: "f32[2]" = torch.ops.aten.add.Tensor(sin, arg1_1);  sin = arg1_1 = None
+	        add_1: "f32[2]" = torch.ops.aten.add.Tensor(add, arg2_1);  add = arg2_1 = None
+	        return (add_1,)
+	        
+V0516 11:47:33.646000 139733182882816 torch/_inductor/graph.py:1697] {"inductor_output_code": {"filename": "/tmp/torchinductor_jjwu/a5/ca5os4o7g4qiox3d7on73q5rz47pg6mywe35z7mwmsaohs3ev3cy.py"}, "frame_id": 0, "frame_compile_id": 0, "attempt": 0, "has_payload": "0e0f93ffb20f4bd34dec99c06a121936"}
+	
+	# AOT ID: ['0_inference']
+	from ctypes import c_void_p, c_long
+	import torch
+	import math
+	import random
+	import os
+	import tempfile
+	from math import inf, nan
+	from torch._inductor.hooks import run_intermediate_hooks
+	from torch._inductor.utils import maybe_profile
+	from torch._inductor.codegen.memory_planning import _align as align
+	
+	from torch import device, empty_strided
+	from torch._inductor.codecache import AsyncCompile
+	from torch._inductor.select_algorithm import extern_kernels
+	from torch._inductor.codegen.multi_kernel import MultiKernelCall
+	
+	aten = torch.ops.aten
+	inductor_ops = torch.ops.inductor
+	_quantized = torch.ops._quantized
+	assert_size_stride = torch._C._dynamo.guards.assert_size_stride
+	empty_strided_cpu = torch._C._dynamo.guards._empty_strided_cpu
+	empty_strided_cuda = torch._C._dynamo.guards._empty_strided_cuda
+	alloc_from_pool = torch.ops.inductor._alloc_from_pool
+	reinterpret_tensor = torch.ops.inductor._reinterpret_tensor
+	async_compile = AsyncCompile()
+	
+	
+	cpp_fused_add_sin_0 = async_compile.cpp_pybinding(['const float*', 'const float*', 'const float*', 'float*'], '''
+	#include "/tmp/torchinductor_jjwu/tc/ctcib3vzwwy5ojjrjpuj6kvvjcgr5r6aayijaxwpdmvn4amuedlx.h"
+	extern "C" void kernel(const float* in_ptr0,
+	                       const float* in_ptr1,
+	                       const float* in_ptr2,
+	                       float* out_ptr0)
+	{
+	    {
+	        #pragma omp simd simdlen(8) 
+	        for(long x0=static_cast<long>(0L); x0<static_cast<long>(2L); x0+=static_cast<long>(1L))
+	        {
+	            auto tmp0 = in_ptr0[static_cast<long>(x0)];
+	            auto tmp2 = in_ptr1[static_cast<long>(x0)];
+	            auto tmp4 = in_ptr2[static_cast<long>(x0)];
+	            auto tmp1 = std::sin(tmp0);
+	            auto tmp3 = decltype(tmp1)(tmp1 + tmp2);
+	            auto tmp5 = decltype(tmp3)(tmp3 + tmp4);
+	            out_ptr0[static_cast<long>(x0)] = tmp5;
+	        }
+	    }
+	}
+	''')
+	
+	
+	async_compile.wait(globals())
+	del async_compile
+	
+	def call(args):
+	    arg0_1, arg1_1, arg2_1 = args
+	    args.clear()
+	    assert_size_stride(arg0_1, (2, ), (1, ))
+	    assert_size_stride(arg1_1, (2, ), (1, ))
+	    assert_size_stride(arg2_1, (2, ), (1, ))
+	    buf0 = empty_strided_cpu((2, ), (1, ), torch.float32)
+	    cpp_fused_add_sin_0(arg0_1, arg1_1, arg2_1, buf0)
+	    del arg0_1
+	    del arg1_1
+	    del arg2_1
+	    return (buf0, )
+	
+	
+	def benchmark_compiled_module(times=10, repeat=10):
+	    from torch._dynamo.testing import rand_strided
+	    from torch._inductor.utils import print_performance
+	    arg0_1 = rand_strided((2, ), (1, ), device='cpu', dtype=torch.float32)
+	    arg1_1 = rand_strided((2, ), (1, ), device='cpu', dtype=torch.float32)
+	    arg2_1 = rand_strided((2, ), (1, ), device='cpu', dtype=torch.float32)
+	    fn = lambda: call([arg0_1, arg1_1, arg2_1])
+	    return print_performance(fn, times=times, repeat=repeat)
+	
+	
+	if __name__ == "__main__":
+	    from torch._inductor.wrapper_benchmark import compiled_module_main
+	    compiled_module_main('None', benchmark_compiled_module)
+	
+V0516 11:47:33.651000 139733182882816 torch/_dynamo/guards.py:2304] {"dynamo_guards": {}, "frame_id": 0, "frame_compile_id": 0, "attempt": 0, "has_payload": "18b50eaa01e860d2c78d96b8478bfd75"}
+	[
+	
+	]
+V0516 11:47:33.652000 139733182882816 torch/_dynamo/guards.py:2132] {"dynamo_cpp_guards_str": {}, "frame_id": 0, "frame_compile_id": 0, "attempt": 0, "has_payload": "8c785311c5ebd407bea97cb8f1eacf06"}
+	
+	TREE_GUARD_MANAGER:
+	+- RootGuardManager
+	| +- DEFAULT_DEVICE: utils_device.CURRENT_DEVICE == None                           # _dynamo/output_graph.py:456 in init_ambient_guards
+	| +- GLOBAL_STATE: ___check_global_state()
+	| +- GuardManager: source=L['x'], accessed_by=DictGetItemGuardAccessor(x)
+	| | +- TENSOR_MATCH: check_tensor(L['x'], Tensor, DispatchKeySet(CPU, BackendSelect, ADInplaceOrView, AutogradCPU), torch.float32, device=None, requires_grad=False, size=[2], stride=[1])
+	| | +- NO_HASATTR: hasattr(L['x'], '_dynamo_dynamic_indices') == False         
+	| | +- NO_TENSOR_ALIASING: check_no_aliasing(L['x'], G['global_state_tensor'])
+	| +- GuardManager: source=L['self'], accessed_by=DictGetItemGuardAccessor(self)
+	| | +- ID_MATCH: ___check_obj_id(L['self'], 139733177812832)                 
+	| | +- GuardManager: source=L['self'].__dict__, accessed_by=GetGenericDictGuardAccessor
+	| | | +- GuardManager: source=L['self'].training, accessed_by=DictGetItemGuardAccessor(training)
+	| | | | +- ID_MATCH: ___check_obj_id(L['self'].training, 7665376)                
+	| | | +- GuardManager: source=L['self']._parameters, accessed_by=DictGetItemGuardAccessor(_parameters)
+	| | | | +- GuardManager: source=L['self'].param, accessed_by=DictGetItemGuardAccessor(param)
+	| | | | | +- ID_MATCH: ___check_obj_id(L['self'].param, 139730993771552)           
+	| +- GuardManager: source=G, accessed_by=GlobalsGuardAccessor
+	| | +- GuardManager: source=G['torch'], accessed_by=DictGetItemGuardAccessor(torch)
+	| | | +- ID_MATCH: ___check_obj_id(G['torch'], 139733176988704)                
+	| | | +- GuardManager: source=G['torch'].sin, accessed_by=GetAttrGuardAccessor(sin)
+	| | | | +- ID_MATCH: ___check_obj_id(G['torch'].sin, 139733173319728)            
+	| | +- GuardManager: source=G['global_state_tensor'], accessed_by=DictGetItemGuardAccessor(global_state_tensor)
+	| | | +- TENSOR_MATCH: check_tensor(G['global_state_tensor'], Tensor, DispatchKeySet(CPU, BackendSelect, ADInplaceOrView, AutogradCPU), torch.float32, device=None, requires_grad=False, size=[2], stride=[1])
+	| | | +- NO_HASATTR: hasattr(G['global_state_tensor'], '_dynamo_dynamic_indices') == False
+	| | | +- NO_TENSOR_ALIASING: check_no_aliasing(L['x'], G['global_state_tensor'])
+	
+V0516 11:47:33.652000 139733182882816 torch/_dynamo/utils.py:634] {"compilation_metrics": {"frame_key": "1", "co_name": "forward", "co_filename": "/home/jjwu/tmp.py", "co_firstlineno": 7, "cache_size": 0, "accumulated_cache_size": 0, "guard_count": 11, "shape_env_guard_count": 0, "graph_op_count": 3, "graph_node_count": 7, "graph_input_count": 2, "start_time": 1715885247.9018195, "entire_frame_compile_time_s": 5.750433683395386, "backend_compile_time_s": 5.728264808654785, "inductor_compile_time_s": 4.610030651092529, "code_gen_time_s": 4.601039886474609, "fail_type": null, "fail_reason": null, "fail_user_frame_filename": null, "fail_user_frame_lineno": null, "non_compliant_ops": [], "compliant_custom_ops": [], "restart_reasons": [], "dynamo_time_before_restart_s": 0.0, "has_guarded_code": true}, "frame_id": 0, "frame_compile_id": 0, "attempt": 0}

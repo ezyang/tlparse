@@ -11,6 +11,8 @@ use once_cell::sync::Lazy;
 use serde::{Deserialize, Serialize};
 use std::sync::Mutex;
 
+
+// Main function returns a list of files to save
 pub type ParseOutput = Vec<(PathBuf, String)>;
 pub type CompilationMetricsIndex = FxIndexMap<Option<CompileId>, Vec<CompilationMetricsMetadata>>;
 pub type StackIndex = FxHashMap<Option<CompileId>, StackSummary>; // NB: attempt is always 0 here
@@ -225,6 +227,12 @@ pub struct InductorOutputCodeMetadata {
     pub filename: Option<PathBuf>,
 }
 
+#[derive(Debug, Deserialize)]
+pub struct LinkMetadata {
+    pub name: String,
+    pub url: String,
+}
+
 #[derive(Debug, Deserialize, Serialize)]
 pub struct CompilationMetricsMetadata {
     // Other information like frame_key, co_name, etc. are already in envelope
@@ -316,6 +324,7 @@ pub struct RestartsAndFailuresContext {
 #[derive(Debug)]
 pub enum Metadata<'e> {
     Empty(&'e EmptyMetadata),
+    Link(&'e LinkMetadata),
     GraphDump(&'e GraphDumpMetadata),
     DynamoOutputGraph(&'e DynamoOutputGraphMetadata),
     #[allow(dead_code)]
@@ -351,6 +360,7 @@ pub struct Envelope {
     pub aot_autograd_backward_compilation_metrics:
         Option<AOTAutogradBackwardCompilationMetricsMetadata>,
     pub graph_dump: Option<GraphDumpMetadata>,
+    pub link: Option<LinkMetadata>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -369,7 +379,7 @@ pub struct DynamoGuardsContext {
 pub struct IndexContext {
     pub css: &'static str,
     pub javascript: &'static str,
-    pub directory: Vec<(String, Vec<(PathBuf, i32)>)>,
+    pub directory: Vec<(String, Vec<(String, String, i32)>)>,
     pub stack_trie_html: String,
     pub unknown_stack_trie_html: String,
     pub has_unknown_stack_trie: bool,

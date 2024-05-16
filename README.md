@@ -33,8 +33,9 @@ impl StructuredLogParser for MyCustomParser {
         _rank: Option<u32>,
         compile_id: &Option<CompileId>,
         payload: &str
-    ) -> anyhow::Result<ParseOutput> {
+    ) -> anyhow::Result<ParserResult> {
        // Use the metadata and payload however you'd like
+       // Return either a ParserOutput::File(filename, payload) or ParserOutput::Link(name, url)
     }
 }
 ```
