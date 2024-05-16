@@ -22,6 +22,17 @@ permissions:
   id-token: write
 
 jobs:
+  rust-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+      - name: Run Tests
+        run: cargo test --release -- --nocapture
   linux:
     runs-on: ubuntu-latest
     strategy:
