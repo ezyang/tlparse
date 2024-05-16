@@ -5,6 +5,8 @@ use std::path::Path;
 use std::path::PathBuf;
 use tinytemplate::TinyTemplate;
 
+use syntect::highlighting::ThemeSet;
+use syntect::parsing::SyntaxSet;
 /**
  * StructuredLogParser
  * Parses a structured log and returns a vec of file outputs.
@@ -202,19 +204,42 @@ impl StructuredLogParser for InductorOutputCodeParser {
                 .as_ref()
                 .and_then(|p| Path::file_stem(p))
                 .map_or_else(
-                    || PathBuf::from("inductor_output_code.txt"),
+                    || PathBuf::from("inductor_output_code.html"),
                     |stem| {
                         let mut r = OsString::from("inductor_output_code_");
                         r.push(stem);
-                        r.push(OsStr::new(".txt"));
+                        r.push(OsStr::new(".html"));
                         r.into()
                     },
                 );
-            simple_file_output(&filename.to_string_lossy(), lineno, compile_id, payload)
+            // Generate HTML output and handle potential errors
+            let html_payload = match generate_html_output(payload) {
+                Ok(html) => html,
+                Err(_e) => return Err(anyhow::anyhow!("Failed to parse html")),
+            };
+            simple_file_output(
+                &filename.to_string_lossy(),
+                lineno,
+                compile_id,
+                &html_payload,
+            )
         } else {
             Err(anyhow::anyhow!("Expected InductorOutputCode metadata"))
         }
     }
+}
+
+fn generate_html_output(payload: &str) -> Result<String, syntect::Error> {
+    let syntax_set = SyntaxSet::load_defaults_newlines();
+    let theme_set = ThemeSet::load_defaults();
+    let syntax = syntax_set.find_syntax_by_extension("py").unwrap();
+    let html = syntect::html::highlighted_html_for_string(
+        &payload,
+        &syntax_set,
+        &syntax,
+        &theme_set.themes["base16-ocean.dark"],
+    );
+    html
 }
 
 pub struct OptimizeDdpSplitChildParser;

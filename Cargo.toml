@@ -17,6 +17,7 @@ path = "src/cli.rs"
 
 [dependencies]
 anyhow = "1.0.75"
+syntect = "5.0"
 base16ct = "0.2.0"
 chrono = "0.4"
 clap = { version = "4.5.2", features = ["derive"] }
