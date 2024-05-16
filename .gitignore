@@ -3,3 +3,4 @@
 /out
 /tl_out
 *.log
+!/tests/inputs/*.log

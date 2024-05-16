@@ -130,7 +130,7 @@ Build products below:
     <li><a id="{compile_directory.0}">{compile_directory.0}</a>
     <ul>
         {{ for path_idx in compile_directory.1 }}
-            <li><a href="{path_idx.0}">{path_idx.0}</a> ({path_idx.1})</li>
+            <li><a href="{path_idx.0}">{path_idx.1}</a> ({path_idx.2})</li>
         {{ endfor }}
     </ul>
     </li>

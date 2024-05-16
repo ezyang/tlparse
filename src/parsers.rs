@@ -7,6 +7,15 @@ use tinytemplate::TinyTemplate;
 
 use syntect::highlighting::ThemeSet;
 use syntect::parsing::SyntaxSet;
+
+pub enum ParserOutput {
+    File(PathBuf, String), // File to be saved on disk
+    Link(String, String), // External href to (name, url) (linked in compile_directory, not returned)
+}
+
+// Each parser returns a list of files to save and links to render in compile directory
+pub type ParserResults = Vec<ParserOutput>;
+
 /**
  * StructuredLogParser
  * Parses a structured log and returns a vec of file outputs.
@@ -27,11 +36,12 @@ pub trait StructuredLogParser {
         rank: Option<u32>,              // Rank of the log
         compile_id: &Option<CompileId>, // Compile ID of the envelope
         payload: &str,                  // Payload from the log (empty string when None)
-    ) -> anyhow::Result<ParseOutput>;
+    ) -> anyhow::Result<ParserResults>;
 
     // Name of the parser, for error logging
     fn name(&self) -> &'static str;
 }
+
 
 // Takes a filename and a payload and writes that payload into a the file
 fn simple_file_output(
@@ -39,7 +49,7 @@ fn simple_file_output(
     lineno: usize,
     compile_id: &Option<CompileId>,
     payload: &str,
-) -> anyhow::Result<ParseOutput> {
+) -> anyhow::Result<ParserResults> {
     let compile_id_dir: PathBuf = compile_id
         .as_ref()
         .map_or(
@@ -53,7 +63,7 @@ fn simple_file_output(
         .into();
     let subdir = PathBuf::from(compile_id_dir);
     let f = subdir.join(filename);
-    Ok(Vec::from([(f, String::from(payload))]))
+    Ok(Vec::from([ParserOutput::File(f, String::from(payload))]))
 }
 
 /**
@@ -88,7 +98,7 @@ impl StructuredLogParser for SentinelFileParser {
         _rank: Option<u32>,
         compile_id: &Option<CompileId>,
         payload: &str,
-    ) -> anyhow::Result<ParseOutput> {
+    ) -> anyhow::Result<ParserResults> {
         simple_file_output(
             &format!("{}.txt", self.filename),
             lineno,
@@ -116,7 +126,7 @@ impl StructuredLogParser for GraphDumpParser {
         _rank: Option<u32>,
         compile_id: &Option<CompileId>,
         payload: &str,
-    ) -> anyhow::Result<ParseOutput> {
+    ) -> anyhow::Result<ParserResults> {
         if let Metadata::GraphDump(metadata) = metadata {
             let filename: PathBuf = {
                 let mut r = OsString::from(&metadata.name);
@@ -148,7 +158,7 @@ impl StructuredLogParser for DynamoOutputGraphParser {
         _rank: Option<u32>,
         compile_id: &Option<CompileId>,
         payload: &str,
-    ) -> anyhow::Result<ParseOutput> {
+    ) -> anyhow::Result<ParserResults> {
         simple_file_output("dynamo_output_graph.txt", lineno, compile_id, payload)
     }
 }
@@ -170,7 +180,7 @@ impl StructuredLogParser for DynamoGuardParser<'_> {
         _rank: Option<u32>,
         compile_id: &Option<CompileId>,
         payload: &str,
-    ) -> anyhow::Result<ParseOutput> {
+    ) -> anyhow::Result<ParserResults> {
         let filename = format!("{}.html", self.name());
         let guards = serde_json::from_str::<Vec<DynamoGuard>>(payload)?;
         let guards_context = DynamoGuardsContext { guards };
@@ -197,7 +207,7 @@ impl StructuredLogParser for InductorOutputCodeParser {
         _rank: Option<u32>,
         compile_id: &Option<CompileId>,
         payload: &str,
-    ) -> anyhow::Result<ParseOutput> {
+    ) -> anyhow::Result<ParserResults> {
         if let Metadata::InductorOutputCode(metadata) = metadata {
             let filename = metadata
                 .filename
@@ -260,12 +270,39 @@ impl StructuredLogParser for OptimizeDdpSplitChildParser {
         _rank: Option<u32>,
         compile_id: &Option<CompileId>,
         payload: &str,
-    ) -> anyhow::Result<ParseOutput> {
+    ) -> anyhow::Result<ParserResults> {
         if let Metadata::OptimizeDdpSplitChild(m) = metadata {
             let filename = format!("optimize_ddp_split_child_{}.txt", m.name);
             simple_file_output(&filename, lineno, compile_id, payload)
         } else {
             Err(anyhow::anyhow!("Expected OptimizeDdpSplitChild metadata"))
+        }
+    }
+}
+
+pub struct LinkParser;
+impl StructuredLogParser for LinkParser {
+    fn name(&self) -> &'static str {
+        "link_parser"
+    }
+    fn get_metadata<'e>(&self, e: &'e Envelope) -> Option<Metadata<'e>> {
+        e.link
+            .as_ref()
+            .map(|m| Metadata::Link(m))
+    }
+
+    fn parse<'e>(
+        &self,
+        _lineno: usize,
+        metadata: Metadata<'e>,
+        _rank: Option<u32>,
+        _compile_id: &Option<CompileId>,
+        _payload: &str,
+    ) -> anyhow::Result<ParserResults> {
+        if let Metadata::Link(m) = metadata {
+            Ok(Vec::from([ParserOutput::Link(m.name.clone(), m.url.clone())]))
+        } else {
+            Err(anyhow::anyhow!("Expected Link Metadata"))
         }
     }
 }
@@ -290,7 +327,7 @@ impl StructuredLogParser for CompilationMetricsParser<'_> {
         _rank: Option<u32>,
         compile_id: &Option<CompileId>,
         _payload: &str,
-    ) -> anyhow::Result<ParseOutput> {
+    ) -> anyhow::Result<ParserResults> {
         let filename = format!("{}.html", self.name());
         if let Metadata::CompilationMetrics(m) = metrics {
             let id = compile_id
@@ -342,7 +379,7 @@ impl StructuredLogParser for AOTAutogradBackwardCompilationMetricsParser<'_> {
         _rank: Option<u32>,
         compile_id: &Option<CompileId>,
         _payload: &str,
-    ) -> anyhow::Result<ParseOutput> {
+    ) -> anyhow::Result<ParserResults> {
         let filename = format!("{}.html", self.name());
         if let Metadata::AOTAutogradBackwardCompilationMetrics(m) = metrics {
             let id = compile_id
@@ -395,6 +432,7 @@ pub fn default_parsers<'t>(
         Box::new(OptimizeDdpSplitChildParser),
         Box::new(CompilationMetricsParser { tt, stack_index }), // TODO: use own tt instances
         Box::new(AOTAutogradBackwardCompilationMetricsParser { tt }), // TODO: use own tt instances
+        Box::new(LinkParser),
     ];
 
     result
