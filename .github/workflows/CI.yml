@@ -33,6 +33,19 @@ jobs:
           profile: minimal
       - name: Run Tests
         run: cargo test --release -- --nocapture
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+      - name: Install rustfmt
+        run: rustup component add rustfmt
+      - name: Run Lint
+        run: cargo fmt --check
   linux:
     runs-on: ubuntu-latest
     strategy:
