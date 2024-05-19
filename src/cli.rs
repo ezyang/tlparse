@@ -66,7 +66,7 @@ fn main() -> anyhow::Result<()> {
     }
 
     if !cli.no_browser {
-        opener::open(out_path.join("index.html"))?;
+          opener::open(out_path.join("index.html"))?;
     }
     Ok(())
 }
