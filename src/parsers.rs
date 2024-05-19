@@ -42,7 +42,6 @@ pub trait StructuredLogParser {
     fn name(&self) -> &'static str;
 }
 
-
 // Takes a filename and a payload and writes that payload into a the file
 fn simple_file_output(
     filename: &str,
@@ -249,11 +248,7 @@ fn generate_html_output(payload: &str) -> Result<String, anyhow::Error> {
         &syntax,
         &theme_set.themes["InspiredGitHub"],
     );
-    let wrapped_html = format!(
-        "<div style=\"padding: 10px; border: 1px solid #ffffff; border-radius: 5px; background-color: #ffffff;\">{}</div>",
-        html.unwrap()
-    );
-    Ok(wrapped_html)
+    Ok(html?)
 }
 
 pub struct OptimizeDdpSplitChildParser;
@@ -290,9 +285,7 @@ impl StructuredLogParser for LinkParser {
         "link_parser"
     }
     fn get_metadata<'e>(&self, e: &'e Envelope) -> Option<Metadata<'e>> {
-        e.link
-            .as_ref()
-            .map(|m| Metadata::Link(m))
+        e.link.as_ref().map(|m| Metadata::Link(m))
     }
 
     fn parse<'e>(
@@ -304,7 +297,10 @@ impl StructuredLogParser for LinkParser {
         _payload: &str,
     ) -> anyhow::Result<ParserResults> {
         if let Metadata::Link(m) = metadata {
-            Ok(Vec::from([ParserOutput::Link(m.name.clone(), m.url.clone())]))
+            Ok(Vec::from([ParserOutput::Link(
+                m.name.clone(),
+                m.url.clone(),
+            )]))
         } else {
             Err(anyhow::anyhow!("Expected Link Metadata"))
         }

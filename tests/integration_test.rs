@@ -11,13 +11,13 @@ fn prefix_exists(map: &HashMap<PathBuf, String>, prefix: &str) -> bool {
 #[test]
 fn test_parse_simple() {
     let expected_files = [
-        "0_0_0/aot_forward_graph.txt",
-        "0_0_0/dynamo_output_graph.txt",
+        "0_0_0/aot_forward_graph",
+        "0_0_0/dynamo_output_graph",
         "index.html",
         "failures_and_restarts.html",
-        "0_0_0/inductor_post_grad_graph.txt",
-        "0_0_0/inductor_output_code", // This always has an output hash, so we use prefixes instead of full
-        "0_0_0/dynamo_guards.html",
+        "0_0_0/inductor_post_grad_graph",
+        "0_0_0/inductor_output_code",
+        "0_0_0/dynamo_guards",
     ];
     // Read the test file
     // simple.log was generated from the following:
@@ -43,15 +43,15 @@ fn test_parse_simple() {
 #[test]
 fn test_parse_compilation_metrics() {
     let expected_files = [
-        "0_0_1/dynamo_output_graph.txt",
-        "0_0_1/dynamo_guards.html",
-        "0_0_1/compilation_metrics.html",
-        "1_0_1/dynamo_output_graph.txt",
-        "1_0_1/dynamo_guards.html",
-        "1_0_1/compilation_metrics.html",
-        "2_0_0/dynamo_output_graph.txt",
-        "2_0_0/dynamo_guards.html",
-        "2_0_0/compilation_metrics.html",
+        "0_0_1/dynamo_output_graph",
+        "0_0_1/dynamo_guards",
+        "0_0_1/compilation_metrics",
+        "1_0_1/dynamo_output_graph",
+        "1_0_1/dynamo_guards",
+        "1_0_1/compilation_metrics",
+        "2_0_0/dynamo_output_graph",
+        "2_0_0/dynamo_guards",
+        "2_0_0/compilation_metrics",
         "index.html",
         "failures_and_restarts.html",
     ];
@@ -79,8 +79,8 @@ fn test_parse_compilation_metrics() {
 #[test]
 fn test_parse_compilation_failures() {
     let expected_files = [
-        "0_0_0/dynamo_output_graph.txt",
-        "0_0_0/compilation_metrics.html",
+        "0_0_0/dynamo_output_graph",
+        "0_0_0/compilation_metrics",
         "index.html",
         "failures_and_restarts.html",
     ];
