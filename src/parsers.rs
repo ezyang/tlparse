@@ -248,7 +248,7 @@ fn generate_html_output(payload: &str) -> Result<String, anyhow::Error> {
         &syntax,
         &theme_set.themes["InspiredGitHub"],
     );
-    Ok(html)
+    Ok(html?)
 }
 
 pub struct OptimizeDdpSplitChildParser;
