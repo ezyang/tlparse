@@ -11,7 +11,6 @@ use once_cell::sync::Lazy;
 use serde::{Deserialize, Serialize};
 use std::sync::Mutex;
 
-
 // Main function returns a list of files to save
 pub type ParseOutput = Vec<(PathBuf, String)>;
 pub type CompilationMetricsIndex = FxIndexMap<Option<CompileId>, Vec<CompilationMetricsMetadata>>;
