@@ -1,6 +1,7 @@
 use anyhow::{anyhow, bail};
 use fxhash::FxHashMap;
 use md5::{Digest, Md5};
+use std::ffi::{OsStr, OsString};
 
 use indicatif::{MultiProgress, ProgressBar, ProgressStyle};
 use regex::Regex;
@@ -105,7 +106,8 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
     // Each entry is a compile id => (link, rendered name, output number)
     // For files, link and rendered name are the same
     // For links, you can specify a custom name for the link
-    let mut directory: FxIndexMap<Option<CompileId>, Vec<(String, String, i32)>> = FxIndexMap::default();
+    let mut directory: FxIndexMap<Option<CompileId>, Vec<(String, String, i32)>> =
+        FxIndexMap::default();
 
     let mut metrics_index: CompilationMetricsIndex = FxIndexMap::default();
     let stack_index: RefCell<StackIndex> = RefCell::new(FxHashMap::default());
@@ -239,11 +241,28 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
                 match results {
                     Ok(results) => {
                         for parser_result in results {
-                            match parser_result  {
-                                ParserOutput::File(filename, out) => {
+                            match parser_result {
+                                ParserOutput::File(raw_filename, out) => {
+                                    let filename = if let Some(stem) = raw_filename.file_stem() {
+                                        let mut r = OsString::new();
+                                        r.push(stem);
+                                        r.push(OsStr::new("_"));
+                                        r.push(output_count.to_string());
+                                        if let Some(e) = raw_filename.extension() {
+                                            r.push(OsStr::new("."));
+                                            r.push(e);
+                                        };
+                                        r.into()
+                                    } else {
+                                        raw_filename
+                                    };
                                     output.push((filename.clone(), out));
                                     let filename_str = format!("{}", filename.to_string_lossy());
-                                    compile_directory.push((filename_str.clone(), filename_str, output_count));
+                                    compile_directory.push((
+                                        filename_str.clone(),
+                                        filename_str,
+                                        output_count,
+                                    ));
                                     output_count += 1;
                                 }
                                 ParserOutput::Link(name, url) => {
