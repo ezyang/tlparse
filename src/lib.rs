@@ -252,7 +252,7 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
                                             r.push(OsStr::new("."));
                                             r.push(e);
                                         };
-                                        r.into()
+                                        raw_filename.with_file_name(r)
                                     } else {
                                         raw_filename
                                     };
