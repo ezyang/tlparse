@@ -112,6 +112,9 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
     let mut metrics_index: CompilationMetricsIndex = FxIndexMap::default();
     let stack_index: RefCell<StackIndex> = RefCell::new(FxHashMap::default());
 
+    let symbolic_shape_specialization_index: RefCell<SymbolicShapeSpecializationIndex> =
+        RefCell::new(FxHashMap::default());
+
     // Store results in an output Vec<PathBuf, String>
     let mut output: Vec<(PathBuf, String)> = Vec::new();
 
@@ -145,7 +148,12 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
         })
         .peekable();
 
-    let mut all_parsers = default_parsers(&tt, &stack_index);
+    let mut all_parsers = default_parsers(&tt);
+    all_parsers.push(Box::new(crate::parsers::CompilationMetricsParser {
+        tt: &tt,
+        stack_index: &stack_index,
+        symbolic_shape_specialization_index: &symbolic_shape_specialization_index,
+    })); // TODO: use own tt instances
     all_parsers.extend(config.custom_parsers);
 
     while let Some((lineno, line)) = iter.next() {
@@ -156,7 +164,7 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
         let start = Instant::now();
 
         let Some(caps) = re_glog.captures(&line) else {
-            eprintln!("Failed to parse glog prefix on line {}", lineno);
+            multi.suspend(|| eprintln!("Failed to parse glog prefix on line {}", lineno));
             stats.fail_glog += 1;
             continue;
         };
@@ -274,11 +282,11 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
                     }
                     Err(err) => match parser.name() {
                         "dynamo_guards" => {
-                            eprintln!("Failed to parse guards json: {}", err);
+                            multi.suspend(|| eprintln!("Failed to parse guards json: {}", err));
                             stats.fail_dynamo_guards_json += 1;
                         }
                         name => {
-                            eprintln!("Parser {name} failed: {err}");
+                            multi.suspend(|| eprintln!("Parser {name} failed: {err}"));
                             stats.fail_parser += 1;
                         }
                     },
@@ -288,6 +296,14 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
 
         if let Some(stack) = e.stack {
             unknown_stack_trie.insert(stack, None);
+        }
+
+        if let Some(specialization) = e.symbolic_shape_specialization {
+            symbolic_shape_specialization_index
+                .borrow_mut()
+                .entry(e.compile_id.clone())
+                .or_default()
+                .push(specialization);
         }
 
         if let Some(m) = e.compilation_metrics {
