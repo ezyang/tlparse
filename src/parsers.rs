@@ -307,9 +307,16 @@ impl StructuredLogParser for LinkParser {
     }
 }
 
+fn format_stack(stack: &StackSummary) -> String {
+    let mut trie = StackTrieNode::default();
+    trie.insert_no_terminal(stack.to_vec());
+    trie.fmt(None).unwrap()
+}
+
 pub struct CompilationMetricsParser<'t> {
-    tt: &'t TinyTemplate<'t>,
-    stack_index: &'t RefCell<StackIndex>,
+    pub tt: &'t TinyTemplate<'t>,
+    pub stack_index: &'t RefCell<StackIndex>,
+    pub symbolic_shape_specialization_index: &'t RefCell<SymbolicShapeSpecializationIndex>,
 }
 impl StructuredLogParser for CompilationMetricsParser<'_> {
     fn name(&self) -> &'static str {
@@ -341,16 +348,27 @@ impl StructuredLogParser for CompilationMetricsParser<'_> {
                 .stack_index
                 .borrow()
                 .get(&cid)
-                .map_or("".to_string(), |stack| {
-                    let mut trie = StackTrieNode::default();
-                    trie.insert_no_terminal(stack.to_vec());
-                    trie.fmt(None).unwrap()
-                });
+                .map_or("".to_string(), format_stack);
+            let specializations = self
+                .symbolic_shape_specialization_index
+                .borrow_mut()
+                .remove(&cid)
+                .unwrap_or(Vec::new())
+                .drain(..)
+                .map(|spec| SymbolicShapeSpecializationContext {
+                    symbol: spec.symbol.unwrap_or("".to_string()),
+                    sources: spec.sources.unwrap_or(Vec::new()),
+                    value: spec.value.unwrap_or("".to_string()),
+                    user_stack_html: format_stack(&spec.user_stack.unwrap_or(Vec::new())),
+                    stack_html: format_stack(&spec.stack.unwrap_or(Vec::new())),
+                })
+                .collect();
             let context = CompilationMetricsContext {
                 css: crate::CSS,
                 m: &m,
                 compile_id: id,
                 stack_html: stack_html,
+                symbolic_shape_specializations: specializations,
             };
             let output = self.tt.render(&filename, &context)?;
             simple_file_output(&filename, lineno, compile_id, &output)
@@ -401,10 +419,7 @@ impl StructuredLogParser for AOTAutogradBackwardCompilationMetricsParser<'_> {
 }
 
 // Register your parser here
-pub fn default_parsers<'t>(
-    tt: &'t TinyTemplate<'t>,
-    stack_index: &'t RefCell<StackIndex>,
-) -> Vec<Box<dyn StructuredLogParser + 't>> {
+pub fn default_parsers<'t>(tt: &'t TinyTemplate<'t>) -> Vec<Box<dyn StructuredLogParser + 't>> {
     // We need to use Box wrappers here because vecs in Rust need to have known size
     let result: Vec<Box<dyn StructuredLogParser>> = vec![
         Box::new(SentinelFileParser::new("optimize_ddp_split_graph", |e| {
@@ -430,7 +445,6 @@ pub fn default_parsers<'t>(
         Box::new(DynamoGuardParser { tt }),
         Box::new(InductorOutputCodeParser),
         Box::new(OptimizeDdpSplitChildParser),
-        Box::new(CompilationMetricsParser { tt, stack_index }), // TODO: use own tt instances
         Box::new(AOTAutogradBackwardCompilationMetricsParser { tt }), // TODO: use own tt instances
         Box::new(LinkParser),
     ];
