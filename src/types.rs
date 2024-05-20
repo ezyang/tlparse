@@ -15,6 +15,8 @@ use std::sync::Mutex;
 pub type ParseOutput = Vec<(PathBuf, String)>;
 pub type CompilationMetricsIndex = FxIndexMap<Option<CompileId>, Vec<CompilationMetricsMetadata>>;
 pub type StackIndex = FxHashMap<Option<CompileId>, StackSummary>; // NB: attempt is always 0 here
+pub type SymbolicShapeSpecializationIndex =
+    FxHashMap<Option<CompileId>, Vec<SymbolicShapeSpecializationMetadata>>;
 
 pub type FxIndexMap<K, V> = IndexMap<K, V, BuildHasherDefault<FxHasher>>;
 
@@ -265,6 +267,16 @@ pub struct AOTAutogradBackwardCompilationMetricsMetadata {
     pub fail_reason: Option<String>,
 }
 
+#[derive(Debug, Deserialize, Serialize)]
+pub struct SymbolicShapeSpecializationMetadata {
+    pub symbol: Option<String>,
+    pub sources: Option<Vec<String>>,
+    pub value: Option<String>,
+    pub reason: Option<String>,
+    pub stack: Option<StackSummary>,
+    pub user_stack: Option<StackSummary>,
+}
+
 #[derive(Debug, Serialize)]
 pub struct AOTAutogradBackwardCompilationMetricsContext<'e> {
     pub m: &'e AOTAutogradBackwardCompilationMetricsMetadata,
@@ -278,6 +290,7 @@ pub struct CompilationMetricsContext<'e> {
     pub css: &'static str,
     pub compile_id: String,
     pub stack_html: String,
+    pub symbolic_shape_specializations: Vec<SymbolicShapeSpecializationContext>,
 }
 
 #[derive(Debug, Serialize)]
@@ -360,6 +373,7 @@ pub struct Envelope {
         Option<AOTAutogradBackwardCompilationMetricsMetadata>,
     pub graph_dump: Option<GraphDumpMetadata>,
     pub link: Option<LinkMetadata>,
+    pub symbolic_shape_specialization: Option<SymbolicShapeSpecializationMetadata>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -384,4 +398,13 @@ pub struct IndexContext {
     pub has_unknown_stack_trie: bool,
     pub num_breaks: usize,
     pub custom_header_html: String,
+}
+
+#[derive(Debug, Serialize)]
+pub struct SymbolicShapeSpecializationContext {
+    pub symbol: String,
+    pub sources: Vec<String>,
+    pub value: String,
+    pub user_stack_html: String,
+    pub stack_html: String,
 }

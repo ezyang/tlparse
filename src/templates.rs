@@ -259,6 +259,21 @@ pub static TEMPLATE_COMPILATION_METRICS: &str = r#"
     {{ for op in m.non_compliant_ops }}
     <li> <code> {op} </code> </li>
     {{ endfor }}
+    <h2>Symbolic shape specializations</h2>
+    <table>
+    <tr>
+        <th>Sym</th> <th>Source(s)</th> <th>Value</th> <th>User stack</th> <th>Framework stack</th>
+    </tr>
+    {{ for spec in symbolic_shape_specializations }}
+    <tr>
+        <td>{spec.symbol}</td>
+        <td>{{ for source in spec.sources }}{source}<br>{{ endfor }}</td>
+        <td>{spec.value}</td>
+        <td>{spec.user_stack_html | format_unescaped}</td>
+        <td>{spec.stack_html | format_unescaped}</td>
+    </tr>
+    {{ endfor }}
+    </table>
 </body>
 </html>
 "#;
