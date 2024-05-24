@@ -234,6 +234,12 @@ pub struct LinkMetadata {
     pub url: String,
 }
 
+#[derive(Debug, Deserialize)]
+pub struct ArtifactMetadata {
+    pub name: String,
+    pub encoding: String,
+}
+
 #[derive(Debug, Deserialize, Serialize)]
 pub struct CompilationMetricsMetadata {
     // Other information like frame_key, co_name, etc. are already in envelope
@@ -345,6 +351,7 @@ pub enum Metadata<'e> {
     OptimizeDdpSplitChild(&'e OptimizeDdpSplitChildMetadata),
     CompilationMetrics(&'e CompilationMetricsMetadata),
     AOTAutogradBackwardCompilationMetrics(&'e AOTAutogradBackwardCompilationMetricsMetadata),
+    Artifact(&'e ArtifactMetadata),
 }
 
 #[derive(Debug, Deserialize)]
@@ -374,6 +381,7 @@ pub struct Envelope {
     pub graph_dump: Option<GraphDumpMetadata>,
     pub link: Option<LinkMetadata>,
     pub symbolic_shape_specialization: Option<SymbolicShapeSpecializationMetadata>,
+    pub artifact: Option<ArtifactMetadata>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]

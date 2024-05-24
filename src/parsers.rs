@@ -5,6 +5,8 @@ use std::path::Path;
 use std::path::PathBuf;
 use tinytemplate::TinyTemplate;
 
+use serde_json::Value;
+
 use syntect::highlighting::ThemeSet;
 use syntect::parsing::SyntaxSet;
 
@@ -418,6 +420,45 @@ impl StructuredLogParser for AOTAutogradBackwardCompilationMetricsParser<'_> {
     }
 }
 
+pub struct ArtifactParser;
+impl StructuredLogParser for ArtifactParser {
+    fn name(&self) -> &'static str {
+        "artifact"
+    }
+    fn get_metadata<'e>(&self, e: &'e Envelope) -> Option<Metadata<'e>> {
+        e.artifact.as_ref().map(|m| Metadata::Artifact(m))
+    }
+    fn parse<'e>(
+        &self,
+        lineno: usize,
+        metadata: Metadata<'e>,
+        _rank: Option<u32>,
+        compile_id: &Option<CompileId>,
+        payload: &str,
+    ) -> anyhow::Result<ParserResults> {
+        if let Metadata::Artifact(metadata) = metadata {
+            match metadata.encoding.as_str() {
+                "string" => {
+                    let filename = format!("{}.txt", metadata.name);
+                    simple_file_output(&filename, lineno, compile_id, &payload)
+                }
+                "json" => {
+                    let filename = format!("{}.json", metadata.name);
+                    let value: Value = serde_json::from_str(&payload).unwrap();
+                    let pretty = serde_json::to_string_pretty(&value).unwrap();
+                    simple_file_output(&filename, lineno, compile_id, &pretty)
+                }
+                _ => Err(anyhow::anyhow!(
+                    "Unsupported encoding: {}",
+                    metadata.encoding
+                )),
+            }
+        } else {
+            Err(anyhow::anyhow!("Expected Artifact metadata"))
+        }
+    }
+}
+
 // Register your parser here
 pub fn default_parsers<'t>(tt: &'t TinyTemplate<'t>) -> Vec<Box<dyn StructuredLogParser + 't>> {
     // We need to use Box wrappers here because vecs in Rust need to have known size
@@ -447,6 +488,7 @@ pub fn default_parsers<'t>(tt: &'t TinyTemplate<'t>) -> Vec<Box<dyn StructuredLo
         Box::new(OptimizeDdpSplitChildParser),
         Box::new(AOTAutogradBackwardCompilationMetricsParser { tt }), // TODO: use own tt instances
         Box::new(LinkParser),
+        Box::new(ArtifactParser),
     ];
 
     result
