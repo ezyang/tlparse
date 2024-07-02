@@ -319,6 +319,7 @@ pub struct CompilationMetricsParser<'t> {
     pub tt: &'t TinyTemplate<'t>,
     pub stack_index: &'t RefCell<StackIndex>,
     pub symbolic_shape_specialization_index: &'t RefCell<SymbolicShapeSpecializationIndex>,
+    pub output_files: &'t Vec<(String, String, i32)>,
 }
 impl StructuredLogParser for CompilationMetricsParser<'_> {
     fn name(&self) -> &'static str {
@@ -365,12 +366,27 @@ impl StructuredLogParser for CompilationMetricsParser<'_> {
                     stack_html: format_stack(&spec.stack.unwrap_or(Vec::new())),
                 })
                 .collect();
+            let remove_prefix = |x: &String| -> String {
+                // url is X_Y_Z/<rest>. Get the rest of the string for the link
+                // on compilation metrics page
+                let parts: Vec<_> = x.split("/").collect();
+                let new_str: String = parts[1..].join("");
+                new_str
+            };
+            let output_files: Vec<(String, String, i32)> = self
+                .output_files
+                .iter()
+                .map(|(url, name, number)| {
+                    return (remove_prefix(url), remove_prefix(name), number.clone());
+                })
+                .collect();
             let context = CompilationMetricsContext {
                 css: crate::CSS,
                 m: &m,
                 compile_id: id,
                 stack_html: stack_html,
                 symbolic_shape_specializations: specializations,
+                output_files: &output_files,
             };
             let output = self.tt.render(&filename, &context)?;
             simple_file_output(&filename, lineno, compile_id, &output)

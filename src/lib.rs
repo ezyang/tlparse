@@ -14,6 +14,7 @@ use tinytemplate::TinyTemplate;
 
 use crate::parsers::default_parsers;
 use crate::parsers::ParserOutput;
+use crate::parsers::StructuredLogParser;
 use crate::templates::*;
 use crate::types::*;
 mod parsers;
@@ -57,6 +58,67 @@ fn maybe_remove_convert_frame_suffixes(frames: &mut Vec<FrameSummary>) {
             })
         {
             frames.truncate(len - target_frames.len());
+        }
+    }
+}
+
+fn run_parser<'t>(
+    lineno: usize,
+    parser: &Box<dyn StructuredLogParser + 't>,
+    e: &Envelope,
+    payload: &str,
+    output_count: &mut i32,
+    output: &mut Vec<(PathBuf, String)>,
+    compile_directory: &mut Vec<(String, String, i32)>,
+    multi: &MultiProgress,
+    stats: &mut Stats,
+) {
+    if let Some(md) = parser.get_metadata(&e) {
+        let results = parser.parse(lineno, md, e.rank, &e.compile_id, &payload);
+        match results {
+            Ok(results) => {
+                for parser_result in results {
+                    match parser_result {
+                        ParserOutput::File(raw_filename, out) => {
+                            let filename = if let Some(stem) = raw_filename.file_stem() {
+                                let mut r = OsString::new();
+                                r.push(stem);
+                                r.push(OsStr::new("_"));
+                                r.push(output_count.to_string());
+                                if let Some(e) = raw_filename.extension() {
+                                    r.push(OsStr::new("."));
+                                    r.push(e);
+                                };
+                                raw_filename.with_file_name(r)
+                            } else {
+                                raw_filename
+                            };
+                            output.push((filename.clone(), out));
+                            let filename_str = format!("{}", filename.to_string_lossy());
+                            compile_directory.push((
+                                filename_str.clone(),
+                                filename_str,
+                                *output_count,
+                            ));
+                            *output_count += 1;
+                        }
+                        ParserOutput::Link(name, url) => {
+                            compile_directory.push((url, name, *output_count));
+                            *output_count += 1;
+                        }
+                    }
+                }
+            }
+            Err(err) => match parser.name() {
+                "dynamo_guards" => {
+                    multi.suspend(|| eprintln!("Failed to parse guards json: {}", err));
+                    stats.fail_dynamo_guards_json += 1;
+                }
+                name => {
+                    multi.suspend(|| eprintln!("Parser {name} failed: {err}"));
+                    stats.fail_parser += 1;
+                }
+            },
         }
     }
 }
@@ -149,11 +211,6 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
         .peekable();
 
     let mut all_parsers = default_parsers(&tt);
-    all_parsers.push(Box::new(crate::parsers::CompilationMetricsParser {
-        tt: &tt,
-        stack_index: &stack_index,
-        symbolic_shape_specialization_index: &symbolic_shape_specialization_index,
-    })); // TODO: use own tt instances
     all_parsers.extend(config.custom_parsers);
 
     while let Some((lineno, line)) = iter.next() {
@@ -244,69 +301,39 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
         let compile_directory = directory.entry(e.compile_id.clone()).or_default();
 
         for parser in &all_parsers {
-            if let Some(md) = parser.get_metadata(&e) {
-                let results = parser.parse(lineno, md, e.rank, &e.compile_id, &payload);
-                match results {
-                    Ok(results) => {
-                        for parser_result in results {
-                            match parser_result {
-                                ParserOutput::File(raw_filename, out) => {
-                                    let filename = if let Some(stem) = raw_filename.file_stem() {
-                                        let mut r = OsString::new();
-                                        r.push(stem);
-                                        r.push(OsStr::new("_"));
-                                        r.push(output_count.to_string());
-                                        if let Some(e) = raw_filename.extension() {
-                                            r.push(OsStr::new("."));
-                                            r.push(e);
-                                        };
-                                        raw_filename.with_file_name(r)
-                                    } else {
-                                        raw_filename
-                                    };
-                                    output.push((filename.clone(), out));
-                                    let filename_str = format!("{}", filename.to_string_lossy());
-                                    compile_directory.push((
-                                        filename_str.clone(),
-                                        filename_str,
-                                        output_count,
-                                    ));
-                                    output_count += 1;
-                                }
-                                ParserOutput::Link(name, url) => {
-                                    compile_directory.push((url, name, output_count));
-                                    output_count += 1;
-                                }
-                            }
-                        }
-                    }
-                    Err(err) => match parser.name() {
-                        "dynamo_guards" => {
-                            multi.suspend(|| eprintln!("Failed to parse guards json: {}", err));
-                            stats.fail_dynamo_guards_json += 1;
-                        }
-                        name => {
-                            multi.suspend(|| eprintln!("Parser {name} failed: {err}"));
-                            stats.fail_parser += 1;
-                        }
-                    },
-                }
-            }
+            run_parser(
+                lineno,
+                parser,
+                &e,
+                &payload,
+                &mut output_count,
+                &mut output,
+                compile_directory,
+                &multi,
+                &mut stats,
+            )
         }
 
-        if let Some(stack) = e.stack {
-            unknown_stack_trie.insert(stack, None);
-        }
-
-        if let Some(specialization) = e.symbolic_shape_specialization {
-            symbolic_shape_specialization_index
-                .borrow_mut()
-                .entry(e.compile_id.clone())
-                .or_default()
-                .push(specialization);
-        }
-
-        if let Some(m) = e.compilation_metrics {
+        if let Some(ref m) = e.compilation_metrics {
+            let copied_directory = compile_directory.clone();
+            let parser: Box<dyn StructuredLogParser> =
+                Box::new(crate::parsers::CompilationMetricsParser {
+                    tt: &tt,
+                    stack_index: &stack_index,
+                    symbolic_shape_specialization_index: &symbolic_shape_specialization_index,
+                    output_files: &copied_directory,
+                });
+            run_parser(
+                lineno,
+                &parser,
+                &e,
+                &payload,
+                &mut output_count,
+                &mut output,
+                compile_directory,
+                &multi,
+                &mut stats,
+            );
             let compile_id_dir: PathBuf = e
                 .compile_id
                 .as_ref()
@@ -320,11 +347,17 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
                 )
                 .into();
 
+            // compilation metrics is always the last output, since it just ran
+            let metrics_filename = format!(
+                "compilation_metrics_{}.html",
+                (output_count - 1).to_string(),
+            );
             let id = e.compile_id.clone().map_or("(unknown) ".to_string(), |c| {
                 format!(
-                    "<a href='{}/compilation_metrics.html'>{cid}</a> ",
+                    "<a href='{}/{}'>{cid}</a> ",
                     compile_id_dir.display(),
-                    cid = c
+                    metrics_filename,
+                    cid = c,
                 )
             });
             if let Some(rr) = m.restart_reasons.as_ref() {
@@ -359,7 +392,19 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
             if let Some(c) = cid.as_mut() {
                 c.attempt = 0;
             }
-            metrics_index.entry(cid).or_default().push(m);
+            metrics_index.entry(cid).or_default().push(m.clone());
+        }
+
+        if let Some(stack) = e.stack {
+            unknown_stack_trie.insert(stack.clone(), None);
+        }
+
+        if let Some(specialization) = e.symbolic_shape_specialization {
+            symbolic_shape_specialization_index
+                .borrow_mut()
+                .entry(e.compile_id.clone())
+                .or_default()
+                .push(specialization);
         }
 
         if let Some(m) = e.dynamo_start {

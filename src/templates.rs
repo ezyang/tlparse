@@ -207,10 +207,12 @@ pub static TEMPLATE_COMPILATION_METRICS: &str = r#"
 </head>
 <body>
     <h1>Compilation Info for {compile_id}</h1>
-    <h2>Dynamo Output:</h2>
-    <object data="dynamo_output_graph.txt" style="width:80%; height:auto">
-    <a href="dynamo_output_graph.txt"> dynamo_output_graph.txt </a>
-    </object>
+    <h2>Output files:</h2>
+    <ul>
+        {{ for path_idx in output_files }}
+            <li><a href="{path_idx.0}">{path_idx.1}</a> ({path_idx.2})</li>
+        {{ endfor }}
+    </ul>
     <h2>Stack</h2>
     {stack_html | format_unescaped}
     <h2>Compile Time(seconds)</h2>

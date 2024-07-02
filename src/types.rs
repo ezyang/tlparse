@@ -240,7 +240,7 @@ pub struct ArtifactMetadata {
     pub encoding: String,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct CompilationMetricsMetadata {
     // Other information like frame_key, co_name, etc. are already in envelope
     pub cache_size: Option<u64>,
@@ -297,6 +297,7 @@ pub struct CompilationMetricsContext<'e> {
     pub compile_id: String,
     pub stack_html: String,
     pub symbolic_shape_specializations: Vec<SymbolicShapeSpecializationContext>,
+    pub output_files: &'e Vec<(String, String, i32)>,
 }
 
 #[derive(Debug, Serialize)]
