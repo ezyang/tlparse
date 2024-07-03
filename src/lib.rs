@@ -1,5 +1,5 @@
 use anyhow::{anyhow, bail};
-use fxhash::FxHashMap;
+use fxhash::{FxHashMap, FxHashSet};
 use md5::{Digest, Md5};
 use std::ffi::{OsStr, OsString};
 
@@ -26,6 +26,7 @@ pub struct ParseConfig {
     pub strict_compile_id: bool,
     pub custom_parsers: Vec<Box<dyn crate::parsers::StructuredLogParser>>,
     pub custom_header_html: String,
+    pub verbose: bool,
 }
 
 impl Default for ParseConfig {
@@ -35,6 +36,7 @@ impl Default for ParseConfig {
             strict_compile_id: false,
             custom_parsers: Vec::default(),
             custom_header_html: String::default(),
+            verbose: false,
         }
     }
 }
@@ -191,6 +193,8 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
         TEMPLATE_AOT_AUTOGRAD_BACKWARD_COMPILATION_METRICS,
     )?;
 
+    let mut unknown_fields: FxHashSet<String> = FxHashSet::default();
+
     let mut output_count = 0;
 
     let mut breaks = RestartsAndFailuresContext {
@@ -245,6 +249,15 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
                 continue;
             }
         };
+
+        stats.unknown += e._other.len() as u64;
+
+        for k in e._other.keys() {
+            unknown_fields.insert(k.clone());
+            if config.verbose {
+                multi.suspend(|| eprintln!("Unknown field {}", k))
+            }
+        }
 
         if let Some((s, i)) = e.str {
             let mut intern_table = INTERN_TABLE.lock().unwrap();
@@ -425,6 +438,10 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
     spinner.finish();
 
     eprintln!("{:?}", stats);
+    eprintln!(
+        "Unknown fields: {:?} (consider updating tlparse to render these)",
+        unknown_fields
+    );
 
     let has_unknown_compile_id = directory.contains_key(&None);
 

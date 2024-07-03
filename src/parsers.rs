@@ -497,6 +497,9 @@ pub fn default_parsers<'t>(tt: &'t TinyTemplate<'t>) -> Vec<Box<dyn StructuredLo
         Box::new(SentinelFileParser::new("inductor_post_grad_graph", |e| {
             e.inductor_post_grad_graph.as_ref()
         })),
+        Box::new(SentinelFileParser::new("dynamo_cpp_guards_str", |e| {
+            e.dynamo_cpp_guards_str.as_ref()
+        })),
         Box::new(GraphDumpParser),
         Box::new(DynamoOutputGraphParser),
         Box::new(DynamoGuardParser { tt }),
