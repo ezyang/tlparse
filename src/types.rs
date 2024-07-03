@@ -3,6 +3,7 @@ use fxhash::{FxHashMap, FxHasher};
 use html_escape::encode_text;
 use indexmap::IndexMap;
 use regex::Regex;
+use serde_json::Value;
 
 use std::fmt::{self, Display, Write};
 use std::path::PathBuf;
@@ -144,6 +145,7 @@ pub struct Stats {
     pub fail_payload_md5: u64,
     pub fail_dynamo_guards_json: u64,
     pub fail_parser: u64,
+    pub unknown: u64,
 }
 
 #[derive(Debug, Hash, Eq, PartialEq, Deserialize, Serialize, Clone)]
@@ -375,6 +377,7 @@ pub struct Envelope {
     pub aot_backward_graph: Option<EmptyMetadata>,
     pub aot_joint_graph: Option<EmptyMetadata>,
     pub inductor_post_grad_graph: Option<EmptyMetadata>,
+    pub dynamo_cpp_guards_str: Option<EmptyMetadata>,
     pub inductor_output_code: Option<InductorOutputCodeMetadata>,
     pub compilation_metrics: Option<CompilationMetricsMetadata>,
     pub aot_autograd_backward_compilation_metrics:
@@ -383,6 +386,8 @@ pub struct Envelope {
     pub link: Option<LinkMetadata>,
     pub symbolic_shape_specialization: Option<SymbolicShapeSpecializationMetadata>,
     pub artifact: Option<ArtifactMetadata>,
+    #[serde(flatten)]
+    pub _other: FxHashMap<String, Value>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
