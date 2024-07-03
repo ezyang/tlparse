@@ -1,5 +1,5 @@
 use anyhow::{anyhow, bail};
-use fxhash::FxHashMap;
+use fxhash::{FxHashMap, FxHashSet};
 use md5::{Digest, Md5};
 use std::ffi::{OsStr, OsString};
 
@@ -193,6 +193,8 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
         TEMPLATE_AOT_AUTOGRAD_BACKWARD_COMPILATION_METRICS,
     )?;
 
+    let mut unknown_fields: FxHashSet<String> = FxHashSet::default();
+
     let mut output_count = 0;
 
     let mut breaks = RestartsAndFailuresContext {
@@ -250,8 +252,9 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
 
         stats.unknown += e._other.len() as u64;
 
-        if config.verbose {
-            for k in e._other.keys() {
+        for k in e._other.keys() {
+            unknown_fields.insert(k.clone());
+            if config.verbose {
                 multi.suspend(|| eprintln!("Unknown field {}", k))
             }
         }
@@ -435,6 +438,10 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
     spinner.finish();
 
     eprintln!("{:?}", stats);
+    eprintln!(
+        "Unknown fields: {:?} (consider updating tlparse to render these)",
+        unknown_fields
+    );
 
     let has_unknown_compile_id = directory.contains_key(&None);
 
