@@ -195,11 +195,21 @@ impl fmt::Display for FrameSummary {
 
 pub type StackSummary = Vec<FrameSummary>;
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 #[serde(untagged)]
 pub enum SymInt {
     Int(i64),
     Symbol(String),
+}
+
+impl Default for SymInt {
+    fn default() -> Self {
+        SymInt::Int(0)
+    }
+}
+
+fn default_layout() -> String {
+    "torch.strided".to_string()
 }
 
 #[derive(Debug, Deserialize)]
@@ -386,8 +396,94 @@ pub struct Envelope {
     pub link: Option<LinkMetadata>,
     pub symbolic_shape_specialization: Option<SymbolicShapeSpecializationMetadata>,
     pub artifact: Option<ArtifactMetadata>,
+    pub describe_storage: Option<StorageDesc>,
+    pub describe_tensor: Option<TensorDesc>,
+    pub describe_source: Option<SourceDesc>,
     #[serde(flatten)]
     pub _other: FxHashMap<String, Value>,
+}
+
+type MetaTensorId = u64;
+type MetaStorageId = u64;
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct TensorDesc {
+    id: MetaTensorId,
+    describer_id: u64,
+    ndim: u64,
+    dtype: String,
+    device: String,
+    size: Vec<SymInt>,
+    dynamo_dynamic_indices: Option<Vec<u64>>,
+    // TODO: Make layout an enum
+    #[serde(default = "default_layout")]
+    layout: String,
+    #[serde(default)]
+    is_inference: bool,
+    #[serde(default)]
+    is_leaf: bool,
+    #[serde(default)]
+    requires_grad: bool,
+    #[serde(default)]
+    is_sparse: bool,
+    #[serde(default)]
+    is_mkldnn: bool,
+    #[serde(default)]
+    is_functorch_wrapped: bool,
+    #[serde(default)]
+    is_batchedtensor: bool,
+    #[serde(default)]
+    is_legacy_batchedtensor: bool,
+    #[serde(default)]
+    is_gradtrackingtensor: bool,
+    #[serde(default)]
+    is_view: bool,
+    #[serde(default)]
+    is_nested: bool,
+    #[serde(default)]
+    is_traceable_wrapper_subclass: bool,
+    #[serde(default)]
+    is_functional: bool,
+    #[serde(default)]
+    is_conj: bool,
+    #[serde(default)]
+    is_neg: bool,
+    #[serde(default)]
+    is_parameter: bool,
+    stride: Option<Vec<SymInt>>,
+    #[serde(default)]
+    storage_offset: SymInt,
+    storage: Option<MetaStorageId>,
+    sparse_dim: Option<u64>,
+    dense_dim: Option<u64>,
+    is_coalesced: Option<bool>,
+    crow_indices: Option<MetaTensorId>,
+    col_indices: Option<MetaTensorId>,
+    ccol_indices: Option<MetaTensorId>,
+    row_indices: Option<MetaTensorId>,
+    values: Option<MetaTensorId>,
+    unwrapped: Option<MetaTensorId>,
+    bdim: Option<u64>,
+    base: Option<MetaTensorId>,
+    attrs: Option<FxHashMap<String, MetaTensorId>>,
+    creation_meta: Option<String>,
+    grad: Option<MetaTensorId>,
+    #[serde(flatten)]
+    pub _other: FxHashMap<String, Value>,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct StorageDesc {
+    id: MetaStorageId,
+    describer_id: u64,
+    size: u64,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct SourceDesc {
+    describer_id: u64,
+    id: MetaTensorId,
+    source: String,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
