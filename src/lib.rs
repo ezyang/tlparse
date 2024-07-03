@@ -438,10 +438,12 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
     spinner.finish();
 
     eprintln!("{:?}", stats);
-    eprintln!(
-        "Unknown fields: {:?} (consider updating tlparse to render these)",
-        unknown_fields
-    );
+    if unknown_fields.len() > 0 {
+        eprintln!(
+            "Unknown fields: {:?} (consider updating tlparse to render these)",
+            unknown_fields
+        );
+    }
 
     let has_unknown_compile_id = directory.contains_key(&None);
 
