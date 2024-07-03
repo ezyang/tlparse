@@ -26,6 +26,7 @@ pub struct ParseConfig {
     pub strict_compile_id: bool,
     pub custom_parsers: Vec<Box<dyn crate::parsers::StructuredLogParser>>,
     pub custom_header_html: String,
+    pub verbose: bool,
 }
 
 impl Default for ParseConfig {
@@ -35,6 +36,7 @@ impl Default for ParseConfig {
             strict_compile_id: false,
             custom_parsers: Vec::default(),
             custom_header_html: String::default(),
+            verbose: false,
         }
     }
 }
@@ -245,6 +247,14 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
                 continue;
             }
         };
+
+        stats.unknown += e._other.len() as u64;
+
+        if config.verbose {
+            for k in e._other.keys() {
+                multi.suspend(|| eprintln!("Unknown field {}", k))
+            }
+        }
 
         if let Some((s, i)) = e.str {
             let mut intern_table = INTERN_TABLE.lock().unwrap();
