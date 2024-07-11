@@ -6,7 +6,7 @@ use std::ffi::{OsStr, OsString};
 use indicatif::{MultiProgress, ProgressBar, ProgressStyle};
 use regex::Regex;
 use std::cell::RefCell;
-use std::fs::File;
+use std::fs::{self, File};
 use std::io::{self, BufRead};
 use std::path::PathBuf;
 use std::time::Instant;
@@ -463,6 +463,11 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
     output.push((
         PathBuf::from("index.html"),
         tt.render("index.html", &index_context)?,
+    ));
+
+    output.push((
+        PathBuf::from("raw.log"),
+        fs::read_to_string(path)?,
     ));
 
     // other_rank is included here because you should only have logs from one rank when
