@@ -277,6 +277,14 @@ pub struct CompilationMetricsMetadata {
     pub dynamo_time_before_restart_s: Option<f64>,
 }
 
+#[derive(Debug, Deserialize, Serialize, Clone)]
+pub struct BwdCompilationMetricsMetadata {
+    pub inductor_compile_time_s: Option<f64>,
+    pub code_gen_time_s: Option<f64>,
+    pub fail_type: Option<String>,
+    pub fail_reason: Option<String>,
+}
+
 #[derive(Debug, Deserialize, Serialize)]
 pub struct AOTAutogradBackwardCompilationMetricsMetadata {
     pub start_time: Option<f64>,
@@ -293,6 +301,13 @@ pub struct SymbolicShapeSpecializationMetadata {
     pub reason: Option<String>,
     pub stack: Option<StackSummary>,
     pub user_stack: Option<StackSummary>,
+}
+
+#[derive(Debug, Serialize)]
+pub struct BwdCompilationMetricsContext<'e> {
+    pub m: &'e BwdCompilationMetricsMetadata,
+    pub css: &'static str,
+    pub compile_id: String,
 }
 
 #[derive(Debug, Serialize)]
@@ -364,6 +379,7 @@ pub enum Metadata<'e> {
     OptimizeDdpSplitChild(&'e OptimizeDdpSplitChildMetadata),
     CompilationMetrics(&'e CompilationMetricsMetadata),
     AOTAutogradBackwardCompilationMetrics(&'e AOTAutogradBackwardCompilationMetricsMetadata),
+    BwdCompilationMetrics(&'e BwdCompilationMetricsMetadata),
     Artifact(&'e ArtifactMetadata),
 }
 
@@ -390,6 +406,7 @@ pub struct Envelope {
     pub dynamo_cpp_guards_str: Option<EmptyMetadata>,
     pub inductor_output_code: Option<InductorOutputCodeMetadata>,
     pub compilation_metrics: Option<CompilationMetricsMetadata>,
+    pub bwd_compilation_metrics: Option<BwdCompilationMetricsMetadata>,
     pub aot_autograd_backward_compilation_metrics:
         Option<AOTAutogradBackwardCompilationMetricsMetadata>,
     pub graph_dump: Option<GraphDumpMetadata>,

@@ -302,3 +302,31 @@ pub static TEMPLATE_AOT_AUTOGRAD_BACKWARD_COMPILATION_METRICS: &str = r#"
 </body>
 </html>
 "#;
+
+pub static TEMPLATE_BWD_COMPILATION_METRICS: &str = r#"
+<html>
+<head>
+    <style>
+    {css}
+    </style>
+    <title>Backward Compilation Metrics</title>
+</head>
+<body>
+    <h1>Backward Compilation Info for {compile_id}</h1>
+    <h2>Compile Time(seconds)</h2>
+    {{ if m.inductor_compile_time_s }}
+    <p>Inductor <abbr title="Total time spent running inductor">[?]</abbr>: {m.inductor_compile_time_s}</div>
+    {{ endif }}
+    {{ if m.code_gen_time_s }}
+    <p>Code Gen Time: {m.code_gen_time_s}</p>
+    {{ endif}}
+    <h2>Failures</h2>
+    {{ if m.fail_type }}
+    <p>Failure Exception: <pre>{m.fail_type}</pre></p>
+    <p>Failure Reason: <pre>{m.fail_reason}</pre></p>
+    {{ else }}
+    <p> No failures! </p>
+    {{ endif }}
+</body>
+</html>
+"#;

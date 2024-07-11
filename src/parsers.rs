@@ -436,6 +436,44 @@ impl StructuredLogParser for AOTAutogradBackwardCompilationMetricsParser<'_> {
     }
 }
 
+pub struct BwdCompilationMetricsParser<'t> {
+    tt: &'t TinyTemplate<'t>,
+}
+impl StructuredLogParser for BwdCompilationMetricsParser<'_> {
+    fn name(&self) -> &'static str {
+        "bwd_compilation_metrics"
+    }
+    fn get_metadata<'e>(&self, e: &'e Envelope) -> Option<Metadata<'e>> {
+        e.bwd_compilation_metrics
+            .as_ref()
+            .map(|m| Metadata::BwdCompilationMetrics(m))
+    }
+    fn parse<'e>(
+        &self,
+        lineno: usize,
+        metrics: Metadata<'e>,
+        _rank: Option<u32>,
+        compile_id: &Option<CompileId>,
+        _payload: &str,
+    ) -> anyhow::Result<ParserResults> {
+        let filename = format!("{}.html", self.name());
+        if let Metadata::BwdCompilationMetrics(m) = metrics {
+            let id = compile_id
+                .clone()
+                .map_or("(unknown) ".to_string(), |c| format!("{cid} ", cid = c));
+            let context = BwdCompilationMetricsContext {
+                css: crate::CSS,
+                m: &m,
+                compile_id: id,
+            };
+            let output = self.tt.render(&filename, &context)?;
+            simple_file_output(&filename, lineno, compile_id, &output)
+        } else {
+            Err(anyhow::anyhow!("Expected BwdCompilationMetrics metadata"))
+        }
+    }
+}
+
 pub struct ArtifactParser;
 impl StructuredLogParser for ArtifactParser {
     fn name(&self) -> &'static str {
@@ -506,6 +544,7 @@ pub fn default_parsers<'t>(tt: &'t TinyTemplate<'t>) -> Vec<Box<dyn StructuredLo
         Box::new(InductorOutputCodeParser),
         Box::new(OptimizeDdpSplitChildParser),
         Box::new(AOTAutogradBackwardCompilationMetricsParser { tt }), // TODO: use own tt instances
+        Box::new(BwdCompilationMetricsParser { tt }),                 // TODO: use own tt instances
         Box::new(LinkParser),
         Box::new(ArtifactParser),
     ];
