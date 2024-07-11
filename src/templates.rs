@@ -1,4 +1,6 @@
 pub static CSS: &str = r#"
+table td { vertical-align: top; }
+
 .stack-trie { white-space: nowrap; font-family: monospace; }
 .stack-trie ul { padding-left: 1ch;  }
 .stack-trie li { margin-left: 1ch; list-style-type: none;  }
