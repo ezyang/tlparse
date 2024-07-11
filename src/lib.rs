@@ -465,10 +465,7 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
         tt.render("index.html", &index_context)?,
     ));
 
-    output.push((
-        PathBuf::from("raw.log"),
-        fs::read_to_string(path)?,
-    ));
+    output.push((PathBuf::from("raw.log"), fs::read_to_string(path)?));
 
     // other_rank is included here because you should only have logs from one rank when
     // configured properly
