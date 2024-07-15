@@ -44,24 +44,33 @@ impl Default for ParseConfig {
 }
 
 fn maybe_remove_convert_frame_suffixes(frames: &mut Vec<FrameSummary>) {
-    let target_frames = [
-        ("torch/_dynamo/convert_frame.py", "catch_errors"),
-        ("torch/_dynamo/convert_frame.py", "_convert_frame"),
-        ("torch/_dynamo/convert_frame.py", "_convert_frame_assert"),
+    let all_target_frames = [
+        [
+            ("torch/_dynamo/convert_frame.py", "catch_errors"),
+            ("torch/_dynamo/convert_frame.py", "_convert_frame"),
+            ("torch/_dynamo/convert_frame.py", "_convert_frame_assert"),
+        ],
+        [
+            ("torch/_dynamo/convert_frame.py", "__call__"),
+            ("torch/_dynamo/convert_frame.py", "__call__"),
+            ("torch/_dynamo/convert_frame.py", "__call__"),
+        ],
     ];
 
     let len = frames.len();
-    if len >= target_frames.len() {
-        let suffix = &frames[len - target_frames.len()..];
-        if suffix
-            .iter()
-            .zip(target_frames.iter())
-            .all(|(frame, target)| {
-                simplify_filename(unintern_str(frame.filename).as_ref()) == target.0
-                    && frame.name == target.1
-            })
-        {
-            frames.truncate(len - target_frames.len());
+    for target_frames in all_target_frames {
+        if len >= target_frames.len() {
+            let suffix = &frames[len - target_frames.len()..];
+            if suffix
+                .iter()
+                .zip(target_frames.iter())
+                .all(|(frame, target)| {
+                    simplify_filename(unintern_str(frame.filename).as_ref()) == target.0
+                        && frame.name == target.1
+                })
+            {
+                frames.truncate(len - target_frames.len());
+            }
         }
     }
 }
