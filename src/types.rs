@@ -160,7 +160,7 @@ pub fn simplify_filename<'a>(filename: &'a str) -> &'a str {
     if parts.len() > 1 {
         return parts[1];
     }
-    let re = Regex::new(r"\d+e\d+-seed-nspid\d+_cgpid\d+-ns-\d+/").unwrap();
+    let re = Regex::new(r"[^/]+-seed-nspid[^/]+/").unwrap();
     if let Some(captures) = re.captures(filename) {
         if let Some(capture) = captures.get(0) {
             return &filename[capture.end()..];
