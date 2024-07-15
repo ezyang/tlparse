@@ -27,6 +27,7 @@ pub struct ParseConfig {
     pub custom_parsers: Vec<Box<dyn crate::parsers::StructuredLogParser>>,
     pub custom_header_html: String,
     pub verbose: bool,
+    pub plain_text: bool,
 }
 
 impl Default for ParseConfig {
@@ -37,6 +38,7 @@ impl Default for ParseConfig {
             custom_parsers: Vec::default(),
             custom_header_html: String::default(),
             verbose: false,
+            plain_text: false,
         }
     }
 }
@@ -218,7 +220,7 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
         })
         .peekable();
 
-    let mut all_parsers = default_parsers(&tt);
+    let mut all_parsers = default_parsers(&tt, &config);
     all_parsers.extend(config.custom_parsers);
 
     while let Some((lineno, line)) = iter.next() {

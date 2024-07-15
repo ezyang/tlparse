@@ -33,6 +33,10 @@ pub struct Cli {
     /// Be more chatty
     #[arg(short, long)]
     verbose: bool,
+    /// Some parsers will write output as rendered html for prettier viewing.
+    /// Enabiling this option will enforce output as plain text for easier diffing
+    #[arg(short, long)]
+    plain_text: bool,
 }
 
 fn main() -> anyhow::Result<()> {
@@ -57,6 +61,7 @@ fn main() -> anyhow::Result<()> {
         custom_parsers: Vec::new(),
         custom_header_html: cli.custom_header_html,
         verbose: cli.verbose,
+        plain_text: cli.plain_text,
     };
 
     let output = parse_path(&path, config)?;
