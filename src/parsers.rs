@@ -1,4 +1,4 @@
-use crate::types::*;
+use crate::{types::*, ParseConfig};
 use std::cell::RefCell;
 use std::ffi::{OsStr, OsString};
 use std::path::Path;
@@ -190,7 +190,19 @@ impl StructuredLogParser for DynamoGuardParser<'_> {
     }
 }
 
-pub struct InductorOutputCodeParser;
+pub struct InductorOutputCodeParser {
+    // If true we output the code as plain text, otherwise we output it as rendered html
+    plain_text: bool,
+}
+
+impl InductorOutputCodeParser {
+    pub fn new(config: &ParseConfig) -> Self {
+        InductorOutputCodeParser {
+            plain_text: config.plain_text,
+        }
+    }
+}
+
 impl StructuredLogParser for InductorOutputCodeParser {
     fn name(&self) -> &'static str {
         "inductor_output_code"
@@ -215,24 +227,40 @@ impl StructuredLogParser for InductorOutputCodeParser {
                 .as_ref()
                 .and_then(|p| Path::file_stem(p))
                 .map_or_else(
-                    || PathBuf::from("inductor_output_code.html"),
+                    || {
+                        if self.plain_text {
+                            PathBuf::from("inductor_output_code.txt")
+                        } else {
+                            PathBuf::from("inductor_output_code.html")
+                        }
+                    },
                     |stem| {
                         let mut r = OsString::from("inductor_output_code_");
                         r.push(stem);
-                        r.push(OsStr::new(".html"));
+                        if self.plain_text {
+                            r.push(OsStr::new(".txt"));
+                        } else {
+                            r.push(OsStr::new(".html"));
+                        }
                         r.into()
                     },
                 );
-            // Generate HTML output and handle potential errors
-            let html_payload = match generate_html_output(payload) {
-                Ok(html) => html,
-                Err(_e) => return Err(anyhow::anyhow!("Failed to parse inductor code to html")),
+            let output_content = if self.plain_text {
+                payload.to_string()
+            } else {
+                match generate_html_output(payload) {
+                    Ok(html) => html,
+                    Err(_e) => {
+                        return Err(anyhow::anyhow!("Failed to parse inductor code to html"))
+                    }
+                }
             };
+
             simple_file_output(
                 &filename.to_string_lossy(),
                 lineno,
                 compile_id,
-                &html_payload,
+                &output_content,
             )
         } else {
             Err(anyhow::anyhow!("Expected InductorOutputCode metadata"))
@@ -514,7 +542,10 @@ impl StructuredLogParser for ArtifactParser {
 }
 
 // Register your parser here
-pub fn default_parsers<'t>(tt: &'t TinyTemplate<'t>) -> Vec<Box<dyn StructuredLogParser + 't>> {
+pub fn default_parsers<'t>(
+    tt: &'t TinyTemplate<'t>,
+    parser_config: &ParseConfig,
+) -> Vec<Box<dyn StructuredLogParser + 't>> {
     // We need to use Box wrappers here because vecs in Rust need to have known size
     let result: Vec<Box<dyn StructuredLogParser>> = vec![
         Box::new(SentinelFileParser::new("optimize_ddp_split_graph", |e| {
@@ -541,7 +572,7 @@ pub fn default_parsers<'t>(tt: &'t TinyTemplate<'t>) -> Vec<Box<dyn StructuredLo
         Box::new(GraphDumpParser),
         Box::new(DynamoOutputGraphParser),
         Box::new(DynamoGuardParser { tt }),
-        Box::new(InductorOutputCodeParser),
+        Box::new(InductorOutputCodeParser::new(parser_config)),
         Box::new(OptimizeDdpSplitChildParser),
         Box::new(AOTAutogradBackwardCompilationMetricsParser { tt }), // TODO: use own tt instances
         Box::new(BwdCompilationMetricsParser { tt }),                 // TODO: use own tt instances
