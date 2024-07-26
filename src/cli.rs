@@ -1,5 +1,6 @@
 use clap::Parser;
 
+use anyhow::bail;
 use std::fs;
 use std::path::PathBuf;
 
@@ -46,8 +47,8 @@ fn main() -> anyhow::Result<()> {
 
     if out_path.exists() {
         if !cli.overwrite {
-            panic!(
-                "{} already exists, pass --overwrite to overwrite",
+            bail!(
+                "Directory {} already exists, use -o OUTDIR to write to another location or pass --overwrite to overwrite the old contents",
                 out_path.display()
             );
         }
