@@ -1,4 +1,5 @@
 use crate::{types::*, ParseConfig};
+use html_escape::encode_text;
 use std::cell::RefCell;
 use std::ffi::{OsStr, OsString};
 use std::path::Path;
@@ -11,7 +12,8 @@ use syntect::highlighting::ThemeSet;
 use syntect::parsing::SyntaxSet;
 
 pub enum ParserOutput {
-    File(PathBuf, String), // File to be saved on disk
+    File(PathBuf, String),       // File to be saved on disk
+    GlobalFile(PathBuf, String), // Like file, but don't give a unique suffix
     Link(String, String), // External href to (name, url) (linked in compile_directory, not returned)
 }
 
@@ -348,6 +350,7 @@ pub struct CompilationMetricsParser<'t> {
     pub stack_index: &'t RefCell<StackIndex>,
     pub symbolic_shape_specialization_index: &'t RefCell<SymbolicShapeSpecializationIndex>,
     pub output_files: &'t Vec<(String, String, i32)>,
+    pub compile_id_dir: &'t PathBuf,
 }
 impl StructuredLogParser for CompilationMetricsParser<'_> {
     fn name(&self) -> &'static str {
@@ -380,6 +383,18 @@ impl StructuredLogParser for CompilationMetricsParser<'_> {
                 .borrow()
                 .get(&cid)
                 .map_or("".to_string(), format_stack);
+            let mini_stack_html = if let (Some(name), Some(filename), Some(line)) =
+                (&m.co_name, &m.co_filename, m.co_firstlineno)
+            {
+                format_stack(&Vec::from([FrameSummary {
+                    uninterned_filename: Some(filename.clone()),
+                    filename: u32::MAX,
+                    line: line,
+                    name: name.clone(),
+                }]))
+            } else {
+                "".to_string()
+            };
             let specializations = self
                 .symbolic_shape_specialization_index
                 .borrow_mut()
@@ -413,8 +428,10 @@ impl StructuredLogParser for CompilationMetricsParser<'_> {
                 m: &m,
                 compile_id: id,
                 stack_html: stack_html,
+                mini_stack_html: mini_stack_html,
                 symbolic_shape_specializations: specializations,
                 output_files: &output_files,
+                compile_id_dir: &self.compile_id_dir,
             };
             let output = self.tt.render(&filename, &context)?;
             simple_file_output(&filename, lineno, compile_id, &output)
@@ -502,6 +519,87 @@ impl StructuredLogParser for BwdCompilationMetricsParser<'_> {
     }
 }
 
+pub struct DumpFileParser;
+impl StructuredLogParser for DumpFileParser {
+    fn name(&self) -> &'static str {
+        "dump_file"
+    }
+    fn get_metadata<'e>(&self, e: &'e Envelope) -> Option<Metadata<'e>> {
+        e.dump_file.as_ref().map(|m| Metadata::DumpFile(m))
+    }
+    fn parse<'e>(
+        &self,
+        lineno: usize,
+        metadata: Metadata<'e>,
+        _rank: Option<u32>,
+        compile_id: &Option<CompileId>,
+        payload: &str,
+    ) -> anyhow::Result<ParserResults> {
+        if let Metadata::DumpFile(metadata) = metadata {
+            let mb_fx_id = extract_eval_with_key_id(&metadata.name);
+            let filename = if let Some(fx_id) = mb_fx_id {
+                format!("eval_with_key_{}.html", fx_id)
+            } else {
+                format!("{}.html", metadata.name)
+            };
+            let subdir = PathBuf::from("dump_file");
+            let f = subdir.join(filename);
+            Ok(Vec::from([ParserOutput::GlobalFile(
+                f,
+                anchor_source(payload),
+            )]))
+        } else {
+            Err(anyhow::anyhow!("Expected DumpFile metadata"))
+        }
+    }
+}
+
+pub fn anchor_source(text: &str) -> String {
+    let lines: Vec<&str> = text.lines().collect();
+    let mut html = String::from(
+        r#"<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Source Code</title>
+    <style>
+        pre {
+            counter-reset: line;
+        }
+        pre span {
+            display: block;
+        }
+        pre span:before {
+            counter-increment: line;
+            content: counter(line);
+            display: inline-block;
+            padding: 0 .5em;
+            margin-right: .5em;
+            color: #888;
+        }
+        pre span:target {
+            background-color: #ffff00;
+        }
+    </style>
+</head>
+<body>
+    <pre>"#,
+    );
+
+    for (i, line) in lines.iter().enumerate() {
+        let line_number = i + 1;
+        html.push_str(&format!(
+            r#"<span id="L{}">{}</span>"#,
+            line_number,
+            encode_text(line)
+        ));
+    }
+
+    html.push_str("</pre></body></html>");
+    html
+}
+
 pub struct ArtifactParser;
 impl StructuredLogParser for ArtifactParser {
     fn name(&self) -> &'static str {
@@ -578,6 +676,7 @@ pub fn default_parsers<'t>(
         Box::new(BwdCompilationMetricsParser { tt }),                 // TODO: use own tt instances
         Box::new(LinkParser),
         Box::new(ArtifactParser),
+        Box::new(DumpFileParser),
     ];
 
     result

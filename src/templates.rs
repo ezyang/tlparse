@@ -206,13 +206,15 @@ pub static TEMPLATE_COMPILATION_METRICS: &str = r#"
     {css}
     </style>
     <title>Compilation Metrics</title>
+    <base href="..">
 </head>
 <body>
     <h1>Compilation Info for {compile_id}</h1>
+    <p>{mini_stack_html | format_unescaped}</p>
     <h2>Output files:</h2>
     <ul>
         {{ for path_idx in output_files }}
-            <li><a href="{path_idx.0}">{path_idx.1}</a> ({path_idx.2})</li>
+            <li><a href="{compile_id_dir}/{path_idx.0}">{path_idx.1}</a> ({path_idx.2})</li>
         {{ endfor }}
     </ul>
     <h2>Stack</h2>
@@ -249,7 +251,7 @@ pub static TEMPLATE_COMPILATION_METRICS: &str = r#"
     <p>Cache Size: {m.cache_size}</p>
     <p>Accumulated Cache Size: {m.accumulated_cache_size}</p>
     <h2>Graph Metrics</h2>
-    <p><a href='dynamo_guards.html'>Guard</a> Count: {m.guard_count}</p>
+    <p>Guard Count: {m.guard_count}</p>
     <p>Shape Env Guards: {m.shape_env_guard_count}</p>
     <p>Graph Ops: {m.graph_op_count}</p>
     <p>Graph Nodes: {m.graph_node_count}</p>
