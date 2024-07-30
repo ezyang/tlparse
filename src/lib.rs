@@ -115,6 +115,16 @@ fn run_parser<'t>(
                             ));
                             *output_count += 1;
                         }
+                        ParserOutput::GlobalFile(filename, out) => {
+                            output.push((filename.clone(), out));
+                            let filename_str = format!("{}", filename.to_string_lossy());
+                            compile_directory.push((
+                                filename_str.clone(),
+                                filename_str,
+                                *output_count,
+                            ));
+                            *output_count += 1;
+                        }
                         ParserOutput::Link(name, url) => {
                             compile_directory.push((url, name, *output_count));
                             *output_count += 1;
@@ -344,24 +354,6 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
 
         if let Some(ref m) = e.compilation_metrics {
             let copied_directory = compile_directory.clone();
-            let parser: Box<dyn StructuredLogParser> =
-                Box::new(crate::parsers::CompilationMetricsParser {
-                    tt: &tt,
-                    stack_index: &stack_index,
-                    symbolic_shape_specialization_index: &symbolic_shape_specialization_index,
-                    output_files: &copied_directory,
-                });
-            run_parser(
-                lineno,
-                &parser,
-                &e,
-                &payload,
-                &mut output_count,
-                &mut output,
-                compile_directory,
-                &multi,
-                &mut stats,
-            );
             let compile_id_dir: PathBuf = e
                 .compile_id
                 .as_ref()
@@ -374,6 +366,25 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
                      }| { format!("{frame_id}_{frame_compile_id}_{attempt}") },
                 )
                 .into();
+            let parser: Box<dyn StructuredLogParser> =
+                Box::new(crate::parsers::CompilationMetricsParser {
+                    tt: &tt,
+                    stack_index: &stack_index,
+                    symbolic_shape_specialization_index: &symbolic_shape_specialization_index,
+                    output_files: &copied_directory,
+                    compile_id_dir: &compile_id_dir,
+                });
+            run_parser(
+                lineno,
+                &parser,
+                &e,
+                &payload,
+                &mut output_count,
+                &mut output,
+                compile_directory,
+                &multi,
+                &mut stats,
+            );
 
             // compilation metrics is always the last output, since it just ran
             let metrics_filename = format!(
