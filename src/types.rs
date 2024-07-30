@@ -21,6 +21,13 @@ pub type SymbolicShapeSpecializationIndex =
 
 pub type FxIndexMap<K, V> = IndexMap<K, V, BuildHasherDefault<FxHasher>>;
 
+pub fn extract_eval_with_key_id(filename: &str) -> Option<u64> {
+    let re = Regex::new(r"<eval_with_key>\.([0-9]+)").unwrap();
+    re.captures(filename)
+        .and_then(|caps| caps.get(1))
+        .and_then(|m| m.as_str().parse::<u64>().ok())
+}
+
 pub static INTERN_TABLE: Lazy<Mutex<FxHashMap<u32, String>>> =
     Lazy::new(|| Mutex::new(FxHashMap::default()));
 
@@ -103,10 +110,10 @@ impl StackTrieNode {
                 // If the node has multiple children, increase the indent and print a hyphen
                 writeln!(
                     f,
-                    "<li><span onclick='toggleList(this)' class='marker'></span>{star}{}<ul>",
-                    frame,
+                    "<li><span onclick='toggleList(this)' class='marker'></span>{star}",
                     star = star
                 )?;
+                writeln!(f, "{}<ul>", frame)?;
                 node.fmt_inner(f, mb_metrics_index)?;
                 write!(f, "</ul></li>")?;
             } else {
@@ -153,6 +160,7 @@ pub struct FrameSummary {
     pub filename: u32,
     pub line: i32,
     pub name: String,
+    pub uninterned_filename: Option<String>,
 }
 
 pub fn simplify_filename<'a>(filename: &'a str) -> &'a str {
@@ -180,16 +188,32 @@ pub fn unintern_str(interned_str: u32) -> String {
 impl fmt::Display for FrameSummary {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let intern_table = INTERN_TABLE.lock().unwrap();
-        let filename = intern_table
-            .get(&self.filename)
-            .map_or("(unknown)", |s| s.as_str());
-        write!(
-            f,
-            "{}:{} in {}",
-            encode_text(simplify_filename(filename)),
-            self.line,
-            encode_text(&self.name)
-        )
+        let filename = if let Some(f) = &self.uninterned_filename {
+            f.as_str()
+        } else {
+            intern_table
+                .get(&self.filename)
+                .map_or("(unknown)", |s| s.as_str())
+        };
+        if let Some(fx_id) = extract_eval_with_key_id(filename) {
+            write!(
+                f,
+                "<a href='dump_file/eval_with_key_{fx_id}.html#L{line}'>{filename}:{line}</a> in {name}",
+                fx_id = fx_id,
+                filename = encode_text(simplify_filename(filename)),
+                line = self.line,
+                name = encode_text(&self.name)
+            )?;
+        } else {
+            write!(
+                f,
+                "{}:{} in {}",
+                encode_text(simplify_filename(filename)),
+                self.line,
+                encode_text(&self.name)
+            )?;
+        }
+        Ok(())
     }
 }
 
@@ -254,7 +278,10 @@ pub struct ArtifactMetadata {
 
 #[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct CompilationMetricsMetadata {
-    // Other information like frame_key, co_name, etc. are already in envelope
+    // Other information like frame_key are already in envelope
+    pub co_name: Option<String>,
+    pub co_filename: Option<String>,
+    pub co_firstlineno: Option<i32>,
     pub cache_size: Option<u64>,
     pub accumulated_cache_size: Option<u64>,
     pub guard_count: Option<u64>,
@@ -325,6 +352,8 @@ pub struct CompilationMetricsContext<'e> {
     pub stack_html: String,
     pub symbolic_shape_specializations: Vec<SymbolicShapeSpecializationContext>,
     pub output_files: &'e Vec<(String, String, i32)>,
+    pub compile_id_dir: &'e PathBuf,
+    pub mini_stack_html: String,
 }
 
 #[derive(Debug, Serialize)]
@@ -381,6 +410,12 @@ pub enum Metadata<'e> {
     AOTAutogradBackwardCompilationMetrics(&'e AOTAutogradBackwardCompilationMetricsMetadata),
     BwdCompilationMetrics(&'e BwdCompilationMetricsMetadata),
     Artifact(&'e ArtifactMetadata),
+    DumpFile(&'e DumpFileMetadata),
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct DumpFileMetadata {
+    pub name: String,
 }
 
 #[derive(Debug, Deserialize)]
@@ -416,6 +451,7 @@ pub struct Envelope {
     pub describe_storage: Option<StorageDesc>,
     pub describe_tensor: Option<TensorDesc>,
     pub describe_source: Option<SourceDesc>,
+    pub dump_file: Option<DumpFileMetadata>,
     #[serde(flatten)]
     pub _other: FxHashMap<String, Value>,
 }
