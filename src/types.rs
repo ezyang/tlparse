@@ -452,6 +452,7 @@ pub struct Envelope {
     pub describe_tensor: Option<TensorDesc>,
     pub describe_source: Option<SourceDesc>,
     pub dump_file: Option<DumpFileMetadata>,
+    pub chromium_event: Option<EmptyMetadata>,
     #[serde(flatten)]
     pub _other: FxHashMap<String, Value>,
 }
@@ -561,6 +562,7 @@ pub struct IndexContext {
     pub has_unknown_stack_trie: bool,
     pub num_breaks: usize,
     pub custom_header_html: String,
+    pub has_chromium_events: bool,
 }
 
 #[derive(Debug, Serialize)]

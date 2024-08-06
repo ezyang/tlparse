@@ -124,6 +124,12 @@ phase generates:
 <li>Inductor will apply some post grad FX passes, producing <code>inductor_post_grad_graph</code></li>
 <li>Inductor will perform code generation, producing the final <code>inductor_output_code</code> which will be executed at runtime.  This output is a valid Python program and can be directly run.</li>
 </ol>
+
+{{ if has_chromium_events }}
+<h2> Chromium Events </h2>
+PT2 generates <a href='chromium_events.json'>Chromium Trace Events</a> in JSON on specific events during compilation.
+You can download and view them in a tool like <a href='https://ui.perfetto.dev/'>Perfetto</a>.
+{{ endif  }}
 <p>
 Build products below:
 </p>
@@ -139,6 +145,7 @@ Build products below:
 {{ endfor }}
 </ul>
 </div>
+
 {{ if has_unknown_stack_trie }}
 <div>
 <h2>Unknown stacks</h2>

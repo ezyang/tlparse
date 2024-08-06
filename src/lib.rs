@@ -241,6 +241,7 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
 
     let mut all_parsers = default_parsers(&tt, &config);
     all_parsers.extend(config.custom_parsers);
+    let mut chromium_events: Vec<serde_json::Value> = Vec::new();
 
     while let Some((lineno, line)) = iter.next() {
         bytes_read += line.len() as u64;
@@ -438,6 +439,10 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
             unknown_stack_trie.insert(stack.clone(), None);
         }
 
+        if let Some(_) = e.chromium_event {
+            chromium_events.push(serde_json::from_str(&payload)?);
+        }
+
         if let Some(specialization) = e.symbolic_shape_specialization {
             symbolic_shape_specialization_index
                 .borrow_mut()
@@ -463,6 +468,11 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
     pb.finish_with_message("done");
     spinner.finish();
 
+    output.push((
+        PathBuf::from("chromium_events.json"),
+        serde_json::to_string_pretty(&chromium_events).unwrap(),
+    ));
+
     eprintln!("{:?}", stats);
     if unknown_fields.len() > 0 {
         eprintln!(
@@ -485,6 +495,7 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
         unknown_stack_trie_html: unknown_stack_trie.fmt(Some(&metrics_index)).unwrap(),
         has_unknown_stack_trie: !unknown_stack_trie.is_empty(),
         num_breaks: breaks.failures.len(),
+        has_chromium_events: !chromium_events.is_empty(),
     };
     output.push((
         PathBuf::from("index.html"),

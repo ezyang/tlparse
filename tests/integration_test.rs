@@ -128,3 +128,27 @@ fn test_parse_artifact() {
         );
     }
 }
+
+#[test]
+fn test_parse_chromium_event() {
+    let expected_files = ["chromium_events.json", "index.html"];
+    // Read the test file
+    // simple.log was generated from the following:
+    // TORCH_TRACE=~/trace_logs/test python test/inductor/test_torchinductor.py  -k TORCH_TRACE=~/trace_logs/comp_metrics python test/dynamo/test_misc.py -k test_graph_break_compilation_metrics_on_failure
+    let path = Path::new("tests/inputs/chromium_nanogpt_cache_miss.log").to_path_buf();
+    let config = tlparse::ParseConfig {
+        strict: true,
+        ..Default::default()
+    };
+    let output = tlparse::parse_path(&path, config);
+    assert!(output.is_ok());
+    let map: HashMap<PathBuf, String> = output.unwrap().into_iter().collect();
+    // Check all files are present
+    for prefix in expected_files {
+        assert!(
+            prefix_exists(&map, prefix),
+            "{} not found in output",
+            prefix
+        );
+    }
+}

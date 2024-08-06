@@ -529,10 +529,10 @@ impl StructuredLogParser for DumpFileParser {
     }
     fn parse<'e>(
         &self,
-        lineno: usize,
+        _lineno: usize,
         metadata: Metadata<'e>,
         _rank: Option<u32>,
-        compile_id: &Option<CompileId>,
+        _compile_id: &Option<CompileId>,
         payload: &str,
     ) -> anyhow::Result<ParserResults> {
         if let Metadata::DumpFile(metadata) = metadata {
