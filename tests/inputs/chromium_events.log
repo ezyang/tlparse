@@ -1,0 +1,339 @@
+V0807 09:51:32.403000 2824488 torch/_logging/structured.py:22] {"str": ["/data/users/jjwu/a/pytorch/torch/_dynamo/convert_frame.py", 0]}
+V0807 09:51:32.403000 2824488 torch/_logging/structured.py:22] {"str": ["/data/users/jjwu/a/pytorch/test/dynamo/test_misc.py", 1]}
+V0807 09:51:32.404000 2824488 torch/_logging/structured.py:22] {"str": ["/data/users/jjwu/a/pytorch/torch/_dynamo/test_case.py", 2]}
+V0807 09:51:32.404000 2824488 torch/_logging/structured.py:22] {"str": ["/data/users/jjwu/a/pytorch/torch/testing/_internal/common_utils.py", 3]}
+V0807 09:51:32.404000 2824488 torch/_logging/structured.py:22] {"str": ["/data/users/jjwu/a/pytorch-env/lib/python3.10/unittest/main.py", 4]}
+V0807 09:51:32.404000 2824488 torch/_logging/structured.py:22] {"str": ["/data/users/jjwu/a/pytorch-env/lib/python3.10/unittest/runner.py", 5]}
+V0807 09:51:32.404000 2824488 torch/_logging/structured.py:22] {"str": ["/data/users/jjwu/a/pytorch-env/lib/python3.10/unittest/suite.py", 6]}
+V0807 09:51:32.404000 2824488 torch/_logging/structured.py:22] {"str": ["/data/users/jjwu/a/pytorch-env/lib/python3.10/unittest/case.py", 7]}
+V0807 09:51:32.404000 2824488 torch/_logging/structured.py:22] {"str": ["/data/users/jjwu/a/pytorch/torch/_dynamo/eval_frame.py", 8]}
+V0807 09:51:32.404000 2824488 torch/_dynamo/convert_frame.py:868] {"dynamo_start": {"stack": [{"line": 11137, "name": "<module>", "filename": 1}, {"line": 38, "name": "run_tests", "filename": 2}, {"line": 1270, "name": "run_tests", "filename": 3}, {"line": 101, "name": "__init__", "filename": 4}, {"line": 271, "name": "runTests", "filename": 4}, {"line": 184, "name": "run", "filename": 5}, {"line": 84, "name": "__call__", "filename": 6}, {"line": 122, "name": "run", "filename": 6}, {"line": 84, "name": "__call__", "filename": 6}, {"line": 122, "name": "run", "filename": 6}, {"line": 650, "name": "__call__", "filename": 7}, {"line": 3051, "name": "run", "filename": 3}, {"line": 3023, "name": "_run_custom", "filename": 3}, {"line": 591, "name": "run", "filename": 7}, {"line": 549, "name": "_callTestMethod", "filename": 7}, {"line": 2918, "name": "wrapper", "filename": 3}, {"line": 10125, "name": "test_graph_break_compilation_metrics", "filename": 1}, {"line": 464, "name": "_fn", "filename": 8}, {"line": 10115, "name": "fn", "filename": 1}]}, "frame_id": 0, "frame_compile_id": 0, "attempt": 0}
+V0807 09:51:32.404000 2824488 torch/_dynamo/utils.py:871] {"chromium_event": {}, "has_payload": "5922bc54db39a829d4160993cce4119c"}
+	{
+	"name": "_compile.compile_inner",
+	"ts": 1723049492404415.8,
+	"args": null,
+	"ph": "B",
+	"pid": 0
+	}
+V0807 09:51:32.404000 2824488 torch/_dynamo/utils.py:871] {"chromium_event": {}, "has_payload": "4e349dec4915b0fac8720db5f1d7b3f1"}
+	{
+	"name": "entire_frame_compile",
+	"ts": 1723049492404521.2,
+	"args": null,
+	"ph": "B",
+	"pid": 0
+	}
+V0807 09:51:32.407000 2824488 torch/_subclasses/meta_utils.py:204] {"describe_storage": {"id": 0, "describer_id": 0, "size": 64}, "frame_id": 0, "frame_compile_id": 0, "attempt": 0}
+V0807 09:51:32.407000 2824488 torch/_subclasses/meta_utils.py:417] {"describe_tensor": {"id": 0, "ndim": 2, "dtype": "torch.float32", "device": "device(type='cpu')", "size": [4, 4], "is_leaf": true, "stride": [4, 1], "storage": 0, "view_func": "<built-in method _view_func_unsafe of Tensor object at 0x7feeb965c400>", "describer_id": 0}, "frame_id": 0, "frame_compile_id": 0, "attempt": 0}
+V0807 09:51:32.407000 2824488 torch/_subclasses/meta_utils.py:1640] {"describe_source": {"describer_id": 0, "id": 0, "source": "L['x']"}, "frame_id": 0, "frame_compile_id": 0, "attempt": 0}
+V0807 09:51:32.411000 2824488 torch/_subclasses/meta_utils.py:204] {"describe_storage": {"id": 0, "describer_id": 1, "size": 64}, "frame_id": 0, "frame_compile_id": 0, "attempt": 1}
+V0807 09:51:32.411000 2824488 torch/_subclasses/meta_utils.py:417] {"describe_tensor": {"id": 0, "ndim": 2, "dtype": "torch.float32", "device": "device(type='cpu')", "size": [4, 4], "is_leaf": true, "stride": [4, 1], "storage": 0, "view_func": "<built-in method _view_func_unsafe of Tensor object at 0x7feeb965c400>", "describer_id": 1}, "frame_id": 0, "frame_compile_id": 0, "attempt": 1}
+V0807 09:51:32.411000 2824488 torch/_subclasses/meta_utils.py:1640] {"describe_source": {"describer_id": 1, "id": 0, "source": "L['x']"}, "frame_id": 0, "frame_compile_id": 0, "attempt": 1}
+V0807 09:51:32.414000 2824488 torch/_dynamo/output_graph.py:1337] {"dynamo_output_graph": {"sizes": {"l_x_": [4, 4], "cos": [4, 4]}}, "frame_id": 0, "frame_compile_id": 0, "attempt": 1, "has_payload": "14f2dba4f0c5f60fdcbcde755d248243"}
+	class GraphModule(torch.nn.Module):
+	    def forward(self, L_x_: "f32[4, 4][4, 1]cpu"):
+	        l_x_ = L_x_
+	        
+	         # File: /data/users/jjwu/a/pytorch/test/dynamo/test_misc.py:10116 in fn, code: x.cos()
+	        cos: "f32[4, 4][4, 1]cpu" = l_x_.cos();  l_x_ = cos = None
+	        return ()
+	        
+V0807 09:51:32.414000 2824488 torch/_dynamo/utils.py:871] {"chromium_event": {}, "has_payload": "fb2fb938fb67faa5c285257ae0f30d1a"}
+	{
+	"name": "OutputGraph.call_user_compiler",
+	"ts": 1723049492414336.0,
+	"args": null,
+	"ph": "B",
+	"pid": 0
+	}
+V0807 09:51:32.414000 2824488 torch/_dynamo/utils.py:871] {"chromium_event": {}, "has_payload": "c23902719ca0aeb35cddd4f30e15b72b"}
+	{
+	"name": "backend_compile",
+	"ts": 1723049492414417.8,
+	"args": null,
+	"ph": "B",
+	"pid": 0
+	}
+V0807 09:51:32.414000 2824488 torch/_dynamo/utils.py:871] {"chromium_event": {}, "has_payload": "1b13e4287eb465f804ccab5afeb981bd"}
+	{
+	"name": "backend_compile",
+	"ts": 1723049492414569.2,
+	"args": null,
+	"ph": "E",
+	"pid": 0
+	}
+V0807 09:51:32.414000 2824488 torch/_dynamo/utils.py:871] {"chromium_event": {}, "has_payload": "41ad13b634777f0eceb1985582be6e08"}
+	{
+	"name": "OutputGraph.call_user_compiler",
+	"ts": 1723049492414628.0,
+	"args": null,
+	"ph": "E",
+	"pid": 0
+	}
+V0807 09:51:32.417000 2824488 torch/_dynamo/guards.py:2211] {"dynamo_cpp_guards_str": {}, "frame_id": 0, "frame_compile_id": 0, "attempt": 1, "has_payload": "be0edc824f8c9943106a5a56f84d3f98"}
+	
+	TREE_GUARD_MANAGER:
+	+- RootGuardManager
+	| +- DEFAULT_DEVICE: utils_device.CURRENT_DEVICE == None                           # _dynamo/output_graph.py:462 in init_ambient_guards
+	| +- GLOBAL_STATE: ___check_global_state()
+	| +- GuardManager: source=L['x'], accessed_by=DictGetItemGuardAccessor(x)
+	| | +- TENSOR_MATCH: check_tensor(L['x'], Tensor, DispatchKeySet(CPU, BackendSelect, ADInplaceOrView, AutogradCPU), torch.float32, device=None, requires_grad=False, size=[4, 4], stride=[4, 1])
+	| | +- NO_HASATTR: hasattr(L['x'], '_dynamo_dynamic_indices') == False         
+	| +- GuardManager: source=G, accessed_by=GlobalsGuardAccessor
+	| | +- GuardManager: source=G['torch'], accessed_by=DictGetItemGuardAccessor(torch)
+	| | | +- ID_MATCH: ___check_obj_id(G['torch'], 140666006061280)                
+	| | | +- GuardManager: source=G['torch']._dynamo, accessed_by=GetAttrGuardAccessor(_dynamo)
+	| | | | +- ID_MATCH: ___check_obj_id(G['torch']._dynamo, 140665945390464)        
+	| | | | +- GuardManager: source=G['torch']._dynamo.graph_break, accessed_by=GetAttrGuardAccessor(graph_break)
+	| | | | | +- ID_MATCH: ___check_obj_id(G['torch']._dynamo.graph_break, 140664823287232)
+	
+V0807 09:51:32.417000 2824488 torch/_dynamo/utils.py:871] {"chromium_event": {}, "has_payload": "c42e7b412bcfec845489dbba83486d48"}
+	{
+	"name": "entire_frame_compile",
+	"ts": 1723049492417530.0,
+	"args": null,
+	"ph": "E",
+	"pid": 0
+	}
+V0807 09:51:32.417000 2824488 torch/_dynamo/utils.py:871] {"chromium_event": {}, "has_payload": "17bf1e5f6d80155117b2cf71e3bcb29a"}
+	{
+	"name": "_compile.compile_inner",
+	"ts": 1723049492417603.2,
+	"args": null,
+	"ph": "E",
+	"pid": 0
+	}
+V0807 09:51:32.417000 2824488 torch/_dynamo/utils.py:780] {"compilation_metrics": {"compile_id": "0/0", "frame_key": "1", "co_name": "fn", "co_filename": "/data/users/jjwu/a/pytorch/test/dynamo/test_misc.py", "co_firstlineno": 10115, "cache_size": 0, "accumulated_cache_size": 0, "guard_count": 9, "shape_env_guard_count": 0, "graph_op_count": 1, "graph_node_count": 3, "graph_input_count": 1, "start_time": 1723049492.404317, "entire_frame_compile_time_s": 0.013243675231933594, "backend_compile_time_s": 0.00034117698669433594, "inductor_compile_time_s": null, "code_gen_time_s": null, "fail_type": null, "fail_reason": null, "fail_user_frame_filename": null, "fail_user_frame_lineno": null, "non_compliant_ops": [], "compliant_custom_ops": [], "restart_reasons": ["'skip function graph_break in file /data/users/jjwu/a/pytorch/torch/_dynamo/decorators.py'"], "dynamo_time_before_restart_s": 0.006322145462036133, "has_guarded_code": true, "possibly_missed_reinplacing_opportunities": 0}, "frame_id": 0, "frame_compile_id": 0, "attempt": 1}
+V0807 09:51:32.418000 2824488 torch/_dynamo/convert_frame.py:868] {"dynamo_start": {"stack": [{"line": 11137, "name": "<module>", "filename": 1}, {"line": 38, "name": "run_tests", "filename": 2}, {"line": 1270, "name": "run_tests", "filename": 3}, {"line": 101, "name": "__init__", "filename": 4}, {"line": 271, "name": "runTests", "filename": 4}, {"line": 184, "name": "run", "filename": 5}, {"line": 84, "name": "__call__", "filename": 6}, {"line": 122, "name": "run", "filename": 6}, {"line": 84, "name": "__call__", "filename": 6}, {"line": 122, "name": "run", "filename": 6}, {"line": 650, "name": "__call__", "filename": 7}, {"line": 3051, "name": "run", "filename": 3}, {"line": 3023, "name": "_run_custom", "filename": 3}, {"line": 591, "name": "run", "filename": 7}, {"line": 549, "name": "_callTestMethod", "filename": 7}, {"line": 2918, "name": "wrapper", "filename": 3}, {"line": 10125, "name": "test_graph_break_compilation_metrics", "filename": 1}, {"line": 464, "name": "_fn", "filename": 8}, {"line": 10117, "name": "fn", "filename": 1}, {"line": 10117, "name": "torch_dynamo_resume_in_fn_at_10117", "filename": 1}]}, "frame_id": 1, "frame_compile_id": 0, "attempt": 0}
+V0807 09:51:32.418000 2824488 torch/_dynamo/utils.py:871] {"chromium_event": {}, "has_payload": "62a9731ed19442d613f1d0b530af14eb"}
+	{
+	"name": "_compile.compile_inner",
+	"ts": 1723049492418357.2,
+	"args": null,
+	"ph": "B",
+	"pid": 0
+	}
+V0807 09:51:32.418000 2824488 torch/_dynamo/utils.py:871] {"chromium_event": {}, "has_payload": "30545a1bf7efef4ca9cca35faa1ec3de"}
+	{
+	"name": "entire_frame_compile",
+	"ts": 1723049492418427.5,
+	"args": null,
+	"ph": "B",
+	"pid": 0
+	}
+V0807 09:51:32.419000 2824488 torch/_subclasses/meta_utils.py:204] {"describe_storage": {"id": 0, "describer_id": 3, "size": 64}, "frame_id": 1, "frame_compile_id": 0, "attempt": 0}
+V0807 09:51:32.419000 2824488 torch/_subclasses/meta_utils.py:417] {"describe_tensor": {"id": 0, "ndim": 2, "dtype": "torch.float32", "device": "device(type='cpu')", "size": [4, 4], "is_leaf": true, "stride": [4, 1], "storage": 0, "view_func": "<built-in method _view_func_unsafe of Tensor object at 0x7feeb965c400>", "describer_id": 3}, "frame_id": 1, "frame_compile_id": 0, "attempt": 0}
+V0807 09:51:32.419000 2824488 torch/_subclasses/meta_utils.py:1640] {"describe_source": {"describer_id": 3, "id": 0, "source": "L['x']"}, "frame_id": 1, "frame_compile_id": 0, "attempt": 0}
+V0807 09:51:32.421000 2824488 torch/_subclasses/meta_utils.py:204] {"describe_storage": {"id": 0, "describer_id": 4, "size": 64}, "frame_id": 1, "frame_compile_id": 0, "attempt": 1}
+V0807 09:51:32.421000 2824488 torch/_subclasses/meta_utils.py:417] {"describe_tensor": {"id": 0, "ndim": 2, "dtype": "torch.float32", "device": "device(type='cpu')", "size": [4, 4], "is_leaf": true, "stride": [4, 1], "storage": 0, "view_func": "<built-in method _view_func_unsafe of Tensor object at 0x7feeb965c400>", "describer_id": 4}, "frame_id": 1, "frame_compile_id": 0, "attempt": 1}
+V0807 09:51:32.421000 2824488 torch/_subclasses/meta_utils.py:1640] {"describe_source": {"describer_id": 4, "id": 0, "source": "L['x']"}, "frame_id": 1, "frame_compile_id": 0, "attempt": 1}
+V0807 09:51:32.423000 2824488 torch/_dynamo/output_graph.py:1337] {"dynamo_output_graph": {"sizes": {"l_x_": [4, 4], "sin": [4, 4]}}, "frame_id": 1, "frame_compile_id": 0, "attempt": 1, "has_payload": "982e9a7c38364664154acd1d0ebefaa3"}
+	class GraphModule(torch.nn.Module):
+	    def forward(self, L_x_: "f32[4, 4][4, 1]cpu"):
+	        l_x_ = L_x_
+	        
+	         # File: /data/users/jjwu/a/pytorch/test/dynamo/test_misc.py:10118 in torch_dynamo_resume_in_fn_at_10117, code: x.sin()
+	        sin: "f32[4, 4][4, 1]cpu" = l_x_.sin();  l_x_ = sin = None
+	        return ()
+	        
+V0807 09:51:32.423000 2824488 torch/_dynamo/utils.py:871] {"chromium_event": {}, "has_payload": "1d72897e58f60785b16f3d20869623be"}
+	{
+	"name": "OutputGraph.call_user_compiler",
+	"ts": 1723049492423506.8,
+	"args": null,
+	"ph": "B",
+	"pid": 0
+	}
+V0807 09:51:32.423000 2824488 torch/_dynamo/utils.py:871] {"chromium_event": {}, "has_payload": "9b9d9a2486f8b7e8d0c40b3f383d3f09"}
+	{
+	"name": "backend_compile",
+	"ts": 1723049492423693.5,
+	"args": null,
+	"ph": "B",
+	"pid": 0
+	}
+V0807 09:51:32.423000 2824488 torch/_dynamo/utils.py:871] {"chromium_event": {}, "has_payload": "150523ccbde1f975220d1a2838bcd170"}
+	{
+	"name": "backend_compile",
+	"ts": 1723049492423789.2,
+	"args": null,
+	"ph": "E",
+	"pid": 0
+	}
+V0807 09:51:32.423000 2824488 torch/_dynamo/utils.py:871] {"chromium_event": {}, "has_payload": "7274bfa940bafe3a302f54894604e3ff"}
+	{
+	"name": "OutputGraph.call_user_compiler",
+	"ts": 1723049492423846.0,
+	"args": null,
+	"ph": "E",
+	"pid": 0
+	}
+V0807 09:51:32.426000 2824488 torch/_dynamo/guards.py:2211] {"dynamo_cpp_guards_str": {}, "frame_id": 1, "frame_compile_id": 0, "attempt": 1, "has_payload": "be0edc824f8c9943106a5a56f84d3f98"}
+	
+	TREE_GUARD_MANAGER:
+	+- RootGuardManager
+	| +- DEFAULT_DEVICE: utils_device.CURRENT_DEVICE == None                           # _dynamo/output_graph.py:462 in init_ambient_guards
+	| +- GLOBAL_STATE: ___check_global_state()
+	| +- GuardManager: source=L['x'], accessed_by=DictGetItemGuardAccessor(x)
+	| | +- TENSOR_MATCH: check_tensor(L['x'], Tensor, DispatchKeySet(CPU, BackendSelect, ADInplaceOrView, AutogradCPU), torch.float32, device=None, requires_grad=False, size=[4, 4], stride=[4, 1])
+	| | +- NO_HASATTR: hasattr(L['x'], '_dynamo_dynamic_indices') == False         
+	| +- GuardManager: source=G, accessed_by=GlobalsGuardAccessor
+	| | +- GuardManager: source=G['torch'], accessed_by=DictGetItemGuardAccessor(torch)
+	| | | +- ID_MATCH: ___check_obj_id(G['torch'], 140666006061280)                
+	| | | +- GuardManager: source=G['torch']._dynamo, accessed_by=GetAttrGuardAccessor(_dynamo)
+	| | | | +- ID_MATCH: ___check_obj_id(G['torch']._dynamo, 140665945390464)        
+	| | | | +- GuardManager: source=G['torch']._dynamo.graph_break, accessed_by=GetAttrGuardAccessor(graph_break)
+	| | | | | +- ID_MATCH: ___check_obj_id(G['torch']._dynamo.graph_break, 140664823287232)
+	
+V0807 09:51:32.426000 2824488 torch/_dynamo/utils.py:871] {"chromium_event": {}, "has_payload": "49ab36075cbca8afadbe97390769ba16"}
+	{
+	"name": "entire_frame_compile",
+	"ts": 1723049492426141.2,
+	"args": null,
+	"ph": "E",
+	"pid": 0
+	}
+V0807 09:51:32.426000 2824488 torch/_dynamo/utils.py:871] {"chromium_event": {}, "has_payload": "470360a71e2e7dc5ef2766ca058cb165"}
+	{
+	"name": "_compile.compile_inner",
+	"ts": 1723049492426211.0,
+	"args": null,
+	"ph": "E",
+	"pid": 0
+	}
+V0807 09:51:32.426000 2824488 torch/_dynamo/utils.py:780] {"compilation_metrics": {"compile_id": "1/0", "frame_key": "2", "co_name": "torch_dynamo_resume_in_fn_at_10117", "co_filename": "/data/users/jjwu/a/pytorch/test/dynamo/test_misc.py", "co_firstlineno": 10117, "cache_size": 0, "accumulated_cache_size": 0, "guard_count": 9, "shape_env_guard_count": 0, "graph_op_count": 1, "graph_node_count": 3, "graph_input_count": 1, "start_time": 1723049492.4183362, "entire_frame_compile_time_s": 0.007906198501586914, "backend_compile_time_s": 0.0003859996795654297, "inductor_compile_time_s": null, "code_gen_time_s": null, "fail_type": null, "fail_reason": null, "fail_user_frame_filename": null, "fail_user_frame_lineno": null, "non_compliant_ops": [], "compliant_custom_ops": [], "restart_reasons": ["'skip function graph_break in file /data/users/jjwu/a/pytorch/torch/_dynamo/decorators.py'"], "dynamo_time_before_restart_s": 0.0023925304412841797, "has_guarded_code": true, "possibly_missed_reinplacing_opportunities": 0}, "frame_id": 1, "frame_compile_id": 0, "attempt": 1}
+V0807 09:51:32.426000 2824488 torch/_dynamo/convert_frame.py:868] {"dynamo_start": {"stack": [{"line": 11137, "name": "<module>", "filename": 1}, {"line": 38, "name": "run_tests", "filename": 2}, {"line": 1270, "name": "run_tests", "filename": 3}, {"line": 101, "name": "__init__", "filename": 4}, {"line": 271, "name": "runTests", "filename": 4}, {"line": 184, "name": "run", "filename": 5}, {"line": 84, "name": "__call__", "filename": 6}, {"line": 122, "name": "run", "filename": 6}, {"line": 84, "name": "__call__", "filename": 6}, {"line": 122, "name": "run", "filename": 6}, {"line": 650, "name": "__call__", "filename": 7}, {"line": 3051, "name": "run", "filename": 3}, {"line": 3023, "name": "_run_custom", "filename": 3}, {"line": 591, "name": "run", "filename": 7}, {"line": 549, "name": "_callTestMethod", "filename": 7}, {"line": 2918, "name": "wrapper", "filename": 3}, {"line": 10125, "name": "test_graph_break_compilation_metrics", "filename": 1}, {"line": 464, "name": "_fn", "filename": 8}, {"line": 10117, "name": "fn", "filename": 1}, {"line": 10119, "name": "torch_dynamo_resume_in_fn_at_10117", "filename": 1}, {"line": 10119, "name": "torch_dynamo_resume_in_fn_at_10119", "filename": 1}]}, "frame_id": 2, "frame_compile_id": 0, "attempt": 0}
+V0807 09:51:32.426000 2824488 torch/_dynamo/utils.py:871] {"chromium_event": {}, "has_payload": "cd67069b314de7443588126f4bb9caab"}
+	{
+	"name": "_compile.compile_inner",
+	"ts": 1723049492426820.8,
+	"args": null,
+	"ph": "B",
+	"pid": 0
+	}
+V0807 09:51:32.426000 2824488 torch/_dynamo/utils.py:871] {"chromium_event": {}, "has_payload": "535fe893ff4610c74adc1a5f325f9cdf"}
+	{
+	"name": "entire_frame_compile",
+	"ts": 1723049492426888.0,
+	"args": null,
+	"ph": "B",
+	"pid": 0
+	}
+V0807 09:51:32.427000 2824488 torch/_subclasses/meta_utils.py:204] {"describe_storage": {"id": 0, "describer_id": 6, "size": 64}, "frame_id": 2, "frame_compile_id": 0, "attempt": 0}
+V0807 09:51:32.427000 2824488 torch/_subclasses/meta_utils.py:417] {"describe_tensor": {"id": 0, "ndim": 2, "dtype": "torch.float32", "device": "device(type='cpu')", "size": [4, 4], "is_leaf": true, "stride": [4, 1], "storage": 0, "view_func": "<built-in method _view_func_unsafe of Tensor object at 0x7feeb965c400>", "describer_id": 6}, "frame_id": 2, "frame_compile_id": 0, "attempt": 0}
+V0807 09:51:32.427000 2824488 torch/_subclasses/meta_utils.py:1640] {"describe_source": {"describer_id": 6, "id": 0, "source": "L['x']"}, "frame_id": 2, "frame_compile_id": 0, "attempt": 0}
+V0807 09:51:32.429000 2824488 torch/_dynamo/output_graph.py:1337] {"dynamo_output_graph": {"sizes": {"l_x_": [4, 4], "cos": [4, 4]}}, "frame_id": 2, "frame_compile_id": 0, "attempt": 0, "has_payload": "a6969283b355d59fdf903f7c44eafd31"}
+	class GraphModule(torch.nn.Module):
+	    def forward(self, L_x_: "f32[4, 4][4, 1]cpu"):
+	        l_x_ = L_x_
+	        
+	         # File: /data/users/jjwu/a/pytorch/test/dynamo/test_misc.py:10120 in torch_dynamo_resume_in_fn_at_10119, code: return x.cos()
+	        cos: "f32[4, 4][4, 1]cpu" = l_x_.cos();  l_x_ = None
+	        return (cos,)
+	        
+V0807 09:51:32.429000 2824488 torch/_dynamo/utils.py:871] {"chromium_event": {}, "has_payload": "10ccd8fe9d672960bbfdd6b77179f982"}
+	{
+	"name": "OutputGraph.call_user_compiler",
+	"ts": 1723049492429474.8,
+	"args": null,
+	"ph": "B",
+	"pid": 0
+	}
+V0807 09:51:32.429000 2824488 torch/_dynamo/utils.py:871] {"chromium_event": {}, "has_payload": "d3f5288a1b1dbe58fc864196ab3d473d"}
+	{
+	"name": "backend_compile",
+	"ts": 1723049492429555.2,
+	"args": null,
+	"ph": "B",
+	"pid": 0
+	}
+V0807 09:51:32.429000 2824488 torch/_dynamo/utils.py:871] {"chromium_event": {}, "has_payload": "c8167a747bfced74d17f4774d8c153e0"}
+	{
+	"name": "backend_compile",
+	"ts": 1723049492429640.0,
+	"args": null,
+	"ph": "E",
+	"pid": 0
+	}
+V0807 09:51:32.429000 2824488 torch/_dynamo/utils.py:871] {"chromium_event": {}, "has_payload": "93de54b9806ab039e3f47a67ed0ba30d"}
+	{
+	"name": "OutputGraph.call_user_compiler",
+	"ts": 1723049492429692.5,
+	"args": null,
+	"ph": "E",
+	"pid": 0
+	}
+V0807 09:51:32.430000 2824488 torch/_dynamo/guards.py:2211] {"dynamo_cpp_guards_str": {}, "frame_id": 2, "frame_compile_id": 0, "attempt": 0, "has_payload": "85f4665e3933f3363f5cc2aee88cf803"}
+	
+	TREE_GUARD_MANAGER:
+	+- RootGuardManager
+	| +- DEFAULT_DEVICE: utils_device.CURRENT_DEVICE == None                           # _dynamo/output_graph.py:462 in init_ambient_guards
+	| +- GLOBAL_STATE: ___check_global_state()
+	| +- GuardManager: source=L['x'], accessed_by=DictGetItemGuardAccessor(x)
+	| | +- TENSOR_MATCH: check_tensor(L['x'], Tensor, DispatchKeySet(CPU, BackendSelect, ADInplaceOrView, AutogradCPU), torch.float32, device=None, requires_grad=False, size=[4, 4], stride=[4, 1])
+	| | +- NO_HASATTR: hasattr(L['x'], '_dynamo_dynamic_indices') == False         
+	
+V0807 09:51:32.430000 2824488 torch/_dynamo/utils.py:871] {"chromium_event": {}, "has_payload": "18b8a657af01bb59c3d74b7ef8ff9203"}
+	{
+	"name": "entire_frame_compile",
+	"ts": 1723049492430901.5,
+	"args": null,
+	"ph": "E",
+	"pid": 0
+	}
+V0807 09:51:32.430000 2824488 torch/_dynamo/utils.py:871] {"chromium_event": {}, "has_payload": "1b512edd840f7ea466b0b8730253cd1f"}
+	{
+	"name": "_compile.compile_inner",
+	"ts": 1723049492430971.0,
+	"args": null,
+	"ph": "E",
+	"pid": 0
+	}
+V0807 09:51:32.431000 2824488 torch/_dynamo/utils.py:780] {"compilation_metrics": {"compile_id": "2/0", "frame_key": "3", "co_name": "torch_dynamo_resume_in_fn_at_10119", "co_filename": "/data/users/jjwu/a/pytorch/test/dynamo/test_misc.py", "co_firstlineno": 10119, "cache_size": 0, "accumulated_cache_size": 0, "guard_count": 6, "shape_env_guard_count": 0, "graph_op_count": 1, "graph_node_count": 3, "graph_input_count": 1, "start_time": 1723049492.4268005, "entire_frame_compile_time_s": 0.0042018890380859375, "backend_compile_time_s": 0.00026297569274902344, "inductor_compile_time_s": null, "code_gen_time_s": null, "fail_type": null, "fail_reason": null, "fail_user_frame_filename": null, "fail_user_frame_lineno": null, "non_compliant_ops": [], "compliant_custom_ops": [], "restart_reasons": [], "dynamo_time_before_restart_s": 0.0, "has_guarded_code": true, "possibly_missed_reinplacing_opportunities": 0}, "frame_id": 2, "frame_compile_id": 0, "attempt": 0}
+V0807 09:51:33.443000 2824488 torch/_dynamo/convert_frame.py:868] {"dynamo_start": {"stack": [{"line": 11137, "name": "<module>", "filename": 1}, {"line": 38, "name": "run_tests", "filename": 2}, {"line": 1270, "name": "run_tests", "filename": 3}, {"line": 101, "name": "__init__", "filename": 4}, {"line": 271, "name": "runTests", "filename": 4}, {"line": 184, "name": "run", "filename": 5}, {"line": 84, "name": "__call__", "filename": 6}, {"line": 122, "name": "run", "filename": 6}, {"line": 84, "name": "__call__", "filename": 6}, {"line": 122, "name": "run", "filename": 6}, {"line": 650, "name": "__call__", "filename": 7}, {"line": 3051, "name": "run", "filename": 3}, {"line": 3023, "name": "_run_custom", "filename": 3}, {"line": 591, "name": "run", "filename": 7}, {"line": 549, "name": "_callTestMethod", "filename": 7}, {"line": 2918, "name": "wrapper", "filename": 3}, {"line": 10165, "name": "test_graph_break_compilation_metrics_on_failure", "filename": 1}, {"line": 464, "name": "_fn", "filename": 8}, {"line": 10155, "name": "fn", "filename": 1}]}, "frame_id": 0, "frame_compile_id": 0, "attempt": 0}
+V0807 09:51:33.443000 2824488 torch/_dynamo/utils.py:871] {"chromium_event": {}, "has_payload": "eef75bcdb35b95b75e2f35fa877d41a9"}
+	{
+	"name": "_compile.compile_inner",
+	"ts": 1723049493443444.5,
+	"args": null,
+	"ph": "B",
+	"pid": 0
+	}
+V0807 09:51:33.443000 2824488 torch/_dynamo/utils.py:871] {"chromium_event": {}, "has_payload": "354889097421a515ce496163d74a9fa3"}
+	{
+	"name": "entire_frame_compile",
+	"ts": 1723049493443541.5,
+	"args": null,
+	"ph": "B",
+	"pid": 0
+	}
+V0807 09:51:33.444000 2824488 torch/_subclasses/meta_utils.py:204] {"describe_storage": {"id": 0, "describer_id": 8, "size": 64}, "frame_id": 0, "frame_compile_id": 0, "attempt": 0}
+V0807 09:51:33.444000 2824488 torch/_subclasses/meta_utils.py:417] {"describe_tensor": {"id": 0, "ndim": 2, "dtype": "torch.float32", "device": "device(type='cpu')", "size": [4, 4], "is_leaf": true, "stride": [4, 1], "storage": 0, "view_func": "<built-in method _view_func_unsafe of Tensor object at 0x7feeb965c400>", "describer_id": 8}, "frame_id": 0, "frame_compile_id": 0, "attempt": 0}
+V0807 09:51:33.444000 2824488 torch/_subclasses/meta_utils.py:1640] {"describe_source": {"describer_id": 8, "id": 0, "source": "L['x']"}, "frame_id": 0, "frame_compile_id": 0, "attempt": 0}
+V0807 09:51:33.446000 2824488 torch/_dynamo/output_graph.py:1337] {"dynamo_output_graph": {"sizes": {"l_x_": [4, 4], "sin": [4, 4]}}, "frame_id": 0, "frame_compile_id": 0, "attempt": 0, "has_payload": "ba845d3191efd77996f11649d13de94e"}
+	class GraphModule(torch.nn.Module):
+	    def forward(self, L_x_: "f32[4, 4][4, 1]cpu"):
+	        l_x_ = L_x_
+	        
+	         # File: /data/users/jjwu/a/pytorch/test/dynamo/test_misc.py:10156 in fn, code: return x.sin()
+	        sin: "f32[4, 4][4, 1]cpu" = l_x_.sin();  l_x_ = None
+	        return (sin,)
+	        
+V0807 09:51:33.446000 2824488 torch/_dynamo/utils.py:871] {"chromium_event": {}, "has_payload": "8615ceb16d467000ba450ddee01f45d1"}
+	{
+	"name": "OutputGraph.call_user_compiler",
+	"ts": 1723049493446954.2,
+	"args": null,
+	"ph": "B",
+	"pid": 0
+	}
+V0807 09:51:33.447000 2824488 torch/_dynamo/utils.py:871] {"chromium_event": {}, "has_payload": "c461c120aa4c7e0f92d09ef62d92a5d1"}
+	{
+	"name": "backend_compile",
+	"ts": 1723049493447036.8,
+	"args": null,
+	"ph": "B",
+	"pid": 0
+	}
+V0807 09:51:33.447000 2824488 torch/_dynamo/utils.py:780] {"compilation_metrics": {"compile_id": "0/0", "frame_key": "1", "co_name": "fn", "co_filename": "/data/users/jjwu/a/pytorch/test/dynamo/test_misc.py", "co_firstlineno": 10155, "cache_size": 0, "accumulated_cache_size": 0, "guard_count": null, "shape_env_guard_count": null, "graph_op_count": null, "graph_node_count": null, "graph_input_count": null, "start_time": 1723049493.4433863, "entire_frame_compile_time_s": null, "backend_compile_time_s": null, "inductor_compile_time_s": null, "code_gen_time_s": null, "fail_type": "<class 'torch._dynamo.exc.BackendCompilerFailed'>", "fail_reason": "backend='broken_backend' raised:\nRuntimeError: broken backend", "fail_user_frame_filename": null, "fail_user_frame_lineno": null, "non_compliant_ops": [], "compliant_custom_ops": [], "restart_reasons": [], "dynamo_time_before_restart_s": 0.0039255619049072266, "has_guarded_code": false, "possibly_missed_reinplacing_opportunities": null}, "frame_id": 0, "frame_compile_id": 0, "attempt": 0}

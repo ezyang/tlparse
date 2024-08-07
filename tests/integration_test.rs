@@ -135,7 +135,7 @@ fn test_parse_chromium_event() {
     // Read the test file
     // simple.log was generated from the following:
     // TORCH_TRACE=~/trace_logs/test python test/inductor/test_torchinductor.py  -k TORCH_TRACE=~/trace_logs/comp_metrics python test/dynamo/test_misc.py -k test_graph_break_compilation_metrics_on_failure
-    let path = Path::new("tests/inputs/chromium_nanogpt_cache_miss.log").to_path_buf();
+    let path = Path::new("tests/inputs/chromium_events.log").to_path_buf();
     let config = tlparse::ParseConfig {
         strict: true,
         ..Default::default()
