@@ -291,21 +291,6 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
             continue;
         };
 
-        match expected_rank {
-            Some(rank) => {
-                if rank != e.rank {
-                    stats.other_rank += 1;
-                    continue;
-                }
-            }
-            None => {
-                multi.suspend(|| {
-                    eprintln!("Detected rank: {:?}", e.rank);
-                });
-                expected_rank = Some(e.rank);
-            }
-        };
-
         let mut payload = String::new();
         if let Some(ref expect) = e.has_payload {
             let mut first = true;
@@ -332,6 +317,21 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
                 stats.fail_payload_md5 += 1;
             }
         }
+
+        match expected_rank {
+            Some(rank) => {
+                if rank != e.rank {
+                    stats.other_rank += 1;
+                    continue;
+                }
+            }
+            None => {
+                multi.suspend(|| {
+                    eprintln!("Detected rank: {:?}", e.rank);
+                });
+                expected_rank = Some(e.rank);
+            }
+        };
 
         stats.ok += 1;
 
