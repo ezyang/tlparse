@@ -138,7 +138,7 @@ Build products below:
     <li><a id="{compile_directory.0}">{compile_directory.0}</a>
     <ul>
         {{ for path_idx in compile_directory.1 }}
-            <li><a href="{path_idx.0}">{path_idx.1}</a> ({path_idx.2})</li>
+            <li><a href="{path_idx.filename}">{path_idx.display_filename}</a> ({path_idx.seq_nr}) {path_idx.size}</li>
         {{ endfor }}
     </ul>
     </li>
