@@ -350,6 +350,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "human_bytes"
+version = "0.4.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "91f255a4535024abf7640cb288260811fc14794f62b063652ed349f9a6c2348e"
+
+[[package]]
 name = "iana-time-zone"
 version = "0.1.60"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -787,6 +793,7 @@ dependencies = [
  "clap",
  "fxhash",
  "html-escape",
+ "human_bytes",
  "indexmap",
  "indicatif",
  "md-5",

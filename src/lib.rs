@@ -3,6 +3,7 @@ use fxhash::{FxHashMap, FxHashSet};
 use md5::{Digest, Md5};
 use std::ffi::{OsStr, OsString};
 
+use human_bytes::human_bytes;
 use indicatif::{MultiProgress, ProgressBar, ProgressStyle};
 use regex::Regex;
 use std::cell::RefCell;
@@ -82,7 +83,7 @@ fn run_parser<'t>(
     payload: &str,
     output_count: &mut i32,
     output: &mut Vec<(PathBuf, String)>,
-    compile_directory: &mut Vec<(String, String, i32)>,
+    compile_directory: &mut Vec<CompileDirectoryEntry>,
     multi: &MultiProgress,
     stats: &mut Stats,
 ) {
@@ -106,27 +107,36 @@ fn run_parser<'t>(
                             } else {
                                 raw_filename
                             };
+                            let size = human_bytes(out.len() as f64);
                             output.push((filename.clone(), out));
                             let filename_str = format!("{}", filename.to_string_lossy());
-                            compile_directory.push((
-                                filename_str.clone(),
-                                filename_str,
-                                *output_count,
-                            ));
+                            compile_directory.push(CompileDirectoryEntry {
+                                filename: filename_str.clone(),
+                                display_filename: filename_str,
+                                seq_nr: *output_count,
+                                size: size,
+                            });
                             *output_count += 1;
                         }
                         ParserOutput::GlobalFile(filename, out) => {
+                            let size = human_bytes(out.len() as f64);
                             output.push((filename.clone(), out));
                             let filename_str = format!("{}", filename.to_string_lossy());
-                            compile_directory.push((
-                                filename_str.clone(),
-                                filename_str,
-                                *output_count,
-                            ));
+                            compile_directory.push(CompileDirectoryEntry {
+                                filename: filename_str.clone(),
+                                display_filename: filename_str,
+                                seq_nr: *output_count,
+                                size: size,
+                            });
                             *output_count += 1;
                         }
                         ParserOutput::Link(name, url) => {
-                            compile_directory.push((url, name, *output_count));
+                            compile_directory.push(CompileDirectoryEntry {
+                                filename: url,
+                                display_filename: name,
+                                seq_nr: *output_count,
+                                size: "".to_string(),
+                            });
                             *output_count += 1;
                         }
                     }
@@ -191,7 +201,7 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
     // Each entry is a compile id => (link, rendered name, output number)
     // For files, link and rendered name are the same
     // For links, you can specify a custom name for the link
-    let mut directory: FxIndexMap<Option<CompileId>, Vec<(String, String, i32)>> =
+    let mut directory: FxIndexMap<Option<CompileId>, Vec<CompileDirectoryEntry>> =
         FxIndexMap::default();
 
     let mut metrics_index: CompilationMetricsIndex = FxIndexMap::default();
