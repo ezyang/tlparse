@@ -10,8 +10,7 @@ use tlparse::{parse_path, ParseConfig};
 #[command(author, version, about, long_about = None)]
 #[command(propagate_version = true)]
 pub struct Cli {
-    #[arg(required_unless_present = "latest")]
-    path: Option<PathBuf>,
+    path: PathBuf,
     /// Parse most recent log
     #[arg(long)]
     latest: bool,
@@ -47,10 +46,13 @@ pub struct Cli {
 fn main() -> anyhow::Result<()> {
     let cli = Cli::parse();
     let path = if cli.latest {
-        let input_path = cli.path.unwrap_or(PathBuf::from("."));
+        let input_path = cli.path;
         // Path should be a directory
         if !input_path.is_dir() {
-            bail!("Input path {} is not a directory", input_path.display());
+            bail!(
+                "Input path {} is not a directory (required when using --latest)",
+                input_path.display()
+            );
         }
 
         let last_modified_file = std::fs::read_dir(&input_path)
@@ -64,7 +66,7 @@ fn main() -> anyhow::Result<()> {
         };
         last_modified_file.path()
     } else {
-        cli.path.unwrap()
+        cli.path
     };
 
     let out_path = cli.out;
