@@ -1,6 +1,6 @@
 use clap::Parser;
 
-use anyhow::{bail, Context};
+use anyhow::bail;
 use std::fs;
 use std::path::PathBuf;
 
@@ -11,9 +11,6 @@ use tlparse::{parse_path, ParseConfig};
 #[command(propagate_version = true)]
 pub struct Cli {
     path: PathBuf,
-    /// Parse most recent log
-    #[arg(long)]
-    latest: bool,
     /// Output directory, defaults to `tl_out`
     #[arg(short, default_value = "tl_out")]
     out: PathBuf,
@@ -45,30 +42,7 @@ pub struct Cli {
 
 fn main() -> anyhow::Result<()> {
     let cli = Cli::parse();
-    let path = if cli.latest {
-        let input_path = cli.path;
-        // Path should be a directory
-        if !input_path.is_dir() {
-            bail!(
-                "Input path {} is not a directory (required when using --latest)",
-                input_path.display()
-            );
-        }
-
-        let last_modified_file = std::fs::read_dir(&input_path)
-            .with_context(|| format!("Couldn't access directory {}", input_path.display()))?
-            .flatten()
-            .filter(|f| f.metadata().unwrap().is_file())
-            .max_by_key(|x| x.metadata().unwrap().modified().unwrap());
-
-        let Some(last_modified_file) = last_modified_file else {
-            bail!("No files found in directory {}", input_path.display());
-        };
-        last_modified_file.path()
-    } else {
-        cli.path
-    };
-
+    let path = cli.path;
     let out_path = cli.out;
 
     if out_path.exists() {
