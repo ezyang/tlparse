@@ -351,7 +351,7 @@ pub struct CompilationMetricsContext<'e> {
     pub compile_id: String,
     pub stack_html: String,
     pub symbolic_shape_specializations: Vec<SymbolicShapeSpecializationContext>,
-    pub output_files: &'e Vec<(String, String, i32)>,
+    pub output_files: &'e Vec<(String, String, i32, String)>,
     pub compile_id_dir: &'e PathBuf,
     pub mini_stack_html: String,
 }
@@ -556,7 +556,7 @@ pub struct DynamoGuardsContext {
 pub struct IndexContext {
     pub css: &'static str,
     pub javascript: &'static str,
-    pub directory: Vec<(String, Vec<(String, String, i32)>)>,
+    pub directory: Vec<(String, Vec<(String, String, i32, String)>)>,
     pub stack_trie_html: String,
     pub unknown_stack_trie_html: String,
     pub has_unknown_stack_trie: bool,

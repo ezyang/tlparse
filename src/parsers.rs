@@ -349,7 +349,7 @@ pub struct CompilationMetricsParser<'t> {
     pub tt: &'t TinyTemplate<'t>,
     pub stack_index: &'t RefCell<StackIndex>,
     pub symbolic_shape_specialization_index: &'t RefCell<SymbolicShapeSpecializationIndex>,
-    pub output_files: &'t Vec<(String, String, i32)>,
+    pub output_files: &'t Vec<(String, String, i32, String)>,
     pub compile_id_dir: &'t PathBuf,
 }
 impl StructuredLogParser for CompilationMetricsParser<'_> {
@@ -416,11 +416,16 @@ impl StructuredLogParser for CompilationMetricsParser<'_> {
                 let new_str: String = parts[1..].join("");
                 new_str
             };
-            let output_files: Vec<(String, String, i32)> = self
+            let output_files: Vec<(String, String, i32, String)> = self
                 .output_files
                 .iter()
-                .map(|(url, name, number)| {
-                    return (remove_prefix(url), remove_prefix(name), number.clone());
+                .map(|(url, name, number, suffix)| {
+                    (
+                        remove_prefix(url),
+                        remove_prefix(name),
+                        number.clone(),
+                        suffix.clone(),
+                    )
                 })
                 .collect();
             let context = CompilationMetricsContext {
