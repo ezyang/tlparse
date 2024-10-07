@@ -90,7 +90,7 @@ fn run_parser<'t>(
         let results = parser.parse(lineno, md, e.rank, &e.compile_id, &payload);
         fn extact_suffix(filename: &String) -> String {
             if filename.contains("fx_graph_cache_miss") {
-                "❎".to_string()
+                "❌".to_string()
             } else if filename.contains("fx_graph_cache_hit") {
                 "✅".to_string()
             } else if filename.contains("fx_graph_cache_bypass") {
