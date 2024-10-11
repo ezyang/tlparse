@@ -344,6 +344,14 @@ pub struct AOTAutogradBackwardCompilationMetricsContext<'e> {
     pub compile_id: String,
 }
 
+#[derive(Clone, Debug, Serialize)]
+pub struct OutputFile {
+    pub url: String,
+    pub name: String,
+    pub number: i32,
+    pub suffix: String,
+}
+
 #[derive(Debug, Serialize)]
 pub struct CompilationMetricsContext<'e> {
     pub m: &'e CompilationMetricsMetadata,
@@ -351,7 +359,7 @@ pub struct CompilationMetricsContext<'e> {
     pub compile_id: String,
     pub stack_html: String,
     pub symbolic_shape_specializations: Vec<SymbolicShapeSpecializationContext>,
-    pub output_files: &'e Vec<(String, String, i32, String)>,
+    pub output_files: &'e Vec<OutputFile>,
     pub compile_id_dir: &'e PathBuf,
     pub mini_stack_html: String,
 }
@@ -556,7 +564,7 @@ pub struct DynamoGuardsContext {
 pub struct IndexContext {
     pub css: &'static str,
     pub javascript: &'static str,
-    pub directory: Vec<(String, Vec<(String, String, i32, String)>)>,
+    pub directory: Vec<(String, Vec<OutputFile>)>,
     pub stack_trie_html: String,
     pub unknown_stack_trie_html: String,
     pub has_unknown_stack_trie: bool,
