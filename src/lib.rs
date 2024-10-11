@@ -82,12 +82,23 @@ fn run_parser<'t>(
     payload: &str,
     output_count: &mut i32,
     output: &mut Vec<(PathBuf, String)>,
-    compile_directory: &mut Vec<(String, String, i32)>,
+    compile_directory: &mut Vec<OutputFile>,
     multi: &MultiProgress,
     stats: &mut Stats,
 ) {
     if let Some(md) = parser.get_metadata(&e) {
         let results = parser.parse(lineno, md, e.rank, &e.compile_id, &payload);
+        fn extract_suffix(filename: &String) -> String {
+            if filename.contains("fx_graph_cache_miss") {
+                "❌".to_string()
+            } else if filename.contains("fx_graph_cache_hit") {
+                "✅".to_string()
+            } else if filename.contains("fx_graph_cache_bypass") {
+                "❓".to_string()
+            } else {
+                "".to_string()
+            }
+        }
         match results {
             Ok(results) => {
                 for parser_result in results {
@@ -108,25 +119,34 @@ fn run_parser<'t>(
                             };
                             output.push((filename.clone(), out));
                             let filename_str = format!("{}", filename.to_string_lossy());
-                            compile_directory.push((
-                                filename_str.clone(),
-                                filename_str,
-                                *output_count,
-                            ));
+                            let suffix = extract_suffix(&filename_str);
+                            compile_directory.push(OutputFile {
+                                url: filename_str.clone(),
+                                name: filename_str,
+                                number: *output_count,
+                                suffix: suffix,
+                            });
                             *output_count += 1;
                         }
                         ParserOutput::GlobalFile(filename, out) => {
                             output.push((filename.clone(), out));
                             let filename_str = format!("{}", filename.to_string_lossy());
-                            compile_directory.push((
-                                filename_str.clone(),
-                                filename_str,
-                                *output_count,
-                            ));
+                            let suffix = extract_suffix(&filename_str);
+                            compile_directory.push(OutputFile {
+                                url: filename_str.clone(),
+                                name: filename_str,
+                                number: *output_count,
+                                suffix: suffix,
+                            });
                             *output_count += 1;
                         }
                         ParserOutput::Link(name, url) => {
-                            compile_directory.push((url, name, *output_count));
+                            compile_directory.push(OutputFile {
+                                url: url,
+                                name: name,
+                                number: *output_count,
+                                suffix: "".to_string(),
+                            });
                             *output_count += 1;
                         }
                     }
@@ -191,8 +211,7 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
     // Each entry is a compile id => (link, rendered name, output number)
     // For files, link and rendered name are the same
     // For links, you can specify a custom name for the link
-    let mut directory: FxIndexMap<Option<CompileId>, Vec<(String, String, i32)>> =
-        FxIndexMap::default();
+    let mut directory: FxIndexMap<Option<CompileId>, Vec<OutputFile>> = FxIndexMap::default();
 
     let mut metrics_index: CompilationMetricsIndex = FxIndexMap::default();
     let stack_index: RefCell<StackIndex> = RefCell::new(FxHashMap::default());

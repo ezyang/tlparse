@@ -152,3 +152,29 @@ fn test_parse_chromium_event() {
         );
     }
 }
+
+#[test]
+fn test_cache_hit_miss() {
+    let expected_files = [
+        "1_0_0/fx_graph_cache_miss_8",
+        "1_0_0/fx_graph_cache_hit_17",
+        "index.html",
+    ];
+    // Generated via TORCH_TRACE=~/trace_logs/test python test/inductor/test_codecache.py -k test_flex_attention_caching
+    let path = Path::new("tests/inputs/cache_hit_miss.log").to_path_buf();
+    let config = tlparse::ParseConfig {
+        strict: true,
+        ..Default::default()
+    };
+    let output = tlparse::parse_path(&path, config);
+    assert!(output.is_ok());
+    let map: HashMap<PathBuf, String> = output.unwrap().into_iter().collect();
+    // Check all files are present
+    for prefix in expected_files {
+        assert!(
+            prefix_exists(&map, prefix),
+            "{} not found in output",
+            prefix
+        );
+    }
+}
