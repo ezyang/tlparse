@@ -50,6 +50,9 @@ pub static TEMPLATE_DYNAMO_GUARDS: &str = r#"
 
 pub static TEMPLATE_INDEX: &str = r#"
 <html>
+<head>
+  <meta charset="UTF-8">
+</head>
 <style>
 {css | format_unescaped}
 </style>
