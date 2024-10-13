@@ -18,7 +18,7 @@ V0516 11:47:27.920000 139733182882816 torch/_dynamo/output_graph.py:1278] {"dyna
 	        return (add_1,)
 	        
 V0516 11:47:27.930000 139733182882816 torch/_functorch/aot_autograd.py:887] {"link": {"name": "manifold_url", "url": "https://www.google.com"}, "frame_id": 0, "frame_compile_id": 0, "attempt": 0}
-V0516 11:47:27.945000 139733182882816 torch/_functorch/_aot_autograd/dispatch_and_compile_graph.py:191] {"aot_forward_graph": {}, "frame_id": 0, "frame_compile_id": 0, "attempt": 0, "has_payload": "1beb7268ed1533c825d47635b0110b80"}
+V0516 11:47:27.945000 139733182882816 torch/_functorch/_aot_autograd/dispatch_and_compile_graph.py:191] {"aot_inference_graph": {}, "frame_id": 0, "frame_compile_id": 0, "attempt": 0, "has_payload": "1beb7268ed1533c825d47635b0110b80"}
 	class <lambda>(torch.nn.Module):
 	    def forward(self, arg0_1: "f32[2]", arg1_1: "f32[2]", arg2_1: "f32[2]"):
 	        # File: /home/jjwu/tmp.py:8 in forward, code: y = torch.sin(self.param)
