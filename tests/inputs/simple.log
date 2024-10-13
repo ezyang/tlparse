@@ -25,7 +25,7 @@ V0401 08:54:21.895000 140424060892160 torch/_dynamo/output_graph.py:1189] {"dyna
 	        out_3 = torch.ops.test.baz(out_2);  out_2 = None
 	        return (out_3,)
 	        
-V0401 08:54:21.914000 140424060892160 torch/_functorch/_aot_autograd/dispatch_and_compile_graph.py:112] {"aot_inference_graph": {}, "frame_id": 0, "frame_compile_id": 0, "attempt": 0, "has_payload": "9d0885575d7f020cb3a1996185650901"}
+V0401 08:54:21.914000 140424060892160 torch/_functorch/_aot_autograd/dispatch_and_compile_graph.py:112] {"aot_forward_graph": {}, "frame_id": 0, "frame_compile_id": 0, "attempt": 0, "has_payload": "9d0885575d7f020cb3a1996185650901"}
 	class <lambda>(torch.nn.Module):
 	    def forward(self, arg0_1: "f32[1, 320, 128, 128]"):
 	        # File: /data/users/jjwu/a/pytorch/test/inductor/test_torchinductor.py:8809 in helper, code: out = F.gelu(x)

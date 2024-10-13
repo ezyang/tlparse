@@ -22,7 +22,7 @@ V0524 12:48:44.675000 140144363024384 torch/_dynamo/output_graph.py:1279] {"dyna
 	        mul: "f32[5, 5][5, 1]cpu" = l_x_ * l_y_;  l_x_ = l_y_ = None
 	        return (mul,)
 	        
-V0524 12:48:45.031000 140144363024384 torch/_functorch/_aot_autograd/dispatch_and_compile_graph.py:191] {"aot_inference_graph": {}, "frame_id": 0, "frame_compile_id": 0, "attempt": 0, "has_payload": "84774a5852019e06f6c57a9aa31dfe7e"}
+V0524 12:48:45.031000 140144363024384 torch/_functorch/_aot_autograd/dispatch_and_compile_graph.py:191] {"aot_forward_graph": {}, "frame_id": 0, "frame_compile_id": 0, "attempt": 0, "has_payload": "84774a5852019e06f6c57a9aa31dfe7e"}
 	class <lambda>(torch.nn.Module):
 	    def forward(self, arg0_1: "f32[5, 5]", arg1_1: "f32[5, 5]"):
 	        # File: /mnt/xarfuse/uid-32109/976f795a-seed-nspid4026531836_cgpid101781736-ns-4026531841/caffe2/test/inductor/test_codecache.py:440 in fn, code: return (x * y,)
