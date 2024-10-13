@@ -462,7 +462,7 @@ V1003 10:10:53.708000 2235078 torch/_dynamo/utils.py:988] {"chromium_event": {},
 	"tid": 0,
 	"pid": 0
 	}
-V1003 10:10:53.842000 2235078 torch/_functorch/_aot_autograd/dispatch_and_compile_graph.py:215] {"aot_inference_graph": {}, "frame_id": 1, "frame_compile_id": 0, "attempt": 0, "has_payload": "f6cec159cb1cee52405afcfe40b62c03"}
+V1003 10:10:53.842000 2235078 torch/_functorch/_aot_autograd/dispatch_and_compile_graph.py:215] {"aot_forward_graph": {}, "frame_id": 1, "frame_compile_id": 0, "attempt": 0, "has_payload": "f6cec159cb1cee52405afcfe40b62c03"}
 	class <lambda>(torch.nn.Module):
 	    def forward(self, arg0_1: "f32[1, 4, 512, 64][131072, 32768, 64, 1]cuda:0", arg1_1: "f32[1, 4, 512, 64][131072, 32768, 64, 1]cuda:0", arg2_1: "f32[1, 4, 512, 64][131072, 32768, 64, 1]cuda:0", arg3_1: "i32[1, 1, 16][16, 16, 1]cuda:0", arg4_1: "i32[1, 1, 16, 16][256, 256, 16, 1]cuda:0", arg5_1: "i32[1, 1, 16][16, 16, 1]cuda:0", arg6_1: "i32[1, 1, 16, 16][256, 256, 16, 1]cuda:0", arg7_1: "i32[1, 1, 16][16, 16, 1]cuda:0", arg8_1: "i32[1, 1, 16, 16][256, 256, 16, 1]cuda:0", arg9_1: "i32[1, 1, 16][16, 16, 1]cuda:0", arg10_1: "i32[1, 1, 16, 16][256, 256, 16, 1]cuda:0"):
 	         # File: /data/users/oulgen/pytorch/torch/nn/attention/flex_attention.py:1032 in flex_attention, code: out, lse = flex_attention_hop(
@@ -2411,7 +2411,7 @@ V1003 10:11:03.012000 2235078 torch/_dynamo/utils.py:988] {"chromium_event": {},
 	"tid": 0,
 	"pid": 0
 	}
-V1003 10:11:03.138000 2235078 torch/_functorch/_aot_autograd/dispatch_and_compile_graph.py:215] {"aot_inference_graph": {}, "frame_id": 1, "frame_compile_id": 0, "attempt": 0, "has_payload": "f6cec159cb1cee52405afcfe40b62c03"}
+V1003 10:11:03.138000 2235078 torch/_functorch/_aot_autograd/dispatch_and_compile_graph.py:215] {"aot_forward_graph": {}, "frame_id": 1, "frame_compile_id": 0, "attempt": 0, "has_payload": "f6cec159cb1cee52405afcfe40b62c03"}
 	class <lambda>(torch.nn.Module):
 	    def forward(self, arg0_1: "f32[1, 4, 512, 64][131072, 32768, 64, 1]cuda:0", arg1_1: "f32[1, 4, 512, 64][131072, 32768, 64, 1]cuda:0", arg2_1: "f32[1, 4, 512, 64][131072, 32768, 64, 1]cuda:0", arg3_1: "i32[1, 1, 16][16, 16, 1]cuda:0", arg4_1: "i32[1, 1, 16, 16][256, 256, 16, 1]cuda:0", arg5_1: "i32[1, 1, 16][16, 16, 1]cuda:0", arg6_1: "i32[1, 1, 16, 16][256, 256, 16, 1]cuda:0", arg7_1: "i32[1, 1, 16][16, 16, 1]cuda:0", arg8_1: "i32[1, 1, 16, 16][256, 256, 16, 1]cuda:0", arg9_1: "i32[1, 1, 16][16, 16, 1]cuda:0", arg10_1: "i32[1, 1, 16, 16][256, 256, 16, 1]cuda:0"):
 	         # File: /data/users/oulgen/pytorch/torch/nn/attention/flex_attention.py:1032 in flex_attention, code: out, lse = flex_attention_hop(
