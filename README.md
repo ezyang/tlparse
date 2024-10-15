@@ -12,7 +12,7 @@ Feed input into tlparse:
 tlparse /tmp/my_traced_log -o tl_out/
 ```
 
-# Adding custom parsers
+## Adding custom parsers
 You can extend tlparse with custom parsers which take existing structured log data and output any file. To do so, first implement StructuredLogParser with your own trait:
 
 ```Rust
@@ -39,3 +39,9 @@ impl StructuredLogParser for MyCustomParser {
     }
 }
 ```
+
+## How to release
+
+1. Make a release commit by updating Cargo.toml and then running cargo update
+2. Push the release commit and a tag for it.  This will trigger PyPI release
+3. cargo publish
