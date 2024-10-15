@@ -661,6 +661,9 @@ pub fn default_parsers<'t>(
         Box::new(SentinelFileParser::new("aot_backward_graph", |e| {
             e.aot_backward_graph.as_ref()
         })),
+        Box::new(SentinelFileParser::new("aot_inference_graph", |e| {
+            e.aot_inference_graph.as_ref()
+        })),
         Box::new(SentinelFileParser::new("aot_joint_graph", |e| {
             e.aot_joint_graph.as_ref()
         })),
