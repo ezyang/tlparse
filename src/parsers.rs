@@ -673,6 +673,9 @@ pub fn default_parsers<'t>(
         Box::new(SentinelFileParser::new("dynamo_cpp_guards_str", |e| {
             e.dynamo_cpp_guards_str.as_ref()
         })),
+        Box::new(SentinelFileParser::new("dynamo_graph_break_reason", |e| {
+            e.dynamo_graph_break_reason.as_ref()
+        })),
         Box::new(GraphDumpParser),
         Box::new(DynamoOutputGraphParser),
         Box::new(DynamoGuardParser { tt }),

@@ -43,9 +43,11 @@ fn test_parse_simple() {
 #[test]
 fn test_parse_compilation_metrics() {
     let expected_files = [
+        "0_0_0/dynamo_graph_break_reason",
         "0_0_1/dynamo_output_graph",
         "0_0_1/dynamo_guards",
         "0_0_1/compilation_metrics",
+        "1_0_0/dynamo_graph_break_reason",
         "1_0_1/dynamo_output_graph",
         "1_0_1/dynamo_guards",
         "1_0_1/compilation_metrics",

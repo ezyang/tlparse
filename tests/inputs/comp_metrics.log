@@ -7,6 +7,30 @@ V0403 07:28:48.052000 139877824898048 torch/_logging/structured.py:19] {"str": [
 V0403 07:28:48.052000 139877824898048 torch/_logging/structured.py:19] {"str": ["/data/users/jjwu/a/pytorch-env/lib/python3.10/unittest/case.py", 6]}
 V0403 07:28:48.052000 139877824898048 torch/_logging/structured.py:19] {"str": ["/data/users/jjwu/a/pytorch/torch/_dynamo/eval_frame.py", 7]}
 V0403 07:28:48.052000 139877824898048 torch/_dynamo/convert_frame.py:672] {"dynamo_start": {"stack": [{"line": 10079, "name": "<module>", "filename": 0}, {"line": 41, "name": "run_tests", "filename": 1}, {"line": 1167, "name": "run_tests", "filename": 2}, {"line": 101, "name": "__init__", "filename": 3}, {"line": 271, "name": "runTests", "filename": 3}, {"line": 184, "name": "run", "filename": 4}, {"line": 84, "name": "__call__", "filename": 5}, {"line": 122, "name": "run", "filename": 5}, {"line": 84, "name": "__call__", "filename": 5}, {"line": 122, "name": "run", "filename": 5}, {"line": 650, "name": "__call__", "filename": 6}, {"line": 2868, "name": "run", "filename": 2}, {"line": 2840, "name": "_run_custom", "filename": 2}, {"line": 591, "name": "run", "filename": 6}, {"line": 549, "name": "_callTestMethod", "filename": 6}, {"line": 2741, "name": "wrapper", "filename": 2}, {"line": 9559, "name": "test_graph_break_compilation_metrics", "filename": 0}, {"line": 410, "name": "_fn", "filename": 7}]}, "frame_id": 0, "frame_compile_id": 0, "attempt": 0}
+V0403 07:28:48.052000 139877824898048 torch/_dynamo/symbolic_convert.py:391] {"dynamo_graph_break_reason": {}, "frame_id": 0, "frame_compile_id": 0, "attempt": 0, "has_payload": "6e58a1cd0c1397ef247aa9c99ab8c5a7"}
+	Graph break in user code at /data/users/willfeng/pytorch/test/dynamo/test_misc.py:10440
+	Reason: Unsupported: 'skip function graph_break in file /data/users/willfeng/pytorch/torch/_dynamo/decorators.py'
+	User code traceback:
+	  File "/data/users/willfeng/pytorch/test/dynamo/test_misc.py", line 10440, in fn
+	    torch._dynamo.graph_break()
+	
+	Traceback (most recent call last):
+	  File "/data/users/willfeng/pytorch/torch/_dynamo/symbolic_convert.py", line 632, in wrapper
+	    return inner_fn(self, inst)
+	           ^^^^^^^^^^^^^^^^^^^^
+	  File "/data/users/willfeng/pytorch/torch/_dynamo/symbolic_convert.py", line 2411, in CALL
+	    self._call(inst)
+	  File "/data/users/willfeng/pytorch/torch/_dynamo/symbolic_convert.py", line 2405, in _call
+	    self.call_function(fn, args, kwargs)
+	  File "/data/users/willfeng/pytorch/torch/_dynamo/symbolic_convert.py", line 959, in call_function
+	    self.push(fn.call_function(self, args, kwargs))  # type: ignore[arg-type]
+	              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+	  File "/data/users/willfeng/pytorch/torch/_dynamo/variables/functions.py", line 750, in call_function
+	    unimplemented(msg)
+	  File "/data/users/willfeng/pytorch/torch/_dynamo/exc.py", line 309, in unimplemented
+	    raise Unsupported(msg, case_name=case_name)
+	torch._dynamo.exc.Unsupported: 'skip function graph_break in file /data/users/willfeng/pytorch/torch/_dynamo/decorators.py'
+	
 V0403 07:28:48.061000 139877824898048 torch/_dynamo/output_graph.py:1139] {"dynamo_output_graph": {"sizes": {"l_x_": [4, 4], "cos": [4, 4]}}, "frame_id": 0, "frame_compile_id": 0, "attempt": 1, "has_payload": "b02b7e74ec144d0daf4087e58131a444"}
 	class GraphModule(torch.nn.Module):
 	    def forward(self, L_x_ : torch.Tensor):
@@ -30,6 +54,30 @@ V0403 07:28:48.064000 139877824898048 torch/_dynamo/guards.py:1894] {"dynamo_gua
 	]
 V0403 07:28:48.065000 139877824898048 torch/_dynamo/utils.py:685] {"compilation_metrics": {"frame_key": "1", "co_name": "fn", "co_filename": "/data/users/jjwu/a/pytorch/test/dynamo/test_misc.py", "co_firstlineno": 9549, "cache_size": 0, "accumulated_cache_size": 0, "guard_count": 9, "shape_env_guard_count": 0, "graph_op_count": 1, "graph_node_count": 3, "graph_input_count": 1, "start_time": 1712154528.0523684, "entire_frame_compile_time_s": 0.012439489364624023, "backend_compile_time_s": 3.910064697265625e-05, "inductor_compile_time_s": null, "code_gen_time_s": null, "fail_type": null, "fail_reason": null, "fail_user_frame_filename": null, "fail_user_frame_lineno": null, "non_compliant_ops": [], "compliant_custom_ops": [], "restart_reasons": ["'skip function graph_break in file /data/users/jjwu/a/pytorch/torch/_dynamo/decorators.py'"], "dynamo_time_before_restart_s": 0.006658077239990234}, "frame_id": 0, "frame_compile_id": 0, "attempt": 1}
 V0403 07:28:48.066000 139877824898048 torch/_dynamo/convert_frame.py:672] {"dynamo_start": {"stack": [{"line": 10079, "name": "<module>", "filename": 0}, {"line": 41, "name": "run_tests", "filename": 1}, {"line": 1167, "name": "run_tests", "filename": 2}, {"line": 101, "name": "__init__", "filename": 3}, {"line": 271, "name": "runTests", "filename": 3}, {"line": 184, "name": "run", "filename": 4}, {"line": 84, "name": "__call__", "filename": 5}, {"line": 122, "name": "run", "filename": 5}, {"line": 84, "name": "__call__", "filename": 5}, {"line": 122, "name": "run", "filename": 5}, {"line": 650, "name": "__call__", "filename": 6}, {"line": 2868, "name": "run", "filename": 2}, {"line": 2840, "name": "_run_custom", "filename": 2}, {"line": 591, "name": "run", "filename": 6}, {"line": 549, "name": "_callTestMethod", "filename": 6}, {"line": 2741, "name": "wrapper", "filename": 2}, {"line": 9559, "name": "test_graph_break_compilation_metrics", "filename": 0}, {"line": 410, "name": "_fn", "filename": 7}, {"line": 9551, "name": "fn", "filename": 0}]}, "frame_id": 1, "frame_compile_id": 0, "attempt": 0}
+V0403 07:28:48.066000 139877824898048 torch/_dynamo/symbolic_convert.py:391] {"dynamo_graph_break_reason": {}, "frame_id": 1, "frame_compile_id": 0, "attempt": 0, "has_payload": "3056e3dd740aea63b7207dab137a36ba"}
+	Graph break in user code at /data/users/willfeng/pytorch/test/dynamo/test_misc.py:10442
+	Reason: Unsupported: 'skip function graph_break in file /data/users/willfeng/pytorch/torch/_dynamo/decorators.py'
+	User code traceback:
+	  File "/data/users/willfeng/pytorch/test/dynamo/test_misc.py", line 10442, in torch_dynamo_resume_in_fn_at_10440
+	    torch._dynamo.graph_break()
+	
+	Traceback (most recent call last):
+	  File "/data/users/willfeng/pytorch/torch/_dynamo/symbolic_convert.py", line 632, in wrapper
+	    return inner_fn(self, inst)
+	           ^^^^^^^^^^^^^^^^^^^^
+	  File "/data/users/willfeng/pytorch/torch/_dynamo/symbolic_convert.py", line 2411, in CALL
+	    self._call(inst)
+	  File "/data/users/willfeng/pytorch/torch/_dynamo/symbolic_convert.py", line 2405, in _call
+	    self.call_function(fn, args, kwargs)
+	  File "/data/users/willfeng/pytorch/torch/_dynamo/symbolic_convert.py", line 959, in call_function
+	    self.push(fn.call_function(self, args, kwargs))  # type: ignore[arg-type]
+	              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+	  File "/data/users/willfeng/pytorch/torch/_dynamo/variables/functions.py", line 750, in call_function
+	    unimplemented(msg)
+	  File "/data/users/willfeng/pytorch/torch/_dynamo/exc.py", line 309, in unimplemented
+	    raise Unsupported(msg, case_name=case_name)
+	torch._dynamo.exc.Unsupported: 'skip function graph_break in file /data/users/willfeng/pytorch/torch/_dynamo/decorators.py'
+	
 V0403 07:28:48.071000 139877824898048 torch/_dynamo/output_graph.py:1139] {"dynamo_output_graph": {"sizes": {"l_x_": [4, 4], "sin": [4, 4]}}, "frame_id": 1, "frame_compile_id": 0, "attempt": 1, "has_payload": "2a35823c4e6ce78bcc3a8557f11f8a52"}
 	class GraphModule(torch.nn.Module):
 	    def forward(self, L_x_ : torch.Tensor):

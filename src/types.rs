@@ -448,6 +448,7 @@ pub struct Envelope {
     pub aot_joint_graph: Option<EmptyMetadata>,
     pub inductor_post_grad_graph: Option<EmptyMetadata>,
     pub dynamo_cpp_guards_str: Option<EmptyMetadata>,
+    pub dynamo_graph_break_reason: Option<EmptyMetadata>,
     pub inductor_output_code: Option<InductorOutputCodeMetadata>,
     pub compilation_metrics: Option<CompilationMetricsMetadata>,
     pub bwd_compilation_metrics: Option<BwdCompilationMetricsMetadata>,
