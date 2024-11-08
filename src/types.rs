@@ -446,6 +446,7 @@ pub struct Envelope {
     pub aot_backward_graph: Option<EmptyMetadata>,
     pub aot_inference_graph: Option<EmptyMetadata>,
     pub aot_joint_graph: Option<EmptyMetadata>,
+    pub inductor_pre_grad_graph: Option<EmptyMetadata>,
     pub inductor_post_grad_graph: Option<EmptyMetadata>,
     pub dynamo_cpp_guards_str: Option<EmptyMetadata>,
     pub inductor_output_code: Option<InductorOutputCodeMetadata>,
