@@ -1,3 +1,5 @@
+use const_format::concatcp;
+
 pub static CSS: &str = r#"
 table td { vertical-align: top; }
 
@@ -35,7 +37,7 @@ pub static JAVASCRIPT: &str = r#"
   }
 "#;
 
-pub static TEMPLATE_DYNAMO_GUARDS: &str = r#"
+pub static TEMPLATE_DYNAMO_GUARDS: &str = concatcp!(r#"
 <html>
 <body>
 <h2>Guards</h2>
@@ -44,11 +46,12 @@ pub static TEMPLATE_DYNAMO_GUARDS: &str = r#"
     <li><code>{guard.code}</code></li>
 {{ endfor }}
 </ul>
+"#, TEMPLATE_QUERY_PARAM_SCRIPT, r#"
 </body>
 </html>
-"#;
+"#);
 
-pub static TEMPLATE_INDEX: &str = r#"
+pub static TEMPLATE_INDEX: &str = concatcp!(r#"
 <html>
 <head>
   <meta charset="UTF-8">
@@ -160,9 +163,10 @@ Build products below:
 {unknown_stack_trie_html | format_unescaped}
 </div>
 {{ endif }}
+"#, TEMPLATE_QUERY_PARAM_SCRIPT, r#"
 </body>
 </html>
-"#;
+"#);
 
 pub static TEMPLATE_FAILURES_CSS: &str = r#"
 table {
@@ -191,7 +195,7 @@ a:hover {
 }
 "#;
 
-pub static TEMPLATE_FAILURES_AND_RESTARTS: &str = r#"
+pub static TEMPLATE_FAILURES_AND_RESTARTS: &str = concatcp!(r#"
 <html>
 <head>
     <style>
@@ -205,11 +209,12 @@ pub static TEMPLATE_FAILURES_AND_RESTARTS: &str = r#"
     {{ for failure in failures }}
     <tr> <td> {failure.0 | format_unescaped} </td>{failure.1 | format_unescaped}</tr>
     {{ endfor }}
+    "#, TEMPLATE_QUERY_PARAM_SCRIPT, r#"
 </body>
 </html>
-"#;
+"#);
 
-pub static TEMPLATE_COMPILATION_METRICS: &str = r#"
+pub static TEMPLATE_COMPILATION_METRICS: &str = concatcp!(r#"
 <html>
 <head>
     <style>
@@ -290,11 +295,12 @@ pub static TEMPLATE_COMPILATION_METRICS: &str = r#"
     </tr>
     {{ endfor }}
     </table>
+    "#, TEMPLATE_QUERY_PARAM_SCRIPT, r#"
 </body>
 </html>
-"#;
+"#);
 
-pub static TEMPLATE_AOT_AUTOGRAD_BACKWARD_COMPILATION_METRICS: &str = r#"
+pub static TEMPLATE_AOT_AUTOGRAD_BACKWARD_COMPILATION_METRICS: &str = concatcp!(r#"
 <html>
 <head>
     <style>
@@ -311,11 +317,12 @@ pub static TEMPLATE_AOT_AUTOGRAD_BACKWARD_COMPILATION_METRICS: &str = r#"
     {{ else }}
     <p> No failures! </p>
     {{ endif }}
+    "#, TEMPLATE_QUERY_PARAM_SCRIPT, r#"
 </body>
 </html>
-"#;
+"#);
 
-pub static TEMPLATE_BWD_COMPILATION_METRICS: &str = r#"
+pub static TEMPLATE_BWD_COMPILATION_METRICS: &str = concatcp!(r#"
 <html>
 <head>
     <style>
@@ -339,6 +346,38 @@ pub static TEMPLATE_BWD_COMPILATION_METRICS: &str = r#"
     {{ else }}
     <p> No failures! </p>
     {{ endif }}
+    "#, TEMPLATE_QUERY_PARAM_SCRIPT, r#"
 </body>
 </html>
-"#;
+"#);
+
+pub const TEMPLATE_QUERY_PARAM_SCRIPT: &str = r#"
+    <script>
+    document.addEventListener('DOMContentLoaded', function() \{
+
+        // Append the current URL's query parameters to all relative links on the page
+        const queryParams = new URLSearchParams(window.location.search);
+        function appendQueryParams(url) \{
+            if (queryParams.size === 0) return url; // No query params, return original URL
+
+            const parsedUrl = new URL(url, window.location.href);
+            const updatedSearchParams = new URLSearchParams(parsedUrl.search);
+
+            // Append query parameters
+            for (const [key, value] of queryParams) \{
+                updatedSearchParams.set(key, value);
+            }
+
+            parsedUrl.search = updatedSearchParams.toString();
+            return parsedUrl.href;
+        }
+
+        // Select all relative links on the page
+        const relativeLinks = document.querySelectorAll('a[href]:not([href^="http://"]):not([href^="https://"]):not([href^="\#"])');
+        // Append query parameters to each relative link
+        relativeLinks.forEach((link) => \{
+            link.href = appendQueryParams(link.href);
+        });
+    });
+    </script>
+    "#;

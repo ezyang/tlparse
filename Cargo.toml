@@ -21,6 +21,7 @@ syntect = "5.0"
 base16ct = "0.2.0"
 chrono = "0.4"
 clap = { version = "4.5.2", features = ["derive"] }
+const_format = "0.2.33"
 fxhash = "0.2.1"
 html-escape = "0.2.5"
 indexmap = "2.1.0"
