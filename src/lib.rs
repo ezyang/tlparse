@@ -244,6 +244,7 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
     let mut breaks = RestartsAndFailuresContext {
         css: TEMPLATE_FAILURES_CSS,
         failures: Vec::new(),
+        qps: TEMPLATE_QUERY_PARAM_SCRIPT,
     };
 
     // NB: Sometimes, the log output we get from Logarithm stutters with a blank line.
@@ -515,6 +516,7 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
         has_unknown_stack_trie: !unknown_stack_trie.is_empty(),
         num_breaks: breaks.failures.len(),
         has_chromium_events: !chromium_events.is_empty(),
+        qps: TEMPLATE_QUERY_PARAM_SCRIPT,
     };
     output.push((
         PathBuf::from("index.html"),

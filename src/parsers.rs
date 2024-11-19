@@ -187,7 +187,10 @@ impl StructuredLogParser for DynamoGuardParser<'_> {
     ) -> anyhow::Result<ParserResults> {
         let filename = format!("{}.html", self.name());
         let guards = serde_json::from_str::<Vec<DynamoGuard>>(payload)?;
-        let guards_context = DynamoGuardsContext { guards };
+        let guards_context = DynamoGuardsContext {
+            guards,
+            qps: TEMPLATE_QUERY_PARAM_SCRIPT,
+        };
         let output = self.tt.render(&filename, &guards_context)?;
         simple_file_output(&filename, lineno, compile_id, &output)
     }
@@ -436,6 +439,7 @@ impl StructuredLogParser for CompilationMetricsParser<'_> {
                 symbolic_shape_specializations: specializations,
                 output_files: &output_files,
                 compile_id_dir: &self.compile_id_dir,
+                qps: TEMPLATE_QUERY_PARAM_SCRIPT,
             };
             let output = self.tt.render(&filename, &context)?;
             simple_file_output(&filename, lineno, compile_id, &output)
@@ -474,6 +478,7 @@ impl StructuredLogParser for AOTAutogradBackwardCompilationMetricsParser<'_> {
                 css: crate::CSS,
                 m: &m,
                 compile_id: id,
+                qps: TEMPLATE_QUERY_PARAM_SCRIPT,
             };
             let output = self.tt.render(&filename, &context)?;
             simple_file_output(&filename, lineno, compile_id, &output)
@@ -514,6 +519,7 @@ impl StructuredLogParser for BwdCompilationMetricsParser<'_> {
                 css: crate::CSS,
                 m: &m,
                 compile_id: id,
+                qps: TEMPLATE_QUERY_PARAM_SCRIPT,
             };
             let output = self.tt.render(&filename, &context)?;
             simple_file_output(&filename, lineno, compile_id, &output)

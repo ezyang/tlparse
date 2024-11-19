@@ -1,5 +1,3 @@
-use const_format::concatcp;
-
 pub static CSS: &str = r#"
 table td { vertical-align: top; }
 
@@ -37,8 +35,7 @@ pub static JAVASCRIPT: &str = r#"
   }
 "#;
 
-pub static TEMPLATE_DYNAMO_GUARDS: &str = concatcp!(
-    r#"
+pub static TEMPLATE_DYNAMO_GUARDS: &str = r#"
 <html>
 <body>
 <h2>Guards</h2>
@@ -47,16 +44,12 @@ pub static TEMPLATE_DYNAMO_GUARDS: &str = concatcp!(
     <li><code>{guard.code}</code></li>
 {{ endfor }}
 </ul>
-"#,
-    TEMPLATE_QUERY_PARAM_SCRIPT,
-    r#"
+{qps | format_unescaped}
 </body>
 </html>
-"#
-);
+"#;
 
-pub static TEMPLATE_INDEX: &str = concatcp!(
-    r#"
+pub static TEMPLATE_INDEX: &str = r#"
 <html>
 <head>
   <meta charset="UTF-8">
@@ -168,13 +161,10 @@ Build products below:
 {unknown_stack_trie_html | format_unescaped}
 </div>
 {{ endif }}
-"#,
-    TEMPLATE_QUERY_PARAM_SCRIPT,
-    r#"
+{qps | format_unescaped}
 </body>
 </html>
-"#
-);
+"#;
 
 pub static TEMPLATE_FAILURES_CSS: &str = r#"
 table {
@@ -203,8 +193,7 @@ a:hover {
 }
 "#;
 
-pub static TEMPLATE_FAILURES_AND_RESTARTS: &str = concatcp!(
-    r#"
+pub static TEMPLATE_FAILURES_AND_RESTARTS: &str = r#"
 <html>
 <head>
     <style>
@@ -218,16 +207,12 @@ pub static TEMPLATE_FAILURES_AND_RESTARTS: &str = concatcp!(
     {{ for failure in failures }}
     <tr> <td> {failure.0 | format_unescaped} </td>{failure.1 | format_unescaped}</tr>
     {{ endfor }}
-    "#,
-    TEMPLATE_QUERY_PARAM_SCRIPT,
-    r#"
+    {qps | format_unescaped}
 </body>
 </html>
-"#
-);
+"#;
 
-pub static TEMPLATE_COMPILATION_METRICS: &str = concatcp!(
-    r#"
+pub static TEMPLATE_COMPILATION_METRICS: &str = r#"
 <html>
 <head>
     <style>
@@ -308,16 +293,12 @@ pub static TEMPLATE_COMPILATION_METRICS: &str = concatcp!(
     </tr>
     {{ endfor }}
     </table>
-    "#,
-    TEMPLATE_QUERY_PARAM_SCRIPT,
-    r#"
+    {qps | format_unescaped}
 </body>
 </html>
-"#
-);
+"#;
 
-pub static TEMPLATE_AOT_AUTOGRAD_BACKWARD_COMPILATION_METRICS: &str = concatcp!(
-    r#"
+pub static TEMPLATE_AOT_AUTOGRAD_BACKWARD_COMPILATION_METRICS: &str = r#"
 <html>
 <head>
     <style>
@@ -334,16 +315,12 @@ pub static TEMPLATE_AOT_AUTOGRAD_BACKWARD_COMPILATION_METRICS: &str = concatcp!(
     {{ else }}
     <p> No failures! </p>
     {{ endif }}
-    "#,
-    TEMPLATE_QUERY_PARAM_SCRIPT,
-    r#"
+    {qps | format_unescaped}
 </body>
 </html>
-"#
-);
+"#;
 
-pub static TEMPLATE_BWD_COMPILATION_METRICS: &str = concatcp!(
-    r#"
+pub static TEMPLATE_BWD_COMPILATION_METRICS: &str = r#"
 <html>
 <head>
     <style>
@@ -367,40 +344,46 @@ pub static TEMPLATE_BWD_COMPILATION_METRICS: &str = concatcp!(
     {{ else }}
     <p> No failures! </p>
     {{ endif }}
-    "#,
-    TEMPLATE_QUERY_PARAM_SCRIPT,
-    r#"
+    {qps | format_unescaped}
 </body>
 </html>
-"#
-);
+"#;
 
-pub const TEMPLATE_QUERY_PARAM_SCRIPT: &str = r#"
+// NB: Invariant for generated HTML: all links must show up in the initial HTML for this to be applied.
+//     Links dynamically generated/added after document load (i.e. using JS) will not get this applied.
+pub static TEMPLATE_QUERY_PARAM_SCRIPT: &str = r#"
     <script>
-    document.addEventListener('DOMContentLoaded', function() \{
+    document.addEventListener('DOMContentLoaded', function() {
 
         // Append the current URL's query parameters to all relative links on the page
         const queryParams = new URLSearchParams(window.location.search);
-        function appendQueryParams(url) \{
-            if (queryParams.size === 0) return url; // No query params, return original URL
+        if (queryParams.size === 0) return url; // No query params, return original URL
 
-            const parsedUrl = new URL(url, window.location.href);
-            const updatedSearchParams = new URLSearchParams(parsedUrl.search);
+        function appendQueryParams(url) {
+            const parsedUrl = url;
+            const noOrigParams = parsedUrl.lastIndexOf('?') == -1;
+            const newSearchParams = new URLSearchParams();
 
             // Append query parameters
-            for (const [key, value] of queryParams) \{
-                updatedSearchParams.set(key, value);
+            for (const [key, value] of queryParams) {
+                newSearchParams.set(key, value);
             }
 
-            parsedUrl.search = updatedSearchParams.toString();
-            return parsedUrl.href;
+            let updatedURL = url;
+            if (noOrigParams) { // Original URL has no params
+                return parsedUrl + "?" + newSearchParams.toString();
+            }
+
+            // Original URL has params - append to end
+            return parsedUrl + "&" + newSearchParams.toString();
         }
 
         // Select all relative links on the page
         const relativeLinks = document.querySelectorAll('a[href]:not([href^="http://"]):not([href^="https://"]):not([href^="\#"])');
+
         // Append query parameters to each relative link
-        relativeLinks.forEach((link) => \{
-            link.href = appendQueryParams(link.href);
+        relativeLinks.forEach((link) => {
+            link.setAttribute("href", appendQueryParams(link.getAttribute("href")))
         });
     });
     </script>
