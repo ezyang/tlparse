@@ -1,5 +1,5 @@
-use crate::{types::*, ParseConfig};
 use crate::templates::TEMPLATE_QUERY_PARAM_SCRIPT;
+use crate::{types::*, ParseConfig};
 use html_escape::encode_text;
 use std::cell::RefCell;
 use std::ffi::{OsStr, OsString};
@@ -600,7 +600,9 @@ pub fn anchor_source(text: &str) -> String {
         ));
     }
 
-    html.push_str(&format!("</pre>{TEMPLATE_QUERY_PARAM_SCRIPT}</body></html>"));
+    html.push_str(&format!(
+        "</pre>{TEMPLATE_QUERY_PARAM_SCRIPT}</body></html>"
+    ));
     html
 }
 
