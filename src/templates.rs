@@ -44,6 +44,7 @@ pub static TEMPLATE_DYNAMO_GUARDS: &str = r#"
     <li><code>{guard.code}</code></li>
 {{ endfor }}
 </ul>
+{qps | format_unescaped}
 </body>
 </html>
 "#;
@@ -160,6 +161,7 @@ Build products below:
 {unknown_stack_trie_html | format_unescaped}
 </div>
 {{ endif }}
+{qps | format_unescaped}
 </body>
 </html>
 "#;
@@ -205,6 +207,7 @@ pub static TEMPLATE_FAILURES_AND_RESTARTS: &str = r#"
     {{ for failure in failures }}
     <tr> <td> {failure.0 | format_unescaped} </td>{failure.1 | format_unescaped}</tr>
     {{ endfor }}
+    {qps | format_unescaped}
 </body>
 </html>
 "#;
@@ -290,6 +293,7 @@ pub static TEMPLATE_COMPILATION_METRICS: &str = r#"
     </tr>
     {{ endfor }}
     </table>
+    {qps | format_unescaped}
 </body>
 </html>
 "#;
@@ -311,6 +315,7 @@ pub static TEMPLATE_AOT_AUTOGRAD_BACKWARD_COMPILATION_METRICS: &str = r#"
     {{ else }}
     <p> No failures! </p>
     {{ endif }}
+    {qps | format_unescaped}
 </body>
 </html>
 "#;
@@ -339,6 +344,47 @@ pub static TEMPLATE_BWD_COMPILATION_METRICS: &str = r#"
     {{ else }}
     <p> No failures! </p>
     {{ endif }}
+    {qps | format_unescaped}
 </body>
 </html>
 "#;
+
+// NB: Invariant for generated HTML: all links must show up in the initial HTML for this to be applied.
+//     Links dynamically generated/added after document load (i.e. using JS) will not get this applied.
+pub static TEMPLATE_QUERY_PARAM_SCRIPT: &str = r#"
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+
+        // Append the current URL's query parameters to all relative links on the page
+        const queryParams = new URLSearchParams(window.location.search);
+        if (queryParams.size === 0) return url; // No query params, return original URL
+
+        function appendQueryParams(url) {
+            const parsedUrl = url;
+            const noOrigParams = parsedUrl.lastIndexOf('?') == -1;
+            const newSearchParams = new URLSearchParams();
+
+            // Append query parameters
+            for (const [key, value] of queryParams) {
+                newSearchParams.set(key, value);
+            }
+
+            let updatedURL = url;
+            if (noOrigParams) { // Original URL has no params
+                return parsedUrl + "?" + newSearchParams.toString();
+            }
+
+            // Original URL has params - append to end
+            return parsedUrl + "&" + newSearchParams.toString();
+        }
+
+        // Select all relative links on the page
+        const relativeLinks = document.querySelectorAll('a[href]:not([href^="http://"]):not([href^="https://"]):not([href^="\#"])');
+
+        // Append query parameters to each relative link
+        relativeLinks.forEach((link) => {
+            link.setAttribute("href", appendQueryParams(link.getAttribute("href")))
+        });
+    });
+    </script>
+    "#;

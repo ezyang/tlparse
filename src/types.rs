@@ -335,6 +335,7 @@ pub struct BwdCompilationMetricsContext<'e> {
     pub m: &'e BwdCompilationMetricsMetadata,
     pub css: &'static str,
     pub compile_id: String,
+    pub qps: &'static str,
 }
 
 #[derive(Debug, Serialize)]
@@ -342,6 +343,7 @@ pub struct AOTAutogradBackwardCompilationMetricsContext<'e> {
     pub m: &'e AOTAutogradBackwardCompilationMetricsMetadata,
     pub css: &'static str,
     pub compile_id: String,
+    pub qps: &'static str,
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -362,6 +364,7 @@ pub struct CompilationMetricsContext<'e> {
     pub output_files: &'e Vec<OutputFile>,
     pub compile_id_dir: &'e PathBuf,
     pub mini_stack_html: String,
+    pub qps: &'static str,
 }
 
 #[derive(Debug, Serialize)]
@@ -402,6 +405,7 @@ pub struct RestartsAndFailuresContext {
     // Serialized versions of (CompileId, FailureReason)
     pub failures: Vec<(String, String)>,
     pub css: &'static str,
+    pub qps: &'static str,
 }
 
 #[derive(Debug)]
@@ -560,6 +564,7 @@ pub struct DynamoGuard {
 #[derive(Debug, Serialize)]
 pub struct DynamoGuardsContext {
     pub guards: Vec<DynamoGuard>,
+    pub qps: &'static str,
 }
 
 #[derive(Debug, Serialize)]
@@ -573,6 +578,7 @@ pub struct IndexContext {
     pub num_breaks: usize,
     pub custom_header_html: String,
     pub has_chromium_events: bool,
+    pub qps: &'static str,
 }
 
 #[derive(Debug, Serialize)]
