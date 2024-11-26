@@ -360,22 +360,23 @@ pub static TEMPLATE_QUERY_PARAM_SCRIPT: &str = r#"
         if (queryParams.size === 0) return url; // No query params, return original URL
 
         function appendQueryParams(url) {
-            const parsedUrl = url;
-            const noOrigParams = parsedUrl.lastIndexOf('?') == -1;
+            const hashIndex = url.lastIndexOf('#');
+            const noOrigParams = url.lastIndexOf('?') == -1;
             const newSearchParams = new URLSearchParams();
+            const urlWithoutHash = hashIndex == -1 ? url : url.slice(0, hashIndex);
+            const hash = hashIndex == -1 ? "" : url.slice(hashIndex);
 
             // Append query parameters
             for (const [key, value] of queryParams) {
                 newSearchParams.set(key, value);
             }
 
-            let updatedURL = url;
             if (noOrigParams) { // Original URL has no params
-                return parsedUrl + "?" + newSearchParams.toString();
+                return urlWithoutHash + "?" + newSearchParams.toString() + hash;
             }
 
             // Original URL has params - append to end
-            return parsedUrl + "&" + newSearchParams.toString();
+            return urlWithoutHash + "&" + newSearchParams.toString() + hash;
         }
 
         // Select all relative links on the page
@@ -387,4 +388,4 @@ pub static TEMPLATE_QUERY_PARAM_SCRIPT: &str = r#"
         });
     });
     </script>
-    "#;
+"#;
