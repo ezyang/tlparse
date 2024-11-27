@@ -360,22 +360,18 @@ pub static TEMPLATE_QUERY_PARAM_SCRIPT: &str = r#"
         if (queryParams.size === 0) return url; // No query params, return original URL
 
         function appendQueryParams(url) {
-            const parsedUrl = url;
-            const noOrigParams = parsedUrl.lastIndexOf('?') == -1;
-            const newSearchParams = new URLSearchParams();
+            const newURL = new URL((new Request(url)).url);  // new URL(<relative URL>) but it actually works
+            const newSearchParams = new URLSearchParams(newURL.searchParams);
+            console.log(newURL.searchParams);
+            console.log(newSearchParams);
 
             // Append query parameters
             for (const [key, value] of queryParams) {
                 newSearchParams.set(key, value);
             }
 
-            let updatedURL = url;
-            if (noOrigParams) { // Original URL has no params
-                return parsedUrl + "?" + newSearchParams.toString();
-            }
-
-            // Original URL has params - append to end
-            return parsedUrl + "&" + newSearchParams.toString();
+            newURL.search = newSearchParams;
+            return newURL;
         }
 
         // Select all relative links on the page
@@ -387,4 +383,4 @@ pub static TEMPLATE_QUERY_PARAM_SCRIPT: &str = r#"
         });
     });
     </script>
-    "#;
+"#;
