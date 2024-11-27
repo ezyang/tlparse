@@ -360,23 +360,18 @@ pub static TEMPLATE_QUERY_PARAM_SCRIPT: &str = r#"
         if (queryParams.size === 0) return url; // No query params, return original URL
 
         function appendQueryParams(url) {
-            const hashIndex = url.lastIndexOf('#');
-            const noOrigParams = url.lastIndexOf('?') == -1;
-            const newSearchParams = new URLSearchParams();
-            const urlWithoutHash = hashIndex == -1 ? url : url.slice(0, hashIndex);
-            const hash = hashIndex == -1 ? "" : url.slice(hashIndex);
+            const newURL = new URL((new Request(url)).url);  // new URL(<relative URL>) but it actually works
+            const newSearchParams = new URLSearchParams(newURL.searchParams);
+            console.log(newURL.searchParams);
+            console.log(newSearchParams);
 
             // Append query parameters
             for (const [key, value] of queryParams) {
                 newSearchParams.set(key, value);
             }
 
-            if (noOrigParams) { // Original URL has no params
-                return urlWithoutHash + "?" + newSearchParams.toString() + hash;
-            }
-
-            // Original URL has params - append to end
-            return urlWithoutHash + "&" + newSearchParams.toString() + hash;
+            newURL.search = newSearchParams;
+            return newURL;
         }
 
         // Select all relative links on the page
