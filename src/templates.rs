@@ -270,14 +270,18 @@ pub static TEMPLATE_COMPILATION_METRICS: &str = r#"
     <p>Graph Nodes: {m.graph_node_count}</p>
     <p>Graph Inputs: {m.graph_input_count}</p>
     <h2> Custom Ops </h2>
+    {{ if m.compliant_custom_ops }}
     <p> Compliant Custom Ops:</p>
     {{ for op in m.compliant_custom_ops }}
     <li> <code> {op} </code> </li>
     {{ endfor }}
+    {{ endif }}
+    {{ if m.non_compliant_ops }}
     <p> Non-Compliant Custom Ops:</p>
     {{ for op in m.non_compliant_ops }}
     <li> <code> {op} </code> </li>
     {{ endfor }}
+    {{ endif }}
     <h2>Symbolic shape specializations</h2>
     <table>
     <tr>
