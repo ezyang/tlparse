@@ -58,11 +58,18 @@ fn simple_file_output(
         .as_ref()
         .map_or(
             format!("unknown_{lineno}"),
-            |CompileId {
-                 frame_id,
-                 frame_compile_id,
-                 attempt,
-             }| { format!("{frame_id}_{frame_compile_id}_{attempt}") },
+            |c | match c {
+                CompileId::UserInitiated(d) => {
+                    format!("-_{}_{}_{}", d.frame_id, d.frame_compile_id, d.attempt)
+                }
+                CompileId::CompiledAutogradInitiated { compiled_autograd_id, dynamo_id } => {
+                    if let Some(d) = dynamo_id {
+                        format!("{}_{}_{}_{}", compiled_autograd_id, d.frame_id, d.frame_compile_id, d.attempt)
+                    } else {
+                        format!("{}_-_-_-", compiled_autograd_id)
+                    }
+                }
+            }
         )
         .into();
     let subdir = PathBuf::from(compile_id_dir);
@@ -380,7 +387,15 @@ impl StructuredLogParser for CompilationMetricsParser<'_> {
                 .map_or("(unknown) ".to_string(), |c| format!("{cid} ", cid = c));
             let mut cid = compile_id.clone();
             if let Some(c) = cid.as_mut() {
-                c.attempt = 0;
+                match c {
+                    CompileId::UserInitiated(d) => {
+                        // Is this for data migration?
+                        d.attempt = 0;
+                    }
+                    CompileId::CompiledAutogradInitiated { compiled_autograd_id: _, dynamo_id: _} => {
+                        // DynamoId should already have attempt set
+                    }
+                }
             }
             let stack_html = self
                 .stack_index
