@@ -169,7 +169,7 @@ impl fmt::Display for CompileId {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             CompileId::UserInitiated(d) => {
-                write!(f, "[-/{}]", _format_dynamo_id(d))
+                write!(f, "[{}]", _format_dynamo_id(d))
             }
             CompileId::CompiledAutogradInitiated {
                 compiled_autograd_id,

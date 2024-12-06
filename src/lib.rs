@@ -380,7 +380,7 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
                 .as_ref()
                 .map_or(format!("unknown_{lineno}"), |c| match c {
                     CompileId::UserInitiated(d) => {
-                        format!("-_{}_{}_{}", d.frame_id, d.frame_compile_id, d.attempt)
+                        format!("{}_{}_{}", d.frame_id, d.frame_compile_id, d.attempt)
                     }
                     CompileId::CompiledAutogradInitiated {
                         compiled_autograd_id,

@@ -1,41 +1,41 @@
-V1205 21:34:04.973000 1556615 torch/_dynamo/utils.py:1288] {"chromium_event": {}, "compiled_autograd_id": null, "frame_id": 0, "frame_compile_id": 0, "attempt": 0, "has_payload": "c30794dff8d2e5e3ffb104aa42f0079e"}
+V1206 15:19:20.597000 1524181 torch/_dynamo/utils.py:1288] {"chromium_event": {}, "compiled_autograd_id": null, "frame_id": 0, "frame_compile_id": 0, "attempt": 0, "has_payload": "5c750e81de6af580aac943559bb2808d"}
 	{
 	"name": "dynamo",
-	"ts": 1733463244973329.2,
+	"ts": 1733527160597711.0,
 	"args": {
-	"compile_id": "-/0/0"
+	"compile_id": "0/0"
 	},
 	"ph": "B",
 	"cat": "dynamo_timed",
 	"tid": 0,
 	"pid": 0
 	}
-V1205 21:34:04.974000 1556615 torch/_logging/structured.py:22] {"str": ["/data/users/xmfan/a/pytorch/torch/_dynamo/convert_frame.py", 0]}
-V1205 21:34:04.974000 1556615 torch/_logging/structured.py:22] {"str": ["/data/users/xmfan/a/pytorch/test/dynamo/test_misc.py", 1]}
-V1205 21:34:04.974000 1556615 torch/_logging/structured.py:22] {"str": ["/data/users/xmfan/a/pytorch/torch/_dynamo/test_case.py", 2]}
-V1205 21:34:04.975000 1556615 torch/_logging/structured.py:22] {"str": ["/data/users/xmfan/a/pytorch/torch/testing/_internal/common_utils.py", 3]}
-V1205 21:34:04.975000 1556615 torch/_logging/structured.py:22] {"str": ["/home/xmfan/local/a/pytorch-env/lib/python3.11/unittest/main.py", 4]}
-V1205 21:34:04.975000 1556615 torch/_logging/structured.py:22] {"str": ["/home/xmfan/local/a/pytorch-env/lib/python3.11/unittest/runner.py", 5]}
-V1205 21:34:04.975000 1556615 torch/_logging/structured.py:22] {"str": ["/home/xmfan/local/a/pytorch-env/lib/python3.11/unittest/suite.py", 6]}
-V1205 21:34:04.975000 1556615 torch/_logging/structured.py:22] {"str": ["/home/xmfan/local/a/pytorch-env/lib/python3.11/unittest/case.py", 7]}
-V1205 21:34:04.976000 1556615 torch/_dynamo/convert_frame.py:961] {"dynamo_start": {"stack": [{"line": 12143, "name": "<module>", "filename": 1}, {"line": 39, "name": "run_tests", "filename": 2}, {"line": 1353, "name": "run_tests", "filename": 3}, {"line": 102, "name": "__init__", "filename": 4}, {"line": 274, "name": "runTests", "filename": 4}, {"line": 217, "name": "run", "filename": 5}, {"line": 84, "name": "__call__", "filename": 6}, {"line": 122, "name": "run", "filename": 6}, {"line": 84, "name": "__call__", "filename": 6}, {"line": 122, "name": "run", "filename": 6}, {"line": 678, "name": "__call__", "filename": 7}, {"line": 3234, "name": "run", "filename": 3}, {"line": 3206, "name": "_run_custom", "filename": 3}, {"line": 623, "name": "run", "filename": 7}, {"line": 579, "name": "_callTestMethod", "filename": 7}, {"line": 3099, "name": "wrapper", "filename": 3}, {"line": 10725, "name": "test_graph_break_compilation_metrics", "filename": 1}, {"line": 10715, "name": "fn", "filename": 1}]}, "compiled_autograd_id": null, "frame_id": 0, "frame_compile_id": 0, "attempt": 0}
-V1205 21:34:04.976000 1556615 torch/_dynamo/utils.py:1288] {"chromium_event": {}, "compiled_autograd_id": null, "frame_id": 0, "frame_compile_id": 0, "attempt": 0, "has_payload": "2b08dd650ffe480a0f6faae935eb65bd"}
+V1206 15:19:20.598000 1524181 torch/_logging/structured.py:22] {"str": ["/data/users/xmfan/a/pytorch/torch/_dynamo/convert_frame.py", 0]}
+V1206 15:19:20.598000 1524181 torch/_logging/structured.py:22] {"str": ["/data/users/xmfan/a/pytorch/test/dynamo/test_misc.py", 1]}
+V1206 15:19:20.598000 1524181 torch/_logging/structured.py:22] {"str": ["/data/users/xmfan/a/pytorch/torch/_dynamo/test_case.py", 2]}
+V1206 15:19:20.598000 1524181 torch/_logging/structured.py:22] {"str": ["/data/users/xmfan/a/pytorch/torch/testing/_internal/common_utils.py", 3]}
+V1206 15:19:20.598000 1524181 torch/_logging/structured.py:22] {"str": ["/home/xmfan/local/a/pytorch-env/lib/python3.11/unittest/main.py", 4]}
+V1206 15:19:20.599000 1524181 torch/_logging/structured.py:22] {"str": ["/home/xmfan/local/a/pytorch-env/lib/python3.11/unittest/runner.py", 5]}
+V1206 15:19:20.599000 1524181 torch/_logging/structured.py:22] {"str": ["/home/xmfan/local/a/pytorch-env/lib/python3.11/unittest/suite.py", 6]}
+V1206 15:19:20.599000 1524181 torch/_logging/structured.py:22] {"str": ["/home/xmfan/local/a/pytorch-env/lib/python3.11/unittest/case.py", 7]}
+V1206 15:19:20.599000 1524181 torch/_dynamo/convert_frame.py:961] {"dynamo_start": {"stack": [{"line": 12143, "name": "<module>", "filename": 1}, {"line": 39, "name": "run_tests", "filename": 2}, {"line": 1353, "name": "run_tests", "filename": 3}, {"line": 102, "name": "__init__", "filename": 4}, {"line": 274, "name": "runTests", "filename": 4}, {"line": 217, "name": "run", "filename": 5}, {"line": 84, "name": "__call__", "filename": 6}, {"line": 122, "name": "run", "filename": 6}, {"line": 84, "name": "__call__", "filename": 6}, {"line": 122, "name": "run", "filename": 6}, {"line": 678, "name": "__call__", "filename": 7}, {"line": 3234, "name": "run", "filename": 3}, {"line": 3206, "name": "_run_custom", "filename": 3}, {"line": 623, "name": "run", "filename": 7}, {"line": 579, "name": "_callTestMethod", "filename": 7}, {"line": 3099, "name": "wrapper", "filename": 3}, {"line": 10725, "name": "test_graph_break_compilation_metrics", "filename": 1}, {"line": 10715, "name": "fn", "filename": 1}]}, "compiled_autograd_id": null, "frame_id": 0, "frame_compile_id": 0, "attempt": 0}
+V1206 15:19:20.599000 1524181 torch/_dynamo/utils.py:1288] {"chromium_event": {}, "compiled_autograd_id": null, "frame_id": 0, "frame_compile_id": 0, "attempt": 0, "has_payload": "8f9708327d55017fc86f9f639895200a"}
 	{
 	"name": "entire_frame_compile",
-	"ts": 1733463244976347.8,
+	"ts": 1733527160599465.0,
 	"args": {
 	"fn_name": "_compile.compile_inner",
-	"compile_id": "-/0/0"
+	"compile_id": "0/0"
 	},
 	"ph": "B",
 	"cat": "dynamo_timed",
 	"tid": 0,
 	"pid": 0
 	}
-V1205 21:34:04.981000 1556615 torch/_subclasses/meta_utils.py:241] {"describe_storage": {"id": 0, "describer_id": 0, "size": 64}, "compiled_autograd_id": null, "frame_id": 0, "frame_compile_id": 0, "attempt": 0}
-V1205 21:34:04.982000 1556615 torch/_subclasses/meta_utils.py:454] {"describe_tensor": {"id": 0, "ndim": 2, "dtype": "torch.float32", "device": "device(type='cpu')", "size": [4, 4], "is_leaf": true, "stride": [4, 1], "storage": 0, "view_func": "<built-in method _view_func_unsafe of Tensor object at 0x7f750d3cf8f0>", "describer_id": 0}, "compiled_autograd_id": null, "frame_id": 0, "frame_compile_id": 0, "attempt": 0}
-V1205 21:34:04.982000 1556615 torch/_subclasses/meta_utils.py:1779] {"describe_source": {"describer_id": 0, "id": 0, "source": "L['x']"}, "compiled_autograd_id": null, "frame_id": 0, "frame_compile_id": 0, "attempt": 0}
-V1205 21:34:05.523000 1556615 torch/_dynamo/symbolic_convert.py:417] {"artifact": {"name": "dynamo_graph_break_reason", "encoding": "string"}, "compiled_autograd_id": null, "frame_id": 0, "frame_compile_id": 0, "attempt": 0, "has_payload": "f04f316548f8d8ecdbbfa0a2b4ea163a"}
+V1206 15:19:20.602000 1524181 torch/_subclasses/meta_utils.py:241] {"describe_storage": {"id": 0, "describer_id": 0, "size": 64}, "compiled_autograd_id": null, "frame_id": 0, "frame_compile_id": 0, "attempt": 0}
+V1206 15:19:20.602000 1524181 torch/_subclasses/meta_utils.py:454] {"describe_tensor": {"id": 0, "ndim": 2, "dtype": "torch.float32", "device": "device(type='cpu')", "size": [4, 4], "is_leaf": true, "stride": [4, 1], "storage": 0, "view_func": "<built-in method _view_func_unsafe of Tensor object at 0x7faa117385f0>", "describer_id": 0}, "compiled_autograd_id": null, "frame_id": 0, "frame_compile_id": 0, "attempt": 0}
+V1206 15:19:20.602000 1524181 torch/_subclasses/meta_utils.py:1779] {"describe_source": {"describer_id": 0, "id": 0, "source": "L['x']"}, "compiled_autograd_id": null, "frame_id": 0, "frame_compile_id": 0, "attempt": 0}
+V1206 15:19:20.753000 1524181 torch/_dynamo/symbolic_convert.py:417] {"artifact": {"name": "dynamo_graph_break_reason", "encoding": "string"}, "compiled_autograd_id": null, "frame_id": 0, "frame_compile_id": 0, "attempt": 0, "has_payload": "f04f316548f8d8ecdbbfa0a2b4ea163a"}
 	Graph break in user code at /data/users/xmfan/a/pytorch/test/dynamo/test_misc.py:10717
 	Reason: Unsupported: 'skip function graph_break in file /data/users/xmfan/a/pytorch/torch/_dynamo/decorators.py'
 	User code traceback:
@@ -59,10 +59,10 @@ V1205 21:34:05.523000 1556615 torch/_dynamo/symbolic_convert.py:417] {"artifact"
 	    raise Unsupported(msg, case_name=case_name)
 	torch._dynamo.exc.Unsupported: 'skip function graph_break in file /data/users/xmfan/a/pytorch/torch/_dynamo/decorators.py'
 	
-V1205 21:34:05.526000 1556615 torch/_subclasses/meta_utils.py:241] {"describe_storage": {"id": 0, "describer_id": 1, "size": 64}, "compiled_autograd_id": null, "frame_id": 0, "frame_compile_id": 0, "attempt": 1}
-V1205 21:34:05.526000 1556615 torch/_subclasses/meta_utils.py:454] {"describe_tensor": {"id": 0, "ndim": 2, "dtype": "torch.float32", "device": "device(type='cpu')", "size": [4, 4], "is_leaf": true, "stride": [4, 1], "storage": 0, "view_func": "<built-in method _view_func_unsafe of Tensor object at 0x7f750d3cf8f0>", "describer_id": 1}, "compiled_autograd_id": null, "frame_id": 0, "frame_compile_id": 0, "attempt": 1}
-V1205 21:34:05.526000 1556615 torch/_subclasses/meta_utils.py:1779] {"describe_source": {"describer_id": 1, "id": 0, "source": "L['x']"}, "compiled_autograd_id": null, "frame_id": 0, "frame_compile_id": 0, "attempt": 1}
-V1205 21:34:05.534000 1556615 torch/_dynamo/output_graph.py:1336] {"dynamo_output_graph": {"sizes": {"l_x_": [4, 4], "cos": [4, 4]}}, "compiled_autograd_id": null, "frame_id": 0, "frame_compile_id": 0, "attempt": 1, "has_payload": "5ad90272506ac2125309cdad5611f41d"}
+V1206 15:19:20.754000 1524181 torch/_subclasses/meta_utils.py:241] {"describe_storage": {"id": 0, "describer_id": 1, "size": 64}, "compiled_autograd_id": null, "frame_id": 0, "frame_compile_id": 0, "attempt": 1}
+V1206 15:19:20.754000 1524181 torch/_subclasses/meta_utils.py:454] {"describe_tensor": {"id": 0, "ndim": 2, "dtype": "torch.float32", "device": "device(type='cpu')", "size": [4, 4], "is_leaf": true, "stride": [4, 1], "storage": 0, "view_func": "<built-in method _view_func_unsafe of Tensor object at 0x7faa117385f0>", "describer_id": 1}, "compiled_autograd_id": null, "frame_id": 0, "frame_compile_id": 0, "attempt": 1}
+V1206 15:19:20.755000 1524181 torch/_subclasses/meta_utils.py:1779] {"describe_source": {"describer_id": 1, "id": 0, "source": "L['x']"}, "compiled_autograd_id": null, "frame_id": 0, "frame_compile_id": 0, "attempt": 1}
+V1206 15:19:20.759000 1524181 torch/_dynamo/output_graph.py:1336] {"dynamo_output_graph": {"sizes": {"l_x_": [4, 4], "cos": [4, 4]}}, "compiled_autograd_id": null, "frame_id": 0, "frame_compile_id": 0, "attempt": 1, "has_payload": "5ad90272506ac2125309cdad5611f41d"}
 	class GraphModule(torch.nn.Module):
 	    def forward(self, L_x_: "f32[4, 4][4, 1]cpu"):
 	        l_x_ = L_x_
@@ -71,33 +71,33 @@ V1205 21:34:05.534000 1556615 torch/_dynamo/output_graph.py:1336] {"dynamo_outpu
 	        cos: "f32[4, 4][4, 1]cpu" = l_x_.cos();  l_x_ = cos = None
 	        return ()
 	        
-V1205 21:34:05.535000 1556615 torch/_dynamo/utils.py:1288] {"chromium_event": {}, "compiled_autograd_id": null, "frame_id": 0, "frame_compile_id": 0, "attempt": 1, "has_payload": "ad5ce49a4bba3ac72fbf24799cf53d1d"}
+V1206 15:19:20.759000 1524181 torch/_dynamo/utils.py:1288] {"chromium_event": {}, "compiled_autograd_id": null, "frame_id": 0, "frame_compile_id": 0, "attempt": 1, "has_payload": "ed79400d0a0b18a3ece9bc669a889690"}
 	{
 	"name": "backend_compile",
-	"ts": 1733463245535257.5,
+	"ts": 1733527160759353.8,
 	"args": {
 	"fn_name": "OutputGraph.call_user_compiler",
-	"compile_id": "-/0/0"
+	"compile_id": "0/0"
 	},
 	"ph": "B",
 	"cat": "dynamo_timed",
 	"tid": 0,
 	"pid": 0
 	}
-V1205 21:34:05.535000 1556615 torch/_dynamo/utils.py:1288] {"chromium_event": {}, "compiled_autograd_id": null, "frame_id": 0, "frame_compile_id": 0, "attempt": 1, "has_payload": "281996a6e4a27dcfadbbc651f972f17c"}
+V1206 15:19:20.759000 1524181 torch/_dynamo/utils.py:1288] {"chromium_event": {}, "compiled_autograd_id": null, "frame_id": 0, "frame_compile_id": 0, "attempt": 1, "has_payload": "9345eaf1b39ecb3f8553a4d6e582465c"}
 	{
 	"name": "backend_compile",
-	"ts": 1733463245535875.2,
+	"ts": 1733527160759676.0,
 	"args": {
 	"fn_name": "OutputGraph.call_user_compiler",
-	"compile_id": "-/0/0"
+	"compile_id": "0/0"
 	},
 	"ph": "E",
 	"cat": "dynamo_timed",
 	"tid": 0,
 	"pid": 0
 	}
-V1205 21:34:05.543000 1556615 torch/_dynamo/guards.py:2315] {"dynamo_cpp_guards_str": {}, "compiled_autograd_id": null, "frame_id": 0, "frame_compile_id": 0, "attempt": 1, "has_payload": "5dd4f6c62ab942940baeb571a2156b38"}
+V1206 15:19:20.763000 1524181 torch/_dynamo/guards.py:2315] {"dynamo_cpp_guards_str": {}, "compiled_autograd_id": null, "frame_id": 0, "frame_compile_id": 0, "attempt": 1, "has_payload": "8ecd19d777f032e1f5d8a99cb3061a05"}
 	
 	TREE_GUARD_MANAGER:
 	+- RootGuardManager
@@ -110,32 +110,32 @@ V1205 21:34:05.543000 1556615 torch/_dynamo/guards.py:2315] {"dynamo_cpp_guards_
 	| | +- GuardManager: source=L['x'].cos, accessed_by=GetAttrGuardAccessor(cos)
 	| +- GuardManager: source=G, accessed_by=GlobalsGuardAccessor
 	| | +- GuardManager: source=G['torch'], accessed_by=DictGetItemGuardAccessor('torch')
-	| | | +- ID_MATCH: ___check_obj_id(G['torch'], 140142959899360)                
+	| | | +- ID_MATCH: ___check_obj_id(G['torch'], 140385151530416)                
 	| | | +- GuardManager: source=G['torch']._dynamo, accessed_by=GetAttrGuardAccessor(_dynamo)
-	| | | | +- ID_MATCH: ___check_obj_id(G['torch']._dynamo, 140142898023696)        
+	| | | | +- ID_MATCH: ___check_obj_id(G['torch']._dynamo, 140382452240752)        
 	| | | | +- GuardManager: source=G['torch']._dynamo.graph_break, accessed_by=GetAttrGuardAccessor(graph_break)
-	| | | | | +- ID_MATCH: ___check_obj_id(G['torch']._dynamo.graph_break, 140141631665344)
+	| | | | | +- ID_MATCH: ___check_obj_id(G['torch']._dynamo.graph_break, 140380257582464)
 	
-V1205 21:34:05.543000 1556615 torch/_dynamo/utils.py:1288] {"chromium_event": {}, "compiled_autograd_id": null, "frame_id": 0, "frame_compile_id": 0, "attempt": 1, "has_payload": "2ac3ed4de6267f02a1cf6edd1d3ee64e"}
+V1206 15:19:20.763000 1524181 torch/_dynamo/utils.py:1288] {"chromium_event": {}, "compiled_autograd_id": null, "frame_id": 0, "frame_compile_id": 0, "attempt": 1, "has_payload": "d7b25cdb6c7d92283cf652c89fda37e4"}
 	{
 	"name": "entire_frame_compile",
-	"ts": 1733463245543487.5,
+	"ts": 1733527160763637.5,
 	"args": {
 	"fn_name": "_compile.compile_inner",
-	"compile_id": "-/0/0"
+	"compile_id": "0/0"
 	},
 	"ph": "E",
 	"cat": "dynamo_timed",
 	"tid": 0,
 	"pid": 0
 	}
-V1205 21:34:05.548000 1556615 torch/_dynamo/utils.py:1045] {"compilation_metrics": {"aot_autograd_cumulative_compile_time_us": 617, "dynamo_cumulative_compile_time_us": 567139, "frame_key": "1", "co_name": "fn", "co_filename": "/data/users/xmfan/a/pytorch/test/dynamo/test_misc.py", "co_firstlineno": 10715, "cache_size": 0, "accumulated_cache_size": 0, "guard_count": 10, "shape_env_guard_count": 0, "graph_op_count": 1, "graph_node_count": 3, "graph_input_count": 1, "fail_type": null, "fail_reason": null, "fail_user_frame_filename": null, "fail_user_frame_lineno": null, "non_compliant_ops": [], "compliant_custom_ops": [], "restart_reasons": ["'skip function graph_break in file /data/users/xmfan/a/pytorch/torch/_dynamo/decorators.py'"], "dynamo_time_before_restart_s": 0.5473113059997559, "has_guarded_code": true, "config_suppress_errors": false, "config_inline_inbuilt_nn_modules": true, "specialize_float": false, "dynamo_config": "{\"verify_correctness\": false, \"minimum_call_count\": 1, \"dead_code_elimination\": true, \"cache_size_limit\": 8, \"accumulated_cache_size_limit\": 256, \"skip_code_recursive_on_cache_limit_hit\": true, \"fail_on_cache_limit_hit\": false, \"specialize_int\": false, \"specialize_float\": false, \"dynamic_shapes\": true, \"use_lazy_graph_module\": true, \"assume_static_by_default\": true, \"automatic_dynamic_shapes\": true, \"force_parameter_static_shapes\": true, \"force_nn_module_property_static_shapes\": true, \"allow_ignore_mark_dynamic\": false, \"guard_nn_modules\": true, \"guard_nn_modules_using_dict_tags\": true, \"suppress_errors\": false, \"replay_record_enabled\": false, \"rewrite_assert_with_torch_assert\": true, \"disable\": false, \"cprofile\": false, \"skipfiles_inline_module_allowlist\": {}, \"allowed_functions_module_string_ignorelist\": [\"torch._decomp\", \"torch._refs\", \"torch._prims\", \"torch.distributions\", \"torch.testing\"], \"capture_scalar_outputs\": false, \"capture_dynamic_output_shape_ops\": false, \"prefer_deferred_runtime_asserts_over_guards\": false, \"allow_complex_guards_as_runtime_asserts\": false, \"force_unspec_int_unbacked_size_like_on_torchrec_kjt\": false, \"optimize_ddp\": true, \"do_not_emit_runtime_asserts\": false, \"_ddp_optimization_mode\": [\"ddp_optimizer\", \"python_reducer\", \"python_reducer_without_compiled_forward\", \"no_optimization\"], \"skip_torchrec\": true, \"optimize_ddp_lazy_compile\": false, \"skip_fsdp_guards\": true, \"skip_fsdp_hooks\": true, \"skip_nnmodule_hook_guards\": true, \"skip_no_tensor_aliasing_guards_on_parameters\": true, \"raise_on_ctx_manager_usage\": true, \"raise_on_unsafe_aot_autograd\": false, \"error_on_nested_jit_trace\": true, \"error_on_nested_fx_trace\": true, \"allow_rnn\": false, \"capture_sparse_compute\": true, \"error_on_recompile\": false, \"report_guard_failures\": true, \"trace_numpy\": true, \"numpy_default_float\": \"float64\", \"numpy_default_complex\": \"complex128\", \"numpy_default_int\": \"int64\", \"use_numpy_random_stream\": false, \"enable_cpp_guard_manager\": true, \"inline_inbuilt_nn_modules\": true, \"record_compile_time_instruction_count\": false, \"cudagraph_backend_keep_input_mutation\": false, \"cudagraph_backend_support_input_mutation\": false, \"only_allow_pt2_compliant_ops\": false, \"capture_autograd_function\": true, \"capture_func_transforms\": true, \"fake_tensor_cache_enabled\": true, \"fake_tensor_cache_crosscheck_enabled\": false, \"compiled_autograd\": false, \"compiled_autograd_kwargs_override\": {}, \"enable_compiler_collectives\": false, \"automatic_dynamic_local_pgo\": false, \"automatic_dynamic_remote_pgo\": null}", "is_forward": true, "dynamo_compile_time_before_restart_us": 547311}, "compiled_autograd_id": null, "frame_id": 0, "frame_compile_id": 0, "attempt": 1}
-V1205 21:34:05.548000 1556615 torch/_dynamo/utils.py:1288] {"chromium_event": {}, "compiled_autograd_id": null, "frame_id": 0, "frame_compile_id": 0, "attempt": 1, "has_payload": "d3f5f4089bc2e836084460f069f71f5f"}
+V1206 15:19:20.766000 1524181 torch/_dynamo/utils.py:1045] {"compilation_metrics": {"aot_autograd_cumulative_compile_time_us": 322, "dynamo_cumulative_compile_time_us": 164172, "frame_key": "1", "co_name": "fn", "co_filename": "/data/users/xmfan/a/pytorch/test/dynamo/test_misc.py", "co_firstlineno": 10715, "cache_size": 0, "accumulated_cache_size": 0, "guard_count": 10, "shape_env_guard_count": 0, "graph_op_count": 1, "graph_node_count": 3, "graph_input_count": 1, "fail_type": null, "fail_reason": null, "fail_user_frame_filename": null, "fail_user_frame_lineno": null, "non_compliant_ops": [], "compliant_custom_ops": [], "restart_reasons": ["'skip function graph_break in file /data/users/xmfan/a/pytorch/torch/_dynamo/decorators.py'"], "dynamo_time_before_restart_s": 0.15378284454345703, "has_guarded_code": true, "config_suppress_errors": false, "config_inline_inbuilt_nn_modules": true, "specialize_float": false, "dynamo_config": "{\"verify_correctness\": false, \"minimum_call_count\": 1, \"dead_code_elimination\": true, \"cache_size_limit\": 8, \"accumulated_cache_size_limit\": 256, \"skip_code_recursive_on_cache_limit_hit\": true, \"fail_on_cache_limit_hit\": false, \"specialize_int\": false, \"specialize_float\": false, \"dynamic_shapes\": true, \"use_lazy_graph_module\": true, \"assume_static_by_default\": true, \"automatic_dynamic_shapes\": true, \"force_parameter_static_shapes\": true, \"force_nn_module_property_static_shapes\": true, \"allow_ignore_mark_dynamic\": false, \"guard_nn_modules\": true, \"guard_nn_modules_using_dict_tags\": true, \"suppress_errors\": false, \"replay_record_enabled\": false, \"rewrite_assert_with_torch_assert\": true, \"disable\": false, \"cprofile\": false, \"skipfiles_inline_module_allowlist\": {}, \"allowed_functions_module_string_ignorelist\": [\"torch._refs\", \"torch._decomp\", \"torch.testing\", \"torch.distributions\", \"torch._prims\"], \"capture_scalar_outputs\": false, \"capture_dynamic_output_shape_ops\": false, \"prefer_deferred_runtime_asserts_over_guards\": false, \"allow_complex_guards_as_runtime_asserts\": false, \"force_unspec_int_unbacked_size_like_on_torchrec_kjt\": false, \"optimize_ddp\": true, \"do_not_emit_runtime_asserts\": false, \"_ddp_optimization_mode\": [\"ddp_optimizer\", \"python_reducer\", \"python_reducer_without_compiled_forward\", \"no_optimization\"], \"skip_torchrec\": true, \"optimize_ddp_lazy_compile\": false, \"skip_fsdp_guards\": true, \"skip_fsdp_hooks\": true, \"skip_nnmodule_hook_guards\": true, \"skip_no_tensor_aliasing_guards_on_parameters\": true, \"raise_on_ctx_manager_usage\": true, \"raise_on_unsafe_aot_autograd\": false, \"error_on_nested_jit_trace\": true, \"error_on_nested_fx_trace\": true, \"allow_rnn\": false, \"capture_sparse_compute\": true, \"error_on_recompile\": false, \"report_guard_failures\": true, \"trace_numpy\": true, \"numpy_default_float\": \"float64\", \"numpy_default_complex\": \"complex128\", \"numpy_default_int\": \"int64\", \"use_numpy_random_stream\": false, \"enable_cpp_guard_manager\": true, \"inline_inbuilt_nn_modules\": true, \"record_compile_time_instruction_count\": false, \"cudagraph_backend_keep_input_mutation\": false, \"cudagraph_backend_support_input_mutation\": false, \"only_allow_pt2_compliant_ops\": false, \"capture_autograd_function\": true, \"capture_func_transforms\": true, \"fake_tensor_cache_enabled\": true, \"fake_tensor_cache_crosscheck_enabled\": false, \"compiled_autograd\": false, \"compiled_autograd_kwargs_override\": {}, \"enable_compiler_collectives\": false, \"automatic_dynamic_local_pgo\": false, \"automatic_dynamic_remote_pgo\": null}", "is_forward": true, "dynamo_compile_time_before_restart_us": 153782}, "compiled_autograd_id": null, "frame_id": 0, "frame_compile_id": 0, "attempt": 1}
+V1206 15:19:20.766000 1524181 torch/_dynamo/utils.py:1288] {"chromium_event": {}, "compiled_autograd_id": null, "frame_id": 0, "frame_compile_id": 0, "attempt": 1, "has_payload": "f8061d1a8884764e00182e2ff0f5b39e"}
 	{
 	"name": "dynamo",
-	"ts": 1733463245548837.2,
+	"ts": 1733527160766526.5,
 	"args": {
-	"compile_id": "-/0/0",
+	"compile_id": "0/0",
 	"frame_key": "1",
 	"co_name": "fn",
 	"co_filename": "/data/users/xmfan/a/pytorch/test/dynamo/test_misc.py",
@@ -156,46 +156,46 @@ V1205 21:34:05.548000 1556615 torch/_dynamo/utils.py:1288] {"chromium_event": {}
 	"restart_reasons": [
 	"'skip function graph_break in file /data/users/xmfan/a/pytorch/torch/_dynamo/decorators.py'"
 	],
-	"dynamo_time_before_restart_s": 0.5473113059997559,
+	"dynamo_time_before_restart_s": 0.15378284454345703,
 	"has_guarded_code": true,
-	"dynamo_config": "{\"verify_correctness\": false, \"minimum_call_count\": 1, \"dead_code_elimination\": true, \"cache_size_limit\": 8, \"accumulated_cache_size_limit\": 256, \"skip_code_recursive_on_cache_limit_hit\": true, \"fail_on_cache_limit_hit\": false, \"specialize_int\": false, \"specialize_float\": false, \"dynamic_shapes\": true, \"use_lazy_graph_module\": true, \"assume_static_by_default\": true, \"automatic_dynamic_shapes\": true, \"force_parameter_static_shapes\": true, \"force_nn_module_property_static_shapes\": true, \"allow_ignore_mark_dynamic\": false, \"guard_nn_modules\": true, \"guard_nn_modules_using_dict_tags\": true, \"suppress_errors\": false, \"replay_record_enabled\": false, \"rewrite_assert_with_torch_assert\": true, \"disable\": false, \"cprofile\": false, \"skipfiles_inline_module_allowlist\": {}, \"allowed_functions_module_string_ignorelist\": [\"torch._decomp\", \"torch._refs\", \"torch._prims\", \"torch.distributions\", \"torch.testing\"], \"capture_scalar_outputs\": false, \"capture_dynamic_output_shape_ops\": false, \"prefer_deferred_runtime_asserts_over_guards\": false, \"allow_complex_guards_as_runtime_asserts\": false, \"force_unspec_int_unbacked_size_like_on_torchrec_kjt\": false, \"optimize_ddp\": true, \"do_not_emit_runtime_asserts\": false, \"_ddp_optimization_mode\": [\"ddp_optimizer\", \"python_reducer\", \"python_reducer_without_compiled_forward\", \"no_optimization\"], \"skip_torchrec\": true, \"optimize_ddp_lazy_compile\": false, \"skip_fsdp_guards\": true, \"skip_fsdp_hooks\": true, \"skip_nnmodule_hook_guards\": true, \"skip_no_tensor_aliasing_guards_on_parameters\": true, \"raise_on_ctx_manager_usage\": true, \"raise_on_unsafe_aot_autograd\": false, \"error_on_nested_jit_trace\": true, \"error_on_nested_fx_trace\": true, \"allow_rnn\": false, \"capture_sparse_compute\": true, \"error_on_recompile\": false, \"report_guard_failures\": true, \"trace_numpy\": true, \"numpy_default_float\": \"float64\", \"numpy_default_complex\": \"complex128\", \"numpy_default_int\": \"int64\", \"use_numpy_random_stream\": false, \"enable_cpp_guard_manager\": true, \"inline_inbuilt_nn_modules\": true, \"record_compile_time_instruction_count\": false, \"cudagraph_backend_keep_input_mutation\": false, \"cudagraph_backend_support_input_mutation\": false, \"only_allow_pt2_compliant_ops\": false, \"capture_autograd_function\": true, \"capture_func_transforms\": true, \"fake_tensor_cache_enabled\": true, \"fake_tensor_cache_crosscheck_enabled\": false, \"compiled_autograd\": false, \"compiled_autograd_kwargs_override\": {}, \"enable_compiler_collectives\": false, \"automatic_dynamic_local_pgo\": false, \"automatic_dynamic_remote_pgo\": null}"
+	"dynamo_config": "{\"verify_correctness\": false, \"minimum_call_count\": 1, \"dead_code_elimination\": true, \"cache_size_limit\": 8, \"accumulated_cache_size_limit\": 256, \"skip_code_recursive_on_cache_limit_hit\": true, \"fail_on_cache_limit_hit\": false, \"specialize_int\": false, \"specialize_float\": false, \"dynamic_shapes\": true, \"use_lazy_graph_module\": true, \"assume_static_by_default\": true, \"automatic_dynamic_shapes\": true, \"force_parameter_static_shapes\": true, \"force_nn_module_property_static_shapes\": true, \"allow_ignore_mark_dynamic\": false, \"guard_nn_modules\": true, \"guard_nn_modules_using_dict_tags\": true, \"suppress_errors\": false, \"replay_record_enabled\": false, \"rewrite_assert_with_torch_assert\": true, \"disable\": false, \"cprofile\": false, \"skipfiles_inline_module_allowlist\": {}, \"allowed_functions_module_string_ignorelist\": [\"torch._refs\", \"torch._decomp\", \"torch.testing\", \"torch.distributions\", \"torch._prims\"], \"capture_scalar_outputs\": false, \"capture_dynamic_output_shape_ops\": false, \"prefer_deferred_runtime_asserts_over_guards\": false, \"allow_complex_guards_as_runtime_asserts\": false, \"force_unspec_int_unbacked_size_like_on_torchrec_kjt\": false, \"optimize_ddp\": true, \"do_not_emit_runtime_asserts\": false, \"_ddp_optimization_mode\": [\"ddp_optimizer\", \"python_reducer\", \"python_reducer_without_compiled_forward\", \"no_optimization\"], \"skip_torchrec\": true, \"optimize_ddp_lazy_compile\": false, \"skip_fsdp_guards\": true, \"skip_fsdp_hooks\": true, \"skip_nnmodule_hook_guards\": true, \"skip_no_tensor_aliasing_guards_on_parameters\": true, \"raise_on_ctx_manager_usage\": true, \"raise_on_unsafe_aot_autograd\": false, \"error_on_nested_jit_trace\": true, \"error_on_nested_fx_trace\": true, \"allow_rnn\": false, \"capture_sparse_compute\": true, \"error_on_recompile\": false, \"report_guard_failures\": true, \"trace_numpy\": true, \"numpy_default_float\": \"float64\", \"numpy_default_complex\": \"complex128\", \"numpy_default_int\": \"int64\", \"use_numpy_random_stream\": false, \"enable_cpp_guard_manager\": true, \"inline_inbuilt_nn_modules\": true, \"record_compile_time_instruction_count\": false, \"cudagraph_backend_keep_input_mutation\": false, \"cudagraph_backend_support_input_mutation\": false, \"only_allow_pt2_compliant_ops\": false, \"capture_autograd_function\": true, \"capture_func_transforms\": true, \"fake_tensor_cache_enabled\": true, \"fake_tensor_cache_crosscheck_enabled\": false, \"compiled_autograd\": false, \"compiled_autograd_kwargs_override\": {}, \"enable_compiler_collectives\": false, \"automatic_dynamic_local_pgo\": false, \"automatic_dynamic_remote_pgo\": null}"
 	},
 	"ph": "E",
 	"cat": "dynamo_timed",
 	"tid": 0,
 	"pid": 0
 	}
-V1205 21:34:05.550000 1556615 torch/_dynamo/utils.py:1288] {"chromium_event": {}, "compiled_autograd_id": null, "frame_id": 1, "frame_compile_id": 0, "attempt": 0, "has_payload": "d36ff4ba061c0ee22fcfcb8ea2801fb4"}
+V1206 15:19:20.768000 1524181 torch/_dynamo/utils.py:1288] {"chromium_event": {}, "compiled_autograd_id": null, "frame_id": 1, "frame_compile_id": 0, "attempt": 0, "has_payload": "4b467587b7113a6f7f359892684dcffe"}
 	{
 	"name": "dynamo",
-	"ts": 1733463245550244.5,
+	"ts": 1733527160768014.8,
 	"args": {
-	"compile_id": "-/1/0"
+	"compile_id": "1/0"
 	},
 	"ph": "B",
 	"cat": "dynamo_timed",
 	"tid": 0,
 	"pid": 0
 	}
-V1205 21:34:05.550000 1556615 torch/_logging/structured.py:22] {"str": ["/data/users/xmfan/a/pytorch/torch/_dynamo/eval_frame.py", 8]}
-V1205 21:34:05.551000 1556615 torch/_dynamo/convert_frame.py:961] {"dynamo_start": {"stack": [{"line": 12143, "name": "<module>", "filename": 1}, {"line": 39, "name": "run_tests", "filename": 2}, {"line": 1353, "name": "run_tests", "filename": 3}, {"line": 102, "name": "__init__", "filename": 4}, {"line": 274, "name": "runTests", "filename": 4}, {"line": 217, "name": "run", "filename": 5}, {"line": 84, "name": "__call__", "filename": 6}, {"line": 122, "name": "run", "filename": 6}, {"line": 84, "name": "__call__", "filename": 6}, {"line": 122, "name": "run", "filename": 6}, {"line": 678, "name": "__call__", "filename": 7}, {"line": 3234, "name": "run", "filename": 3}, {"line": 3206, "name": "_run_custom", "filename": 3}, {"line": 623, "name": "run", "filename": 7}, {"line": 579, "name": "_callTestMethod", "filename": 7}, {"line": 3099, "name": "wrapper", "filename": 3}, {"line": 10725, "name": "test_graph_break_compilation_metrics", "filename": 1}, {"line": 573, "name": "_fn", "filename": 8}, {"line": 10717, "name": "torch_dynamo_resume_in_fn_at_10717", "filename": 1}]}, "compiled_autograd_id": null, "frame_id": 1, "frame_compile_id": 0, "attempt": 0}
-V1205 21:34:05.551000 1556615 torch/_dynamo/utils.py:1288] {"chromium_event": {}, "compiled_autograd_id": null, "frame_id": 1, "frame_compile_id": 0, "attempt": 0, "has_payload": "cfd693e90509842b83064ca9279cb42a"}
+V1206 15:19:20.768000 1524181 torch/_logging/structured.py:22] {"str": ["/data/users/xmfan/a/pytorch/torch/_dynamo/eval_frame.py", 8]}
+V1206 15:19:20.768000 1524181 torch/_dynamo/convert_frame.py:961] {"dynamo_start": {"stack": [{"line": 12143, "name": "<module>", "filename": 1}, {"line": 39, "name": "run_tests", "filename": 2}, {"line": 1353, "name": "run_tests", "filename": 3}, {"line": 102, "name": "__init__", "filename": 4}, {"line": 274, "name": "runTests", "filename": 4}, {"line": 217, "name": "run", "filename": 5}, {"line": 84, "name": "__call__", "filename": 6}, {"line": 122, "name": "run", "filename": 6}, {"line": 84, "name": "__call__", "filename": 6}, {"line": 122, "name": "run", "filename": 6}, {"line": 678, "name": "__call__", "filename": 7}, {"line": 3234, "name": "run", "filename": 3}, {"line": 3206, "name": "_run_custom", "filename": 3}, {"line": 623, "name": "run", "filename": 7}, {"line": 579, "name": "_callTestMethod", "filename": 7}, {"line": 3099, "name": "wrapper", "filename": 3}, {"line": 10725, "name": "test_graph_break_compilation_metrics", "filename": 1}, {"line": 573, "name": "_fn", "filename": 8}, {"line": 10717, "name": "torch_dynamo_resume_in_fn_at_10717", "filename": 1}]}, "compiled_autograd_id": null, "frame_id": 1, "frame_compile_id": 0, "attempt": 0}
+V1206 15:19:20.768000 1524181 torch/_dynamo/utils.py:1288] {"chromium_event": {}, "compiled_autograd_id": null, "frame_id": 1, "frame_compile_id": 0, "attempt": 0, "has_payload": "b037746539aa49bc911ce7e825e4910f"}
 	{
 	"name": "entire_frame_compile",
-	"ts": 1733463245551404.0,
+	"ts": 1733527160768607.8,
 	"args": {
 	"fn_name": "_compile.compile_inner",
-	"compile_id": "-/1/0"
+	"compile_id": "1/0"
 	},
 	"ph": "B",
 	"cat": "dynamo_timed",
 	"tid": 0,
 	"pid": 0
 	}
-V1205 21:34:05.553000 1556615 torch/_subclasses/meta_utils.py:241] {"describe_storage": {"id": 0, "describer_id": 3, "size": 64}, "compiled_autograd_id": null, "frame_id": 1, "frame_compile_id": 0, "attempt": 0}
-V1205 21:34:05.553000 1556615 torch/_subclasses/meta_utils.py:454] {"describe_tensor": {"id": 0, "ndim": 2, "dtype": "torch.float32", "device": "device(type='cpu')", "size": [4, 4], "is_leaf": true, "stride": [4, 1], "storage": 0, "view_func": "<built-in method _view_func_unsafe of Tensor object at 0x7f750d3cf8f0>", "describer_id": 3}, "compiled_autograd_id": null, "frame_id": 1, "frame_compile_id": 0, "attempt": 0}
-V1205 21:34:05.553000 1556615 torch/_subclasses/meta_utils.py:1779] {"describe_source": {"describer_id": 3, "id": 0, "source": "L['x']"}, "compiled_autograd_id": null, "frame_id": 1, "frame_compile_id": 0, "attempt": 0}
-V1205 21:34:05.557000 1556615 torch/_dynamo/symbolic_convert.py:417] {"artifact": {"name": "dynamo_graph_break_reason", "encoding": "string"}, "compiled_autograd_id": null, "frame_id": 1, "frame_compile_id": 0, "attempt": 0, "has_payload": "3be5341dae8897d4fd2d7e55a644cdb1"}
+V1206 15:19:20.769000 1524181 torch/_subclasses/meta_utils.py:241] {"describe_storage": {"id": 0, "describer_id": 3, "size": 64}, "compiled_autograd_id": null, "frame_id": 1, "frame_compile_id": 0, "attempt": 0}
+V1206 15:19:20.769000 1524181 torch/_subclasses/meta_utils.py:454] {"describe_tensor": {"id": 0, "ndim": 2, "dtype": "torch.float32", "device": "device(type='cpu')", "size": [4, 4], "is_leaf": true, "stride": [4, 1], "storage": 0, "view_func": "<built-in method _view_func_unsafe of Tensor object at 0x7faa117385f0>", "describer_id": 3}, "compiled_autograd_id": null, "frame_id": 1, "frame_compile_id": 0, "attempt": 0}
+V1206 15:19:20.769000 1524181 torch/_subclasses/meta_utils.py:1779] {"describe_source": {"describer_id": 3, "id": 0, "source": "L['x']"}, "compiled_autograd_id": null, "frame_id": 1, "frame_compile_id": 0, "attempt": 0}
+V1206 15:19:20.771000 1524181 torch/_dynamo/symbolic_convert.py:417] {"artifact": {"name": "dynamo_graph_break_reason", "encoding": "string"}, "compiled_autograd_id": null, "frame_id": 1, "frame_compile_id": 0, "attempt": 0, "has_payload": "3be5341dae8897d4fd2d7e55a644cdb1"}
 	Graph break in user code at /data/users/xmfan/a/pytorch/test/dynamo/test_misc.py:10719
 	Reason: Unsupported: 'skip function graph_break in file /data/users/xmfan/a/pytorch/torch/_dynamo/decorators.py'
 	User code traceback:
@@ -219,10 +219,10 @@ V1205 21:34:05.557000 1556615 torch/_dynamo/symbolic_convert.py:417] {"artifact"
 	    raise Unsupported(msg, case_name=case_name)
 	torch._dynamo.exc.Unsupported: 'skip function graph_break in file /data/users/xmfan/a/pytorch/torch/_dynamo/decorators.py'
 	
-V1205 21:34:05.559000 1556615 torch/_subclasses/meta_utils.py:241] {"describe_storage": {"id": 0, "describer_id": 4, "size": 64}, "compiled_autograd_id": null, "frame_id": 1, "frame_compile_id": 0, "attempt": 1}
-V1205 21:34:05.559000 1556615 torch/_subclasses/meta_utils.py:454] {"describe_tensor": {"id": 0, "ndim": 2, "dtype": "torch.float32", "device": "device(type='cpu')", "size": [4, 4], "is_leaf": true, "stride": [4, 1], "storage": 0, "view_func": "<built-in method _view_func_unsafe of Tensor object at 0x7f750d3cf8f0>", "describer_id": 4}, "compiled_autograd_id": null, "frame_id": 1, "frame_compile_id": 0, "attempt": 1}
-V1205 21:34:05.560000 1556615 torch/_subclasses/meta_utils.py:1779] {"describe_source": {"describer_id": 4, "id": 0, "source": "L['x']"}, "compiled_autograd_id": null, "frame_id": 1, "frame_compile_id": 0, "attempt": 1}
-V1205 21:34:05.563000 1556615 torch/_dynamo/output_graph.py:1336] {"dynamo_output_graph": {"sizes": {"l_x_": [4, 4], "sin": [4, 4]}}, "compiled_autograd_id": null, "frame_id": 1, "frame_compile_id": 0, "attempt": 1, "has_payload": "fed8fe8097989f418398de0fb8e36aff"}
+V1206 15:19:20.772000 1524181 torch/_subclasses/meta_utils.py:241] {"describe_storage": {"id": 0, "describer_id": 4, "size": 64}, "compiled_autograd_id": null, "frame_id": 1, "frame_compile_id": 0, "attempt": 1}
+V1206 15:19:20.773000 1524181 torch/_subclasses/meta_utils.py:454] {"describe_tensor": {"id": 0, "ndim": 2, "dtype": "torch.float32", "device": "device(type='cpu')", "size": [4, 4], "is_leaf": true, "stride": [4, 1], "storage": 0, "view_func": "<built-in method _view_func_unsafe of Tensor object at 0x7faa117385f0>", "describer_id": 4}, "compiled_autograd_id": null, "frame_id": 1, "frame_compile_id": 0, "attempt": 1}
+V1206 15:19:20.773000 1524181 torch/_subclasses/meta_utils.py:1779] {"describe_source": {"describer_id": 4, "id": 0, "source": "L['x']"}, "compiled_autograd_id": null, "frame_id": 1, "frame_compile_id": 0, "attempt": 1}
+V1206 15:19:20.775000 1524181 torch/_dynamo/output_graph.py:1336] {"dynamo_output_graph": {"sizes": {"l_x_": [4, 4], "sin": [4, 4]}}, "compiled_autograd_id": null, "frame_id": 1, "frame_compile_id": 0, "attempt": 1, "has_payload": "fed8fe8097989f418398de0fb8e36aff"}
 	class GraphModule(torch.nn.Module):
 	    def forward(self, L_x_: "f32[4, 4][4, 1]cpu"):
 	        l_x_ = L_x_
@@ -231,33 +231,33 @@ V1205 21:34:05.563000 1556615 torch/_dynamo/output_graph.py:1336] {"dynamo_outpu
 	        sin: "f32[4, 4][4, 1]cpu" = l_x_.sin();  l_x_ = sin = None
 	        return ()
 	        
-V1205 21:34:05.564000 1556615 torch/_dynamo/utils.py:1288] {"chromium_event": {}, "compiled_autograd_id": null, "frame_id": 1, "frame_compile_id": 0, "attempt": 1, "has_payload": "0d5e8fe1aa871cb254db9e3e15d917e6"}
+V1206 15:19:20.775000 1524181 torch/_dynamo/utils.py:1288] {"chromium_event": {}, "compiled_autograd_id": null, "frame_id": 1, "frame_compile_id": 0, "attempt": 1, "has_payload": "03bf1bc5843e0bf697685810fb375643"}
 	{
 	"name": "backend_compile",
-	"ts": 1733463245564065.0,
+	"ts": 1733527160775399.5,
 	"args": {
 	"fn_name": "OutputGraph.call_user_compiler",
-	"compile_id": "-/1/0"
+	"compile_id": "1/0"
 	},
 	"ph": "B",
 	"cat": "dynamo_timed",
 	"tid": 0,
 	"pid": 0
 	}
-V1205 21:34:05.564000 1556615 torch/_dynamo/utils.py:1288] {"chromium_event": {}, "compiled_autograd_id": null, "frame_id": 1, "frame_compile_id": 0, "attempt": 1, "has_payload": "eefbe17cf610111217c1c1e52f0b6f95"}
+V1206 15:19:20.775000 1524181 torch/_dynamo/utils.py:1288] {"chromium_event": {}, "compiled_autograd_id": null, "frame_id": 1, "frame_compile_id": 0, "attempt": 1, "has_payload": "feab32619774ebe320ba3da5d514a982"}
 	{
 	"name": "backend_compile",
-	"ts": 1733463245564476.5,
+	"ts": 1733527160775618.0,
 	"args": {
 	"fn_name": "OutputGraph.call_user_compiler",
-	"compile_id": "-/1/0"
+	"compile_id": "1/0"
 	},
 	"ph": "E",
 	"cat": "dynamo_timed",
 	"tid": 0,
 	"pid": 0
 	}
-V1205 21:34:05.571000 1556615 torch/_dynamo/guards.py:2315] {"dynamo_cpp_guards_str": {}, "compiled_autograd_id": null, "frame_id": 1, "frame_compile_id": 0, "attempt": 1, "has_payload": "220dc16e6475b9e6ef7e4fa811dd7e15"}
+V1206 15:19:20.779000 1524181 torch/_dynamo/guards.py:2315] {"dynamo_cpp_guards_str": {}, "compiled_autograd_id": null, "frame_id": 1, "frame_compile_id": 0, "attempt": 1, "has_payload": "3aa22d5919e29b46fc9b9765b464e017"}
 	
 	TREE_GUARD_MANAGER:
 	+- RootGuardManager
@@ -270,32 +270,32 @@ V1205 21:34:05.571000 1556615 torch/_dynamo/guards.py:2315] {"dynamo_cpp_guards_
 	| | +- GuardManager: source=L['x'].sin, accessed_by=GetAttrGuardAccessor(sin)
 	| +- GuardManager: source=G, accessed_by=GlobalsGuardAccessor
 	| | +- GuardManager: source=G['torch'], accessed_by=DictGetItemGuardAccessor('torch')
-	| | | +- ID_MATCH: ___check_obj_id(G['torch'], 140142959899360)                
+	| | | +- ID_MATCH: ___check_obj_id(G['torch'], 140385151530416)                
 	| | | +- GuardManager: source=G['torch']._dynamo, accessed_by=GetAttrGuardAccessor(_dynamo)
-	| | | | +- ID_MATCH: ___check_obj_id(G['torch']._dynamo, 140142898023696)        
+	| | | | +- ID_MATCH: ___check_obj_id(G['torch']._dynamo, 140382452240752)        
 	| | | | +- GuardManager: source=G['torch']._dynamo.graph_break, accessed_by=GetAttrGuardAccessor(graph_break)
-	| | | | | +- ID_MATCH: ___check_obj_id(G['torch']._dynamo.graph_break, 140141631665344)
+	| | | | | +- ID_MATCH: ___check_obj_id(G['torch']._dynamo.graph_break, 140380257582464)
 	
-V1205 21:34:05.571000 1556615 torch/_dynamo/utils.py:1288] {"chromium_event": {}, "compiled_autograd_id": null, "frame_id": 1, "frame_compile_id": 0, "attempt": 1, "has_payload": "ae817b8f7943c6537b9e8c951b7b45bb"}
+V1206 15:19:20.779000 1524181 torch/_dynamo/utils.py:1288] {"chromium_event": {}, "compiled_autograd_id": null, "frame_id": 1, "frame_compile_id": 0, "attempt": 1, "has_payload": "b0a86d4ae27b88fbb56b48ad670346a8"}
 	{
 	"name": "entire_frame_compile",
-	"ts": 1733463245571897.5,
+	"ts": 1733527160779562.8,
 	"args": {
 	"fn_name": "_compile.compile_inner",
-	"compile_id": "-/1/0"
+	"compile_id": "1/0"
 	},
 	"ph": "E",
 	"cat": "dynamo_timed",
 	"tid": 0,
 	"pid": 0
 	}
-V1205 21:34:05.576000 1556615 torch/_dynamo/utils.py:1045] {"compilation_metrics": {"aot_autograd_cumulative_compile_time_us": 411, "dynamo_cumulative_compile_time_us": 20493, "frame_key": "2", "co_name": "torch_dynamo_resume_in_fn_at_10717", "co_filename": "/data/users/xmfan/a/pytorch/test/dynamo/test_misc.py", "co_firstlineno": 10717, "cache_size": 0, "accumulated_cache_size": 0, "guard_count": 10, "shape_env_guard_count": 0, "graph_op_count": 1, "graph_node_count": 3, "graph_input_count": 1, "fail_type": null, "fail_reason": null, "fail_user_frame_filename": null, "fail_user_frame_lineno": null, "non_compliant_ops": [], "compliant_custom_ops": [], "restart_reasons": ["'skip function graph_break in file /data/users/xmfan/a/pytorch/torch/_dynamo/decorators.py'"], "dynamo_time_before_restart_s": 0.006140470504760742, "has_guarded_code": true, "config_suppress_errors": false, "config_inline_inbuilt_nn_modules": true, "specialize_float": false, "dynamo_config": "{\"verify_correctness\": false, \"minimum_call_count\": 1, \"dead_code_elimination\": true, \"cache_size_limit\": 8, \"accumulated_cache_size_limit\": 256, \"skip_code_recursive_on_cache_limit_hit\": true, \"fail_on_cache_limit_hit\": false, \"specialize_int\": false, \"specialize_float\": false, \"dynamic_shapes\": true, \"use_lazy_graph_module\": true, \"assume_static_by_default\": true, \"automatic_dynamic_shapes\": true, \"force_parameter_static_shapes\": true, \"force_nn_module_property_static_shapes\": true, \"allow_ignore_mark_dynamic\": false, \"guard_nn_modules\": true, \"guard_nn_modules_using_dict_tags\": true, \"suppress_errors\": false, \"replay_record_enabled\": false, \"rewrite_assert_with_torch_assert\": true, \"disable\": false, \"cprofile\": false, \"skipfiles_inline_module_allowlist\": {}, \"allowed_functions_module_string_ignorelist\": [\"torch._decomp\", \"torch._refs\", \"torch._prims\", \"torch.distributions\", \"torch.testing\"], \"capture_scalar_outputs\": false, \"capture_dynamic_output_shape_ops\": false, \"prefer_deferred_runtime_asserts_over_guards\": false, \"allow_complex_guards_as_runtime_asserts\": false, \"force_unspec_int_unbacked_size_like_on_torchrec_kjt\": false, \"optimize_ddp\": true, \"do_not_emit_runtime_asserts\": false, \"_ddp_optimization_mode\": [\"ddp_optimizer\", \"python_reducer\", \"python_reducer_without_compiled_forward\", \"no_optimization\"], \"skip_torchrec\": true, \"optimize_ddp_lazy_compile\": false, \"skip_fsdp_guards\": true, \"skip_fsdp_hooks\": true, \"skip_nnmodule_hook_guards\": true, \"skip_no_tensor_aliasing_guards_on_parameters\": true, \"raise_on_ctx_manager_usage\": true, \"raise_on_unsafe_aot_autograd\": false, \"error_on_nested_jit_trace\": true, \"error_on_nested_fx_trace\": true, \"allow_rnn\": false, \"capture_sparse_compute\": true, \"error_on_recompile\": false, \"report_guard_failures\": true, \"trace_numpy\": true, \"numpy_default_float\": \"float64\", \"numpy_default_complex\": \"complex128\", \"numpy_default_int\": \"int64\", \"use_numpy_random_stream\": false, \"enable_cpp_guard_manager\": true, \"inline_inbuilt_nn_modules\": true, \"record_compile_time_instruction_count\": false, \"cudagraph_backend_keep_input_mutation\": false, \"cudagraph_backend_support_input_mutation\": false, \"only_allow_pt2_compliant_ops\": false, \"capture_autograd_function\": true, \"capture_func_transforms\": true, \"fake_tensor_cache_enabled\": true, \"fake_tensor_cache_crosscheck_enabled\": false, \"compiled_autograd\": false, \"compiled_autograd_kwargs_override\": {}, \"enable_compiler_collectives\": false, \"automatic_dynamic_local_pgo\": false, \"automatic_dynamic_remote_pgo\": null}", "is_forward": true, "dynamo_compile_time_before_restart_us": 6140}, "compiled_autograd_id": null, "frame_id": 1, "frame_compile_id": 0, "attempt": 1}
-V1205 21:34:05.576000 1556615 torch/_dynamo/utils.py:1288] {"chromium_event": {}, "compiled_autograd_id": null, "frame_id": 1, "frame_compile_id": 0, "attempt": 1, "has_payload": "da69fa561d809b54f17aa05cbc2240bf"}
+V1206 15:19:20.782000 1524181 torch/_dynamo/utils.py:1045] {"compilation_metrics": {"aot_autograd_cumulative_compile_time_us": 218, "dynamo_cumulative_compile_time_us": 10954, "frame_key": "2", "co_name": "torch_dynamo_resume_in_fn_at_10717", "co_filename": "/data/users/xmfan/a/pytorch/test/dynamo/test_misc.py", "co_firstlineno": 10717, "cache_size": 0, "accumulated_cache_size": 0, "guard_count": 10, "shape_env_guard_count": 0, "graph_op_count": 1, "graph_node_count": 3, "graph_input_count": 1, "fail_type": null, "fail_reason": null, "fail_user_frame_filename": null, "fail_user_frame_lineno": null, "non_compliant_ops": [], "compliant_custom_ops": [], "restart_reasons": ["'skip function graph_break in file /data/users/xmfan/a/pytorch/torch/_dynamo/decorators.py'"], "dynamo_time_before_restart_s": 0.0033178329467773438, "has_guarded_code": true, "config_suppress_errors": false, "config_inline_inbuilt_nn_modules": true, "specialize_float": false, "dynamo_config": "{\"verify_correctness\": false, \"minimum_call_count\": 1, \"dead_code_elimination\": true, \"cache_size_limit\": 8, \"accumulated_cache_size_limit\": 256, \"skip_code_recursive_on_cache_limit_hit\": true, \"fail_on_cache_limit_hit\": false, \"specialize_int\": false, \"specialize_float\": false, \"dynamic_shapes\": true, \"use_lazy_graph_module\": true, \"assume_static_by_default\": true, \"automatic_dynamic_shapes\": true, \"force_parameter_static_shapes\": true, \"force_nn_module_property_static_shapes\": true, \"allow_ignore_mark_dynamic\": false, \"guard_nn_modules\": true, \"guard_nn_modules_using_dict_tags\": true, \"suppress_errors\": false, \"replay_record_enabled\": false, \"rewrite_assert_with_torch_assert\": true, \"disable\": false, \"cprofile\": false, \"skipfiles_inline_module_allowlist\": {}, \"allowed_functions_module_string_ignorelist\": [\"torch._refs\", \"torch._decomp\", \"torch.testing\", \"torch.distributions\", \"torch._prims\"], \"capture_scalar_outputs\": false, \"capture_dynamic_output_shape_ops\": false, \"prefer_deferred_runtime_asserts_over_guards\": false, \"allow_complex_guards_as_runtime_asserts\": false, \"force_unspec_int_unbacked_size_like_on_torchrec_kjt\": false, \"optimize_ddp\": true, \"do_not_emit_runtime_asserts\": false, \"_ddp_optimization_mode\": [\"ddp_optimizer\", \"python_reducer\", \"python_reducer_without_compiled_forward\", \"no_optimization\"], \"skip_torchrec\": true, \"optimize_ddp_lazy_compile\": false, \"skip_fsdp_guards\": true, \"skip_fsdp_hooks\": true, \"skip_nnmodule_hook_guards\": true, \"skip_no_tensor_aliasing_guards_on_parameters\": true, \"raise_on_ctx_manager_usage\": true, \"raise_on_unsafe_aot_autograd\": false, \"error_on_nested_jit_trace\": true, \"error_on_nested_fx_trace\": true, \"allow_rnn\": false, \"capture_sparse_compute\": true, \"error_on_recompile\": false, \"report_guard_failures\": true, \"trace_numpy\": true, \"numpy_default_float\": \"float64\", \"numpy_default_complex\": \"complex128\", \"numpy_default_int\": \"int64\", \"use_numpy_random_stream\": false, \"enable_cpp_guard_manager\": true, \"inline_inbuilt_nn_modules\": true, \"record_compile_time_instruction_count\": false, \"cudagraph_backend_keep_input_mutation\": false, \"cudagraph_backend_support_input_mutation\": false, \"only_allow_pt2_compliant_ops\": false, \"capture_autograd_function\": true, \"capture_func_transforms\": true, \"fake_tensor_cache_enabled\": true, \"fake_tensor_cache_crosscheck_enabled\": false, \"compiled_autograd\": false, \"compiled_autograd_kwargs_override\": {}, \"enable_compiler_collectives\": false, \"automatic_dynamic_local_pgo\": false, \"automatic_dynamic_remote_pgo\": null}", "is_forward": true, "dynamo_compile_time_before_restart_us": 3317}, "compiled_autograd_id": null, "frame_id": 1, "frame_compile_id": 0, "attempt": 1}
+V1206 15:19:20.782000 1524181 torch/_dynamo/utils.py:1288] {"chromium_event": {}, "compiled_autograd_id": null, "frame_id": 1, "frame_compile_id": 0, "attempt": 1, "has_payload": "6c9b505889778bead7f6675d888c1206"}
 	{
 	"name": "dynamo",
-	"ts": 1733463245576561.5,
+	"ts": 1733527160782270.0,
 	"args": {
-	"compile_id": "-/1/0",
+	"compile_id": "1/0",
 	"frame_key": "2",
 	"co_name": "torch_dynamo_resume_in_fn_at_10717",
 	"co_filename": "/data/users/xmfan/a/pytorch/test/dynamo/test_misc.py",
@@ -316,45 +316,45 @@ V1205 21:34:05.576000 1556615 torch/_dynamo/utils.py:1288] {"chromium_event": {}
 	"restart_reasons": [
 	"'skip function graph_break in file /data/users/xmfan/a/pytorch/torch/_dynamo/decorators.py'"
 	],
-	"dynamo_time_before_restart_s": 0.006140470504760742,
+	"dynamo_time_before_restart_s": 0.0033178329467773438,
 	"has_guarded_code": true,
-	"dynamo_config": "{\"verify_correctness\": false, \"minimum_call_count\": 1, \"dead_code_elimination\": true, \"cache_size_limit\": 8, \"accumulated_cache_size_limit\": 256, \"skip_code_recursive_on_cache_limit_hit\": true, \"fail_on_cache_limit_hit\": false, \"specialize_int\": false, \"specialize_float\": false, \"dynamic_shapes\": true, \"use_lazy_graph_module\": true, \"assume_static_by_default\": true, \"automatic_dynamic_shapes\": true, \"force_parameter_static_shapes\": true, \"force_nn_module_property_static_shapes\": true, \"allow_ignore_mark_dynamic\": false, \"guard_nn_modules\": true, \"guard_nn_modules_using_dict_tags\": true, \"suppress_errors\": false, \"replay_record_enabled\": false, \"rewrite_assert_with_torch_assert\": true, \"disable\": false, \"cprofile\": false, \"skipfiles_inline_module_allowlist\": {}, \"allowed_functions_module_string_ignorelist\": [\"torch._decomp\", \"torch._refs\", \"torch._prims\", \"torch.distributions\", \"torch.testing\"], \"capture_scalar_outputs\": false, \"capture_dynamic_output_shape_ops\": false, \"prefer_deferred_runtime_asserts_over_guards\": false, \"allow_complex_guards_as_runtime_asserts\": false, \"force_unspec_int_unbacked_size_like_on_torchrec_kjt\": false, \"optimize_ddp\": true, \"do_not_emit_runtime_asserts\": false, \"_ddp_optimization_mode\": [\"ddp_optimizer\", \"python_reducer\", \"python_reducer_without_compiled_forward\", \"no_optimization\"], \"skip_torchrec\": true, \"optimize_ddp_lazy_compile\": false, \"skip_fsdp_guards\": true, \"skip_fsdp_hooks\": true, \"skip_nnmodule_hook_guards\": true, \"skip_no_tensor_aliasing_guards_on_parameters\": true, \"raise_on_ctx_manager_usage\": true, \"raise_on_unsafe_aot_autograd\": false, \"error_on_nested_jit_trace\": true, \"error_on_nested_fx_trace\": true, \"allow_rnn\": false, \"capture_sparse_compute\": true, \"error_on_recompile\": false, \"report_guard_failures\": true, \"trace_numpy\": true, \"numpy_default_float\": \"float64\", \"numpy_default_complex\": \"complex128\", \"numpy_default_int\": \"int64\", \"use_numpy_random_stream\": false, \"enable_cpp_guard_manager\": true, \"inline_inbuilt_nn_modules\": true, \"record_compile_time_instruction_count\": false, \"cudagraph_backend_keep_input_mutation\": false, \"cudagraph_backend_support_input_mutation\": false, \"only_allow_pt2_compliant_ops\": false, \"capture_autograd_function\": true, \"capture_func_transforms\": true, \"fake_tensor_cache_enabled\": true, \"fake_tensor_cache_crosscheck_enabled\": false, \"compiled_autograd\": false, \"compiled_autograd_kwargs_override\": {}, \"enable_compiler_collectives\": false, \"automatic_dynamic_local_pgo\": false, \"automatic_dynamic_remote_pgo\": null}"
+	"dynamo_config": "{\"verify_correctness\": false, \"minimum_call_count\": 1, \"dead_code_elimination\": true, \"cache_size_limit\": 8, \"accumulated_cache_size_limit\": 256, \"skip_code_recursive_on_cache_limit_hit\": true, \"fail_on_cache_limit_hit\": false, \"specialize_int\": false, \"specialize_float\": false, \"dynamic_shapes\": true, \"use_lazy_graph_module\": true, \"assume_static_by_default\": true, \"automatic_dynamic_shapes\": true, \"force_parameter_static_shapes\": true, \"force_nn_module_property_static_shapes\": true, \"allow_ignore_mark_dynamic\": false, \"guard_nn_modules\": true, \"guard_nn_modules_using_dict_tags\": true, \"suppress_errors\": false, \"replay_record_enabled\": false, \"rewrite_assert_with_torch_assert\": true, \"disable\": false, \"cprofile\": false, \"skipfiles_inline_module_allowlist\": {}, \"allowed_functions_module_string_ignorelist\": [\"torch._refs\", \"torch._decomp\", \"torch.testing\", \"torch.distributions\", \"torch._prims\"], \"capture_scalar_outputs\": false, \"capture_dynamic_output_shape_ops\": false, \"prefer_deferred_runtime_asserts_over_guards\": false, \"allow_complex_guards_as_runtime_asserts\": false, \"force_unspec_int_unbacked_size_like_on_torchrec_kjt\": false, \"optimize_ddp\": true, \"do_not_emit_runtime_asserts\": false, \"_ddp_optimization_mode\": [\"ddp_optimizer\", \"python_reducer\", \"python_reducer_without_compiled_forward\", \"no_optimization\"], \"skip_torchrec\": true, \"optimize_ddp_lazy_compile\": false, \"skip_fsdp_guards\": true, \"skip_fsdp_hooks\": true, \"skip_nnmodule_hook_guards\": true, \"skip_no_tensor_aliasing_guards_on_parameters\": true, \"raise_on_ctx_manager_usage\": true, \"raise_on_unsafe_aot_autograd\": false, \"error_on_nested_jit_trace\": true, \"error_on_nested_fx_trace\": true, \"allow_rnn\": false, \"capture_sparse_compute\": true, \"error_on_recompile\": false, \"report_guard_failures\": true, \"trace_numpy\": true, \"numpy_default_float\": \"float64\", \"numpy_default_complex\": \"complex128\", \"numpy_default_int\": \"int64\", \"use_numpy_random_stream\": false, \"enable_cpp_guard_manager\": true, \"inline_inbuilt_nn_modules\": true, \"record_compile_time_instruction_count\": false, \"cudagraph_backend_keep_input_mutation\": false, \"cudagraph_backend_support_input_mutation\": false, \"only_allow_pt2_compliant_ops\": false, \"capture_autograd_function\": true, \"capture_func_transforms\": true, \"fake_tensor_cache_enabled\": true, \"fake_tensor_cache_crosscheck_enabled\": false, \"compiled_autograd\": false, \"compiled_autograd_kwargs_override\": {}, \"enable_compiler_collectives\": false, \"automatic_dynamic_local_pgo\": false, \"automatic_dynamic_remote_pgo\": null}"
 	},
 	"ph": "E",
 	"cat": "dynamo_timed",
 	"tid": 0,
 	"pid": 0
 	}
-V1205 21:34:05.577000 1556615 torch/_dynamo/utils.py:1288] {"chromium_event": {}, "compiled_autograd_id": null, "frame_id": 2, "frame_compile_id": 0, "attempt": 0, "has_payload": "3c2b2c1c6fa65d68c01be441674a77b0"}
+V1206 15:19:20.782000 1524181 torch/_dynamo/utils.py:1288] {"chromium_event": {}, "compiled_autograd_id": null, "frame_id": 2, "frame_compile_id": 0, "attempt": 0, "has_payload": "bb4d2567ed51b41c4b730c4b5e7a18a6"}
 	{
 	"name": "dynamo",
-	"ts": 1733463245577274.0,
+	"ts": 1733527160782667.8,
 	"args": {
-	"compile_id": "-/2/0"
+	"compile_id": "2/0"
 	},
 	"ph": "B",
 	"cat": "dynamo_timed",
 	"tid": 0,
 	"pid": 0
 	}
-V1205 21:34:05.577000 1556615 torch/_dynamo/convert_frame.py:961] {"dynamo_start": {"stack": [{"line": 12143, "name": "<module>", "filename": 1}, {"line": 39, "name": "run_tests", "filename": 2}, {"line": 1353, "name": "run_tests", "filename": 3}, {"line": 102, "name": "__init__", "filename": 4}, {"line": 274, "name": "runTests", "filename": 4}, {"line": 217, "name": "run", "filename": 5}, {"line": 84, "name": "__call__", "filename": 6}, {"line": 122, "name": "run", "filename": 6}, {"line": 84, "name": "__call__", "filename": 6}, {"line": 122, "name": "run", "filename": 6}, {"line": 678, "name": "__call__", "filename": 7}, {"line": 3234, "name": "run", "filename": 3}, {"line": 3206, "name": "_run_custom", "filename": 3}, {"line": 623, "name": "run", "filename": 7}, {"line": 579, "name": "_callTestMethod", "filename": 7}, {"line": 3099, "name": "wrapper", "filename": 3}, {"line": 10725, "name": "test_graph_break_compilation_metrics", "filename": 1}, {"line": 573, "name": "_fn", "filename": 8}, {"line": 10715, "name": "fn", "filename": 1}, {"line": 10719, "name": "torch_dynamo_resume_in_fn_at_10719", "filename": 1}]}, "compiled_autograd_id": null, "frame_id": 2, "frame_compile_id": 0, "attempt": 0}
-V1205 21:34:05.578000 1556615 torch/_dynamo/utils.py:1288] {"chromium_event": {}, "compiled_autograd_id": null, "frame_id": 2, "frame_compile_id": 0, "attempt": 0, "has_payload": "951bfbfb166cfa89c975717153ba7e85"}
+V1206 15:19:20.783000 1524181 torch/_dynamo/convert_frame.py:961] {"dynamo_start": {"stack": [{"line": 12143, "name": "<module>", "filename": 1}, {"line": 39, "name": "run_tests", "filename": 2}, {"line": 1353, "name": "run_tests", "filename": 3}, {"line": 102, "name": "__init__", "filename": 4}, {"line": 274, "name": "runTests", "filename": 4}, {"line": 217, "name": "run", "filename": 5}, {"line": 84, "name": "__call__", "filename": 6}, {"line": 122, "name": "run", "filename": 6}, {"line": 84, "name": "__call__", "filename": 6}, {"line": 122, "name": "run", "filename": 6}, {"line": 678, "name": "__call__", "filename": 7}, {"line": 3234, "name": "run", "filename": 3}, {"line": 3206, "name": "_run_custom", "filename": 3}, {"line": 623, "name": "run", "filename": 7}, {"line": 579, "name": "_callTestMethod", "filename": 7}, {"line": 3099, "name": "wrapper", "filename": 3}, {"line": 10725, "name": "test_graph_break_compilation_metrics", "filename": 1}, {"line": 573, "name": "_fn", "filename": 8}, {"line": 10715, "name": "fn", "filename": 1}, {"line": 10719, "name": "torch_dynamo_resume_in_fn_at_10719", "filename": 1}]}, "compiled_autograd_id": null, "frame_id": 2, "frame_compile_id": 0, "attempt": 0}
+V1206 15:19:20.783000 1524181 torch/_dynamo/utils.py:1288] {"chromium_event": {}, "compiled_autograd_id": null, "frame_id": 2, "frame_compile_id": 0, "attempt": 0, "has_payload": "39b2e5ddae6d3d44871627453d2f4cd5"}
 	{
 	"name": "entire_frame_compile",
-	"ts": 1733463245578147.0,
+	"ts": 1733527160783133.2,
 	"args": {
 	"fn_name": "_compile.compile_inner",
-	"compile_id": "-/2/0"
+	"compile_id": "2/0"
 	},
 	"ph": "B",
 	"cat": "dynamo_timed",
 	"tid": 0,
 	"pid": 0
 	}
-V1205 21:34:05.579000 1556615 torch/_subclasses/meta_utils.py:241] {"describe_storage": {"id": 0, "describer_id": 6, "size": 64}, "compiled_autograd_id": null, "frame_id": 2, "frame_compile_id": 0, "attempt": 0}
-V1205 21:34:05.580000 1556615 torch/_subclasses/meta_utils.py:454] {"describe_tensor": {"id": 0, "ndim": 2, "dtype": "torch.float32", "device": "device(type='cpu')", "size": [4, 4], "is_leaf": true, "stride": [4, 1], "storage": 0, "view_func": "<built-in method _view_func_unsafe of Tensor object at 0x7f750d3cf8f0>", "describer_id": 6}, "compiled_autograd_id": null, "frame_id": 2, "frame_compile_id": 0, "attempt": 0}
-V1205 21:34:05.580000 1556615 torch/_subclasses/meta_utils.py:1779] {"describe_source": {"describer_id": 6, "id": 0, "source": "L['x']"}, "compiled_autograd_id": null, "frame_id": 2, "frame_compile_id": 0, "attempt": 0}
-V1205 21:34:05.583000 1556615 torch/_dynamo/output_graph.py:1336] {"dynamo_output_graph": {"sizes": {"l_x_": [4, 4], "cos": [4, 4]}}, "compiled_autograd_id": null, "frame_id": 2, "frame_compile_id": 0, "attempt": 0, "has_payload": "fde42e3550a073ebc24c06419319a4cb"}
+V1206 15:19:20.784000 1524181 torch/_subclasses/meta_utils.py:241] {"describe_storage": {"id": 0, "describer_id": 6, "size": 64}, "compiled_autograd_id": null, "frame_id": 2, "frame_compile_id": 0, "attempt": 0}
+V1206 15:19:20.784000 1524181 torch/_subclasses/meta_utils.py:454] {"describe_tensor": {"id": 0, "ndim": 2, "dtype": "torch.float32", "device": "device(type='cpu')", "size": [4, 4], "is_leaf": true, "stride": [4, 1], "storage": 0, "view_func": "<built-in method _view_func_unsafe of Tensor object at 0x7faa117385f0>", "describer_id": 6}, "compiled_autograd_id": null, "frame_id": 2, "frame_compile_id": 0, "attempt": 0}
+V1206 15:19:20.784000 1524181 torch/_subclasses/meta_utils.py:1779] {"describe_source": {"describer_id": 6, "id": 0, "source": "L['x']"}, "compiled_autograd_id": null, "frame_id": 2, "frame_compile_id": 0, "attempt": 0}
+V1206 15:19:20.785000 1524181 torch/_dynamo/output_graph.py:1336] {"dynamo_output_graph": {"sizes": {"l_x_": [4, 4], "cos": [4, 4]}}, "compiled_autograd_id": null, "frame_id": 2, "frame_compile_id": 0, "attempt": 0, "has_payload": "fde42e3550a073ebc24c06419319a4cb"}
 	class GraphModule(torch.nn.Module):
 	    def forward(self, L_x_: "f32[4, 4][4, 1]cpu"):
 	        l_x_ = L_x_
@@ -363,33 +363,33 @@ V1205 21:34:05.583000 1556615 torch/_dynamo/output_graph.py:1336] {"dynamo_outpu
 	        cos: "f32[4, 4][4, 1]cpu" = l_x_.cos();  l_x_ = None
 	        return (cos,)
 	        
-V1205 21:34:05.583000 1556615 torch/_dynamo/utils.py:1288] {"chromium_event": {}, "compiled_autograd_id": null, "frame_id": 2, "frame_compile_id": 0, "attempt": 0, "has_payload": "7ced6acf6de2a8fa28be17042dc7b1ec"}
+V1206 15:19:20.786000 1524181 torch/_dynamo/utils.py:1288] {"chromium_event": {}, "compiled_autograd_id": null, "frame_id": 2, "frame_compile_id": 0, "attempt": 0, "has_payload": "a5a9a5c382c5b5e7f0e04a511b1fb0ad"}
 	{
 	"name": "backend_compile",
-	"ts": 1733463245583850.2,
+	"ts": 1733527160786318.0,
 	"args": {
 	"fn_name": "OutputGraph.call_user_compiler",
-	"compile_id": "-/2/0"
+	"compile_id": "2/0"
 	},
 	"ph": "B",
 	"cat": "dynamo_timed",
 	"tid": 0,
 	"pid": 0
 	}
-V1205 21:34:05.584000 1556615 torch/_dynamo/utils.py:1288] {"chromium_event": {}, "compiled_autograd_id": null, "frame_id": 2, "frame_compile_id": 0, "attempt": 0, "has_payload": "c61131b8d775fd55bb955844aadb1433"}
+V1206 15:19:20.786000 1524181 torch/_dynamo/utils.py:1288] {"chromium_event": {}, "compiled_autograd_id": null, "frame_id": 2, "frame_compile_id": 0, "attempt": 0, "has_payload": "afb3c76c9a540a3d948e293085b45232"}
 	{
 	"name": "backend_compile",
-	"ts": 1733463245584239.8,
+	"ts": 1733527160786532.2,
 	"args": {
 	"fn_name": "OutputGraph.call_user_compiler",
-	"compile_id": "-/2/0"
+	"compile_id": "2/0"
 	},
 	"ph": "E",
 	"cat": "dynamo_timed",
 	"tid": 0,
 	"pid": 0
 	}
-V1205 21:34:05.586000 1556615 torch/_dynamo/guards.py:2315] {"dynamo_cpp_guards_str": {}, "compiled_autograd_id": null, "frame_id": 2, "frame_compile_id": 0, "attempt": 0, "has_payload": "c5544972e90daf8e28289162d4be0b2b"}
+V1206 15:19:20.787000 1524181 torch/_dynamo/guards.py:2315] {"dynamo_cpp_guards_str": {}, "compiled_autograd_id": null, "frame_id": 2, "frame_compile_id": 0, "attempt": 0, "has_payload": "c5544972e90daf8e28289162d4be0b2b"}
 	
 	TREE_GUARD_MANAGER:
 	+- RootGuardManager
@@ -401,26 +401,26 @@ V1205 21:34:05.586000 1556615 torch/_dynamo/guards.py:2315] {"dynamo_cpp_guards_
 	| | +- NO_HASATTR: hasattr(L['x'], '_dynamo_dynamic_indices') == False         
 	| | +- GuardManager: source=L['x'].cos, accessed_by=GetAttrGuardAccessor(cos)
 	
-V1205 21:34:05.587000 1556615 torch/_dynamo/utils.py:1288] {"chromium_event": {}, "compiled_autograd_id": null, "frame_id": 2, "frame_compile_id": 0, "attempt": 0, "has_payload": "10675898b7337b976e2edb5254ef378f"}
+V1206 15:19:20.788000 1524181 torch/_dynamo/utils.py:1288] {"chromium_event": {}, "compiled_autograd_id": null, "frame_id": 2, "frame_compile_id": 0, "attempt": 0, "has_payload": "5f1d06d042031cff969b5958207bd92d"}
 	{
 	"name": "entire_frame_compile",
-	"ts": 1733463245587106.2,
+	"ts": 1733527160788106.5,
 	"args": {
 	"fn_name": "_compile.compile_inner",
-	"compile_id": "-/2/0"
+	"compile_id": "2/0"
 	},
 	"ph": "E",
 	"cat": "dynamo_timed",
 	"tid": 0,
 	"pid": 0
 	}
-V1205 21:34:05.591000 1556615 torch/_dynamo/utils.py:1045] {"compilation_metrics": {"aot_autograd_cumulative_compile_time_us": 389, "dynamo_cumulative_compile_time_us": 8959, "frame_key": "3", "co_name": "torch_dynamo_resume_in_fn_at_10719", "co_filename": "/data/users/xmfan/a/pytorch/test/dynamo/test_misc.py", "co_firstlineno": 10719, "cache_size": 0, "accumulated_cache_size": 0, "guard_count": 7, "shape_env_guard_count": 0, "graph_op_count": 1, "graph_node_count": 3, "graph_input_count": 1, "fail_type": null, "fail_reason": null, "fail_user_frame_filename": null, "fail_user_frame_lineno": null, "non_compliant_ops": [], "compliant_custom_ops": [], "restart_reasons": [], "dynamo_time_before_restart_s": 0.0, "has_guarded_code": true, "config_suppress_errors": false, "config_inline_inbuilt_nn_modules": true, "specialize_float": false, "dynamo_config": "{\"verify_correctness\": false, \"minimum_call_count\": 1, \"dead_code_elimination\": true, \"cache_size_limit\": 8, \"accumulated_cache_size_limit\": 256, \"skip_code_recursive_on_cache_limit_hit\": true, \"fail_on_cache_limit_hit\": false, \"specialize_int\": false, \"specialize_float\": false, \"dynamic_shapes\": true, \"use_lazy_graph_module\": true, \"assume_static_by_default\": true, \"automatic_dynamic_shapes\": true, \"force_parameter_static_shapes\": true, \"force_nn_module_property_static_shapes\": true, \"allow_ignore_mark_dynamic\": false, \"guard_nn_modules\": true, \"guard_nn_modules_using_dict_tags\": true, \"suppress_errors\": false, \"replay_record_enabled\": false, \"rewrite_assert_with_torch_assert\": true, \"disable\": false, \"cprofile\": false, \"skipfiles_inline_module_allowlist\": {}, \"allowed_functions_module_string_ignorelist\": [\"torch._decomp\", \"torch._refs\", \"torch._prims\", \"torch.distributions\", \"torch.testing\"], \"capture_scalar_outputs\": false, \"capture_dynamic_output_shape_ops\": false, \"prefer_deferred_runtime_asserts_over_guards\": false, \"allow_complex_guards_as_runtime_asserts\": false, \"force_unspec_int_unbacked_size_like_on_torchrec_kjt\": false, \"optimize_ddp\": true, \"do_not_emit_runtime_asserts\": false, \"_ddp_optimization_mode\": [\"ddp_optimizer\", \"python_reducer\", \"python_reducer_without_compiled_forward\", \"no_optimization\"], \"skip_torchrec\": true, \"optimize_ddp_lazy_compile\": false, \"skip_fsdp_guards\": true, \"skip_fsdp_hooks\": true, \"skip_nnmodule_hook_guards\": true, \"skip_no_tensor_aliasing_guards_on_parameters\": true, \"raise_on_ctx_manager_usage\": true, \"raise_on_unsafe_aot_autograd\": false, \"error_on_nested_jit_trace\": true, \"error_on_nested_fx_trace\": true, \"allow_rnn\": false, \"capture_sparse_compute\": true, \"error_on_recompile\": false, \"report_guard_failures\": true, \"trace_numpy\": true, \"numpy_default_float\": \"float64\", \"numpy_default_complex\": \"complex128\", \"numpy_default_int\": \"int64\", \"use_numpy_random_stream\": false, \"enable_cpp_guard_manager\": true, \"inline_inbuilt_nn_modules\": true, \"record_compile_time_instruction_count\": false, \"cudagraph_backend_keep_input_mutation\": false, \"cudagraph_backend_support_input_mutation\": false, \"only_allow_pt2_compliant_ops\": false, \"capture_autograd_function\": true, \"capture_func_transforms\": true, \"fake_tensor_cache_enabled\": true, \"fake_tensor_cache_crosscheck_enabled\": false, \"compiled_autograd\": false, \"compiled_autograd_kwargs_override\": {}, \"enable_compiler_collectives\": false, \"automatic_dynamic_local_pgo\": false, \"automatic_dynamic_remote_pgo\": null}", "is_forward": true, "dynamo_compile_time_before_restart_us": 0}, "compiled_autograd_id": null, "frame_id": 2, "frame_compile_id": 0, "attempt": 0}
-V1205 21:34:05.591000 1556615 torch/_dynamo/utils.py:1288] {"chromium_event": {}, "compiled_autograd_id": null, "frame_id": 2, "frame_compile_id": 0, "attempt": 0, "has_payload": "b84174e8de18120536486832288b94e5"}
+V1206 15:19:20.790000 1524181 torch/_dynamo/utils.py:1045] {"compilation_metrics": {"aot_autograd_cumulative_compile_time_us": 214, "dynamo_cumulative_compile_time_us": 4973, "frame_key": "3", "co_name": "torch_dynamo_resume_in_fn_at_10719", "co_filename": "/data/users/xmfan/a/pytorch/test/dynamo/test_misc.py", "co_firstlineno": 10719, "cache_size": 0, "accumulated_cache_size": 0, "guard_count": 7, "shape_env_guard_count": 0, "graph_op_count": 1, "graph_node_count": 3, "graph_input_count": 1, "fail_type": null, "fail_reason": null, "fail_user_frame_filename": null, "fail_user_frame_lineno": null, "non_compliant_ops": [], "compliant_custom_ops": [], "restart_reasons": [], "dynamo_time_before_restart_s": 0.0, "has_guarded_code": true, "config_suppress_errors": false, "config_inline_inbuilt_nn_modules": true, "specialize_float": false, "dynamo_config": "{\"verify_correctness\": false, \"minimum_call_count\": 1, \"dead_code_elimination\": true, \"cache_size_limit\": 8, \"accumulated_cache_size_limit\": 256, \"skip_code_recursive_on_cache_limit_hit\": true, \"fail_on_cache_limit_hit\": false, \"specialize_int\": false, \"specialize_float\": false, \"dynamic_shapes\": true, \"use_lazy_graph_module\": true, \"assume_static_by_default\": true, \"automatic_dynamic_shapes\": true, \"force_parameter_static_shapes\": true, \"force_nn_module_property_static_shapes\": true, \"allow_ignore_mark_dynamic\": false, \"guard_nn_modules\": true, \"guard_nn_modules_using_dict_tags\": true, \"suppress_errors\": false, \"replay_record_enabled\": false, \"rewrite_assert_with_torch_assert\": true, \"disable\": false, \"cprofile\": false, \"skipfiles_inline_module_allowlist\": {}, \"allowed_functions_module_string_ignorelist\": [\"torch._refs\", \"torch._decomp\", \"torch.testing\", \"torch.distributions\", \"torch._prims\"], \"capture_scalar_outputs\": false, \"capture_dynamic_output_shape_ops\": false, \"prefer_deferred_runtime_asserts_over_guards\": false, \"allow_complex_guards_as_runtime_asserts\": false, \"force_unspec_int_unbacked_size_like_on_torchrec_kjt\": false, \"optimize_ddp\": true, \"do_not_emit_runtime_asserts\": false, \"_ddp_optimization_mode\": [\"ddp_optimizer\", \"python_reducer\", \"python_reducer_without_compiled_forward\", \"no_optimization\"], \"skip_torchrec\": true, \"optimize_ddp_lazy_compile\": false, \"skip_fsdp_guards\": true, \"skip_fsdp_hooks\": true, \"skip_nnmodule_hook_guards\": true, \"skip_no_tensor_aliasing_guards_on_parameters\": true, \"raise_on_ctx_manager_usage\": true, \"raise_on_unsafe_aot_autograd\": false, \"error_on_nested_jit_trace\": true, \"error_on_nested_fx_trace\": true, \"allow_rnn\": false, \"capture_sparse_compute\": true, \"error_on_recompile\": false, \"report_guard_failures\": true, \"trace_numpy\": true, \"numpy_default_float\": \"float64\", \"numpy_default_complex\": \"complex128\", \"numpy_default_int\": \"int64\", \"use_numpy_random_stream\": false, \"enable_cpp_guard_manager\": true, \"inline_inbuilt_nn_modules\": true, \"record_compile_time_instruction_count\": false, \"cudagraph_backend_keep_input_mutation\": false, \"cudagraph_backend_support_input_mutation\": false, \"only_allow_pt2_compliant_ops\": false, \"capture_autograd_function\": true, \"capture_func_transforms\": true, \"fake_tensor_cache_enabled\": true, \"fake_tensor_cache_crosscheck_enabled\": false, \"compiled_autograd\": false, \"compiled_autograd_kwargs_override\": {}, \"enable_compiler_collectives\": false, \"automatic_dynamic_local_pgo\": false, \"automatic_dynamic_remote_pgo\": null}", "is_forward": true, "dynamo_compile_time_before_restart_us": 0}, "compiled_autograd_id": null, "frame_id": 2, "frame_compile_id": 0, "attempt": 0}
+V1206 15:19:20.790000 1524181 torch/_dynamo/utils.py:1288] {"chromium_event": {}, "compiled_autograd_id": null, "frame_id": 2, "frame_compile_id": 0, "attempt": 0, "has_payload": "95d1d0e5bdf1c32eb5fa5941788bb85f"}
 	{
 	"name": "dynamo",
-	"ts": 1733463245591709.0,
+	"ts": 1733527160790764.0,
 	"args": {
-	"compile_id": "-/2/0",
+	"compile_id": "2/0",
 	"frame_key": "3",
 	"co_name": "torch_dynamo_resume_in_fn_at_10719",
 	"co_filename": "/data/users/xmfan/a/pytorch/test/dynamo/test_misc.py",
@@ -441,43 +441,43 @@ V1205 21:34:05.591000 1556615 torch/_dynamo/utils.py:1288] {"chromium_event": {}
 	"restart_reasons": [],
 	"dynamo_time_before_restart_s": 0.0,
 	"has_guarded_code": true,
-	"dynamo_config": "{\"verify_correctness\": false, \"minimum_call_count\": 1, \"dead_code_elimination\": true, \"cache_size_limit\": 8, \"accumulated_cache_size_limit\": 256, \"skip_code_recursive_on_cache_limit_hit\": true, \"fail_on_cache_limit_hit\": false, \"specialize_int\": false, \"specialize_float\": false, \"dynamic_shapes\": true, \"use_lazy_graph_module\": true, \"assume_static_by_default\": true, \"automatic_dynamic_shapes\": true, \"force_parameter_static_shapes\": true, \"force_nn_module_property_static_shapes\": true, \"allow_ignore_mark_dynamic\": false, \"guard_nn_modules\": true, \"guard_nn_modules_using_dict_tags\": true, \"suppress_errors\": false, \"replay_record_enabled\": false, \"rewrite_assert_with_torch_assert\": true, \"disable\": false, \"cprofile\": false, \"skipfiles_inline_module_allowlist\": {}, \"allowed_functions_module_string_ignorelist\": [\"torch._decomp\", \"torch._refs\", \"torch._prims\", \"torch.distributions\", \"torch.testing\"], \"capture_scalar_outputs\": false, \"capture_dynamic_output_shape_ops\": false, \"prefer_deferred_runtime_asserts_over_guards\": false, \"allow_complex_guards_as_runtime_asserts\": false, \"force_unspec_int_unbacked_size_like_on_torchrec_kjt\": false, \"optimize_ddp\": true, \"do_not_emit_runtime_asserts\": false, \"_ddp_optimization_mode\": [\"ddp_optimizer\", \"python_reducer\", \"python_reducer_without_compiled_forward\", \"no_optimization\"], \"skip_torchrec\": true, \"optimize_ddp_lazy_compile\": false, \"skip_fsdp_guards\": true, \"skip_fsdp_hooks\": true, \"skip_nnmodule_hook_guards\": true, \"skip_no_tensor_aliasing_guards_on_parameters\": true, \"raise_on_ctx_manager_usage\": true, \"raise_on_unsafe_aot_autograd\": false, \"error_on_nested_jit_trace\": true, \"error_on_nested_fx_trace\": true, \"allow_rnn\": false, \"capture_sparse_compute\": true, \"error_on_recompile\": false, \"report_guard_failures\": true, \"trace_numpy\": true, \"numpy_default_float\": \"float64\", \"numpy_default_complex\": \"complex128\", \"numpy_default_int\": \"int64\", \"use_numpy_random_stream\": false, \"enable_cpp_guard_manager\": true, \"inline_inbuilt_nn_modules\": true, \"record_compile_time_instruction_count\": false, \"cudagraph_backend_keep_input_mutation\": false, \"cudagraph_backend_support_input_mutation\": false, \"only_allow_pt2_compliant_ops\": false, \"capture_autograd_function\": true, \"capture_func_transforms\": true, \"fake_tensor_cache_enabled\": true, \"fake_tensor_cache_crosscheck_enabled\": false, \"compiled_autograd\": false, \"compiled_autograd_kwargs_override\": {}, \"enable_compiler_collectives\": false, \"automatic_dynamic_local_pgo\": false, \"automatic_dynamic_remote_pgo\": null}"
+	"dynamo_config": "{\"verify_correctness\": false, \"minimum_call_count\": 1, \"dead_code_elimination\": true, \"cache_size_limit\": 8, \"accumulated_cache_size_limit\": 256, \"skip_code_recursive_on_cache_limit_hit\": true, \"fail_on_cache_limit_hit\": false, \"specialize_int\": false, \"specialize_float\": false, \"dynamic_shapes\": true, \"use_lazy_graph_module\": true, \"assume_static_by_default\": true, \"automatic_dynamic_shapes\": true, \"force_parameter_static_shapes\": true, \"force_nn_module_property_static_shapes\": true, \"allow_ignore_mark_dynamic\": false, \"guard_nn_modules\": true, \"guard_nn_modules_using_dict_tags\": true, \"suppress_errors\": false, \"replay_record_enabled\": false, \"rewrite_assert_with_torch_assert\": true, \"disable\": false, \"cprofile\": false, \"skipfiles_inline_module_allowlist\": {}, \"allowed_functions_module_string_ignorelist\": [\"torch._refs\", \"torch._decomp\", \"torch.testing\", \"torch.distributions\", \"torch._prims\"], \"capture_scalar_outputs\": false, \"capture_dynamic_output_shape_ops\": false, \"prefer_deferred_runtime_asserts_over_guards\": false, \"allow_complex_guards_as_runtime_asserts\": false, \"force_unspec_int_unbacked_size_like_on_torchrec_kjt\": false, \"optimize_ddp\": true, \"do_not_emit_runtime_asserts\": false, \"_ddp_optimization_mode\": [\"ddp_optimizer\", \"python_reducer\", \"python_reducer_without_compiled_forward\", \"no_optimization\"], \"skip_torchrec\": true, \"optimize_ddp_lazy_compile\": false, \"skip_fsdp_guards\": true, \"skip_fsdp_hooks\": true, \"skip_nnmodule_hook_guards\": true, \"skip_no_tensor_aliasing_guards_on_parameters\": true, \"raise_on_ctx_manager_usage\": true, \"raise_on_unsafe_aot_autograd\": false, \"error_on_nested_jit_trace\": true, \"error_on_nested_fx_trace\": true, \"allow_rnn\": false, \"capture_sparse_compute\": true, \"error_on_recompile\": false, \"report_guard_failures\": true, \"trace_numpy\": true, \"numpy_default_float\": \"float64\", \"numpy_default_complex\": \"complex128\", \"numpy_default_int\": \"int64\", \"use_numpy_random_stream\": false, \"enable_cpp_guard_manager\": true, \"inline_inbuilt_nn_modules\": true, \"record_compile_time_instruction_count\": false, \"cudagraph_backend_keep_input_mutation\": false, \"cudagraph_backend_support_input_mutation\": false, \"only_allow_pt2_compliant_ops\": false, \"capture_autograd_function\": true, \"capture_func_transforms\": true, \"fake_tensor_cache_enabled\": true, \"fake_tensor_cache_crosscheck_enabled\": false, \"compiled_autograd\": false, \"compiled_autograd_kwargs_override\": {}, \"enable_compiler_collectives\": false, \"automatic_dynamic_local_pgo\": false, \"automatic_dynamic_remote_pgo\": null}"
 	},
 	"ph": "E",
 	"cat": "dynamo_timed",
 	"tid": 0,
 	"pid": 0
 	}
-V1205 21:34:07.712000 1556615 torch/_dynamo/utils.py:1288] {"chromium_event": {}, "compiled_autograd_id": null, "frame_id": 0, "frame_compile_id": 0, "attempt": 0, "has_payload": "64af8e0633e113cc51f5219e4e76c092"}
+V1206 15:19:20.979000 1524181 torch/_dynamo/utils.py:1288] {"chromium_event": {}, "compiled_autograd_id": null, "frame_id": 0, "frame_compile_id": 0, "attempt": 0, "has_payload": "9daa2219e584575027e227930ae710f3"}
 	{
 	"name": "dynamo",
-	"ts": 1733463247711890.8,
+	"ts": 1733527160979577.0,
 	"args": {
-	"compile_id": "-/0/0"
+	"compile_id": "0/0"
 	},
 	"ph": "B",
 	"cat": "dynamo_timed",
 	"tid": 0,
 	"pid": 0
 	}
-V1205 21:34:07.712000 1556615 torch/_dynamo/convert_frame.py:961] {"dynamo_start": {"stack": [{"line": 12143, "name": "<module>", "filename": 1}, {"line": 39, "name": "run_tests", "filename": 2}, {"line": 1353, "name": "run_tests", "filename": 3}, {"line": 102, "name": "__init__", "filename": 4}, {"line": 274, "name": "runTests", "filename": 4}, {"line": 217, "name": "run", "filename": 5}, {"line": 84, "name": "__call__", "filename": 6}, {"line": 122, "name": "run", "filename": 6}, {"line": 84, "name": "__call__", "filename": 6}, {"line": 122, "name": "run", "filename": 6}, {"line": 678, "name": "__call__", "filename": 7}, {"line": 3234, "name": "run", "filename": 3}, {"line": 3206, "name": "_run_custom", "filename": 3}, {"line": 623, "name": "run", "filename": 7}, {"line": 579, "name": "_callTestMethod", "filename": 7}, {"line": 3099, "name": "wrapper", "filename": 3}, {"line": 10765, "name": "test_graph_break_compilation_metrics_on_failure", "filename": 1}, {"line": 10755, "name": "fn", "filename": 1}]}, "compiled_autograd_id": null, "frame_id": 0, "frame_compile_id": 0, "attempt": 0}
-V1205 21:34:07.713000 1556615 torch/_dynamo/utils.py:1288] {"chromium_event": {}, "compiled_autograd_id": null, "frame_id": 0, "frame_compile_id": 0, "attempt": 0, "has_payload": "27e926f8091d3c79456f0ac950bde049"}
+V1206 15:19:20.980000 1524181 torch/_dynamo/convert_frame.py:961] {"dynamo_start": {"stack": [{"line": 12143, "name": "<module>", "filename": 1}, {"line": 39, "name": "run_tests", "filename": 2}, {"line": 1353, "name": "run_tests", "filename": 3}, {"line": 102, "name": "__init__", "filename": 4}, {"line": 274, "name": "runTests", "filename": 4}, {"line": 217, "name": "run", "filename": 5}, {"line": 84, "name": "__call__", "filename": 6}, {"line": 122, "name": "run", "filename": 6}, {"line": 84, "name": "__call__", "filename": 6}, {"line": 122, "name": "run", "filename": 6}, {"line": 678, "name": "__call__", "filename": 7}, {"line": 3234, "name": "run", "filename": 3}, {"line": 3206, "name": "_run_custom", "filename": 3}, {"line": 623, "name": "run", "filename": 7}, {"line": 579, "name": "_callTestMethod", "filename": 7}, {"line": 3099, "name": "wrapper", "filename": 3}, {"line": 10765, "name": "test_graph_break_compilation_metrics_on_failure", "filename": 1}, {"line": 10755, "name": "fn", "filename": 1}]}, "compiled_autograd_id": null, "frame_id": 0, "frame_compile_id": 0, "attempt": 0}
+V1206 15:19:20.980000 1524181 torch/_dynamo/utils.py:1288] {"chromium_event": {}, "compiled_autograd_id": null, "frame_id": 0, "frame_compile_id": 0, "attempt": 0, "has_payload": "b19804eb17a0afa33f8303cc2f33751f"}
 	{
 	"name": "entire_frame_compile",
-	"ts": 1733463247713022.2,
+	"ts": 1733527160980233.2,
 	"args": {
 	"fn_name": "_compile.compile_inner",
-	"compile_id": "-/0/0"
+	"compile_id": "0/0"
 	},
 	"ph": "B",
 	"cat": "dynamo_timed",
 	"tid": 0,
 	"pid": 0
 	}
-V1205 21:34:07.715000 1556615 torch/_subclasses/meta_utils.py:241] {"describe_storage": {"id": 0, "describer_id": 8, "size": 64}, "compiled_autograd_id": null, "frame_id": 0, "frame_compile_id": 0, "attempt": 0}
-V1205 21:34:07.715000 1556615 torch/_subclasses/meta_utils.py:454] {"describe_tensor": {"id": 0, "ndim": 2, "dtype": "torch.float32", "device": "device(type='cpu')", "size": [4, 4], "is_leaf": true, "stride": [4, 1], "storage": 0, "view_func": "<built-in method _view_func_unsafe of Tensor object at 0x7f7504f9c710>", "describer_id": 8}, "compiled_autograd_id": null, "frame_id": 0, "frame_compile_id": 0, "attempt": 0}
-V1205 21:34:07.715000 1556615 torch/_subclasses/meta_utils.py:1779] {"describe_source": {"describer_id": 8, "id": 0, "source": "L['x']"}, "compiled_autograd_id": null, "frame_id": 0, "frame_compile_id": 0, "attempt": 0}
-V1205 21:34:07.720000 1556615 torch/_dynamo/output_graph.py:1336] {"dynamo_output_graph": {"sizes": {"l_x_": [4, 4], "sin": [4, 4]}}, "compiled_autograd_id": null, "frame_id": 0, "frame_compile_id": 0, "attempt": 0, "has_payload": "289c7de0221d9f71a5513269eb25c1a2"}
+V1206 15:19:20.981000 1524181 torch/_subclasses/meta_utils.py:241] {"describe_storage": {"id": 0, "describer_id": 8, "size": 64}, "compiled_autograd_id": null, "frame_id": 0, "frame_compile_id": 0, "attempt": 0}
+V1206 15:19:20.981000 1524181 torch/_subclasses/meta_utils.py:454] {"describe_tensor": {"id": 0, "ndim": 2, "dtype": "torch.float32", "device": "device(type='cpu')", "size": [4, 4], "is_leaf": true, "stride": [4, 1], "storage": 0, "view_func": "<built-in method _view_func_unsafe of Tensor object at 0x7faa113e8830>", "describer_id": 8}, "compiled_autograd_id": null, "frame_id": 0, "frame_compile_id": 0, "attempt": 0}
+V1206 15:19:20.981000 1524181 torch/_subclasses/meta_utils.py:1779] {"describe_source": {"describer_id": 8, "id": 0, "source": "L['x']"}, "compiled_autograd_id": null, "frame_id": 0, "frame_compile_id": 0, "attempt": 0}
+V1206 15:19:20.983000 1524181 torch/_dynamo/output_graph.py:1336] {"dynamo_output_graph": {"sizes": {"l_x_": [4, 4], "sin": [4, 4]}}, "compiled_autograd_id": null, "frame_id": 0, "frame_compile_id": 0, "attempt": 0, "has_payload": "289c7de0221d9f71a5513269eb25c1a2"}
 	class GraphModule(torch.nn.Module):
 	    def forward(self, L_x_: "f32[4, 4][4, 1]cpu"):
 	        l_x_ = L_x_
@@ -486,46 +486,46 @@ V1205 21:34:07.720000 1556615 torch/_dynamo/output_graph.py:1336] {"dynamo_outpu
 	        sin: "f32[4, 4][4, 1]cpu" = l_x_.sin();  l_x_ = None
 	        return (sin,)
 	        
-V1205 21:34:07.720000 1556615 torch/_dynamo/utils.py:1288] {"chromium_event": {}, "compiled_autograd_id": null, "frame_id": 0, "frame_compile_id": 0, "attempt": 0, "has_payload": "f0ed19bee2d03bb6faa7ff5eafbc6838"}
+V1206 15:19:20.984000 1524181 torch/_dynamo/utils.py:1288] {"chromium_event": {}, "compiled_autograd_id": null, "frame_id": 0, "frame_compile_id": 0, "attempt": 0, "has_payload": "b66a10af2172713be017fe217480e433"}
 	{
 	"name": "backend_compile",
-	"ts": 1733463247720867.8,
+	"ts": 1733527160984193.0,
 	"args": {
 	"fn_name": "OutputGraph.call_user_compiler",
-	"compile_id": "-/0/0"
+	"compile_id": "0/0"
 	},
 	"ph": "B",
 	"cat": "dynamo_timed",
 	"tid": 0,
 	"pid": 0
 	}
-V1205 21:34:07.721000 1556615 torch/_dynamo/utils.py:1288] {"chromium_event": {}, "compiled_autograd_id": null, "frame_id": 0, "frame_compile_id": 0, "attempt": 0, "has_payload": "1ad935d71451a056e8e66b459e76ae83"}
+V1206 15:19:20.984000 1524181 torch/_dynamo/utils.py:1288] {"chromium_event": {}, "compiled_autograd_id": null, "frame_id": 0, "frame_compile_id": 0, "attempt": 0, "has_payload": "4fbd69f2113763626d452ced55f6934e"}
 	{
 	"name": "backend_compile",
-	"ts": 1733463247721325.5,
+	"ts": 1733527160984428.0,
 	"args": {
 	"fn_name": "OutputGraph.call_user_compiler",
-	"compile_id": "-/0/0"
+	"compile_id": "0/0"
 	},
 	"ph": "E",
 	"cat": "dynamo_timed",
 	"tid": 0,
 	"pid": 0
 	}
-V1205 21:34:07.721000 1556615 torch/_dynamo/utils.py:1288] {"chromium_event": {}, "compiled_autograd_id": null, "frame_id": 0, "frame_compile_id": 0, "attempt": 0, "has_payload": "397f1eb49d1c5ab22137cef73175815e"}
+V1206 15:19:20.984000 1524181 torch/_dynamo/utils.py:1288] {"chromium_event": {}, "compiled_autograd_id": null, "frame_id": 0, "frame_compile_id": 0, "attempt": 0, "has_payload": "d5551403b2946d84819009efa6f04131"}
 	{
 	"name": "entire_frame_compile",
-	"ts": 1733463247721882.0,
+	"ts": 1733527160984732.5,
 	"args": {
 	"fn_name": "_compile.compile_inner",
-	"compile_id": "-/0/0"
+	"compile_id": "0/0"
 	},
 	"ph": "E",
 	"cat": "dynamo_timed",
 	"tid": 0,
 	"pid": 0
 	}
-V1205 21:34:07.723000 1556615 torch/_dynamo/convert_frame.py:1011] {"artifact": {"name": "dynamo_error", "encoding": "string"}, "compiled_autograd_id": null, "frame_id": 0, "frame_compile_id": 0, "attempt": 0, "has_payload": "8240b625682b3ef80eddf3423a91511c"}
+V1206 15:19:20.985000 1524181 torch/_dynamo/convert_frame.py:1011] {"artifact": {"name": "dynamo_error", "encoding": "string"}, "compiled_autograd_id": null, "frame_id": 0, "frame_compile_id": 0, "attempt": 0, "has_payload": "8240b625682b3ef80eddf3423a91511c"}
 	Traceback (most recent call last):
 	  File "/data/users/xmfan/a/pytorch/torch/_dynamo/convert_frame.py", line 989, in _compile
 	    guarded_code = compile_inner(code, one_graph, hooks, transform)
@@ -584,13 +584,13 @@ V1205 21:34:07.723000 1556615 torch/_dynamo/convert_frame.py:1011] {"artifact": 
 	Set TORCH_LOGS="+dynamo" and TORCHDYNAMO_VERBOSE=1 for more information
 	
 	
-V1205 21:34:07.728000 1556615 torch/_dynamo/utils.py:1045] {"compilation_metrics": {"aot_autograd_cumulative_compile_time_us": 457, "dynamo_cumulative_compile_time_us": 8859, "frame_key": "1", "co_name": "fn", "co_filename": "/data/users/xmfan/a/pytorch/test/dynamo/test_misc.py", "co_firstlineno": 10755, "cache_size": 0, "accumulated_cache_size": 0, "guard_count": null, "shape_env_guard_count": null, "graph_op_count": null, "graph_node_count": null, "graph_input_count": null, "fail_type": "BackendCompilerFailed", "fail_reason": "backend='broken_backend' raised:\nRuntimeError: broken backend", "fail_user_frame_filename": null, "fail_user_frame_lineno": null, "non_compliant_ops": [], "compliant_custom_ops": [], "restart_reasons": [], "dynamo_time_before_restart_s": 0.01111214, "has_guarded_code": false, "config_suppress_errors": true, "config_inline_inbuilt_nn_modules": true, "specialize_float": false, "dynamo_config": "{\"verify_correctness\": false, \"minimum_call_count\": 1, \"dead_code_elimination\": true, \"cache_size_limit\": 8, \"accumulated_cache_size_limit\": 256, \"skip_code_recursive_on_cache_limit_hit\": true, \"fail_on_cache_limit_hit\": false, \"specialize_int\": false, \"specialize_float\": false, \"dynamic_shapes\": true, \"use_lazy_graph_module\": true, \"assume_static_by_default\": true, \"automatic_dynamic_shapes\": true, \"force_parameter_static_shapes\": true, \"force_nn_module_property_static_shapes\": true, \"allow_ignore_mark_dynamic\": false, \"guard_nn_modules\": true, \"guard_nn_modules_using_dict_tags\": true, \"suppress_errors\": true, \"replay_record_enabled\": false, \"rewrite_assert_with_torch_assert\": true, \"disable\": false, \"cprofile\": false, \"skipfiles_inline_module_allowlist\": {}, \"allowed_functions_module_string_ignorelist\": [\"torch._decomp\", \"torch._refs\", \"torch._prims\", \"torch.distributions\", \"torch.testing\"], \"capture_scalar_outputs\": false, \"capture_dynamic_output_shape_ops\": false, \"prefer_deferred_runtime_asserts_over_guards\": false, \"allow_complex_guards_as_runtime_asserts\": false, \"force_unspec_int_unbacked_size_like_on_torchrec_kjt\": false, \"optimize_ddp\": true, \"do_not_emit_runtime_asserts\": false, \"_ddp_optimization_mode\": [\"ddp_optimizer\", \"python_reducer\", \"python_reducer_without_compiled_forward\", \"no_optimization\"], \"skip_torchrec\": true, \"optimize_ddp_lazy_compile\": false, \"skip_fsdp_guards\": true, \"skip_fsdp_hooks\": true, \"skip_nnmodule_hook_guards\": true, \"skip_no_tensor_aliasing_guards_on_parameters\": true, \"raise_on_ctx_manager_usage\": true, \"raise_on_unsafe_aot_autograd\": false, \"error_on_nested_jit_trace\": true, \"error_on_nested_fx_trace\": true, \"allow_rnn\": false, \"capture_sparse_compute\": true, \"error_on_recompile\": false, \"report_guard_failures\": true, \"trace_numpy\": true, \"numpy_default_float\": \"float64\", \"numpy_default_complex\": \"complex128\", \"numpy_default_int\": \"int64\", \"use_numpy_random_stream\": false, \"enable_cpp_guard_manager\": true, \"inline_inbuilt_nn_modules\": true, \"record_compile_time_instruction_count\": false, \"cudagraph_backend_keep_input_mutation\": false, \"cudagraph_backend_support_input_mutation\": false, \"only_allow_pt2_compliant_ops\": false, \"capture_autograd_function\": true, \"capture_func_transforms\": true, \"fake_tensor_cache_enabled\": true, \"fake_tensor_cache_crosscheck_enabled\": false, \"compiled_autograd\": false, \"compiled_autograd_kwargs_override\": {}, \"enable_compiler_collectives\": false, \"automatic_dynamic_local_pgo\": false, \"automatic_dynamic_remote_pgo\": null}", "is_forward": true, "dynamo_compile_time_before_restart_us": 11112}, "compiled_autograd_id": null, "frame_id": 0, "frame_compile_id": 0, "attempt": 0}
-V1205 21:34:07.728000 1556615 torch/_dynamo/utils.py:1288] {"chromium_event": {}, "compiled_autograd_id": null, "frame_id": 0, "frame_compile_id": 0, "attempt": 0, "has_payload": "28dd629a11f6ff13dd4bec9e4e19f410"}
+V1206 15:19:20.988000 1524181 torch/_dynamo/utils.py:1045] {"compilation_metrics": {"aot_autograd_cumulative_compile_time_us": 234, "dynamo_cumulative_compile_time_us": 4499, "frame_key": "1", "co_name": "fn", "co_filename": "/data/users/xmfan/a/pytorch/test/dynamo/test_misc.py", "co_firstlineno": 10755, "cache_size": 0, "accumulated_cache_size": 0, "guard_count": null, "shape_env_guard_count": null, "graph_op_count": null, "graph_node_count": null, "graph_input_count": null, "fail_type": "BackendCompilerFailed", "fail_reason": "backend='broken_backend' raised:\nRuntimeError: broken backend", "fail_user_frame_filename": null, "fail_user_frame_lineno": null, "non_compliant_ops": [], "compliant_custom_ops": [], "restart_reasons": [], "dynamo_time_before_restart_s": 0.005744147, "has_guarded_code": false, "config_suppress_errors": true, "config_inline_inbuilt_nn_modules": true, "specialize_float": false, "dynamo_config": "{\"verify_correctness\": false, \"minimum_call_count\": 1, \"dead_code_elimination\": true, \"cache_size_limit\": 8, \"accumulated_cache_size_limit\": 256, \"skip_code_recursive_on_cache_limit_hit\": true, \"fail_on_cache_limit_hit\": false, \"specialize_int\": false, \"specialize_float\": false, \"dynamic_shapes\": true, \"use_lazy_graph_module\": true, \"assume_static_by_default\": true, \"automatic_dynamic_shapes\": true, \"force_parameter_static_shapes\": true, \"force_nn_module_property_static_shapes\": true, \"allow_ignore_mark_dynamic\": false, \"guard_nn_modules\": true, \"guard_nn_modules_using_dict_tags\": true, \"suppress_errors\": true, \"replay_record_enabled\": false, \"rewrite_assert_with_torch_assert\": true, \"disable\": false, \"cprofile\": false, \"skipfiles_inline_module_allowlist\": {}, \"allowed_functions_module_string_ignorelist\": [\"torch._refs\", \"torch._decomp\", \"torch.testing\", \"torch.distributions\", \"torch._prims\"], \"capture_scalar_outputs\": false, \"capture_dynamic_output_shape_ops\": false, \"prefer_deferred_runtime_asserts_over_guards\": false, \"allow_complex_guards_as_runtime_asserts\": false, \"force_unspec_int_unbacked_size_like_on_torchrec_kjt\": false, \"optimize_ddp\": true, \"do_not_emit_runtime_asserts\": false, \"_ddp_optimization_mode\": [\"ddp_optimizer\", \"python_reducer\", \"python_reducer_without_compiled_forward\", \"no_optimization\"], \"skip_torchrec\": true, \"optimize_ddp_lazy_compile\": false, \"skip_fsdp_guards\": true, \"skip_fsdp_hooks\": true, \"skip_nnmodule_hook_guards\": true, \"skip_no_tensor_aliasing_guards_on_parameters\": true, \"raise_on_ctx_manager_usage\": true, \"raise_on_unsafe_aot_autograd\": false, \"error_on_nested_jit_trace\": true, \"error_on_nested_fx_trace\": true, \"allow_rnn\": false, \"capture_sparse_compute\": true, \"error_on_recompile\": false, \"report_guard_failures\": true, \"trace_numpy\": true, \"numpy_default_float\": \"float64\", \"numpy_default_complex\": \"complex128\", \"numpy_default_int\": \"int64\", \"use_numpy_random_stream\": false, \"enable_cpp_guard_manager\": true, \"inline_inbuilt_nn_modules\": true, \"record_compile_time_instruction_count\": false, \"cudagraph_backend_keep_input_mutation\": false, \"cudagraph_backend_support_input_mutation\": false, \"only_allow_pt2_compliant_ops\": false, \"capture_autograd_function\": true, \"capture_func_transforms\": true, \"fake_tensor_cache_enabled\": true, \"fake_tensor_cache_crosscheck_enabled\": false, \"compiled_autograd\": false, \"compiled_autograd_kwargs_override\": {}, \"enable_compiler_collectives\": false, \"automatic_dynamic_local_pgo\": false, \"automatic_dynamic_remote_pgo\": null}", "is_forward": true, "dynamo_compile_time_before_restart_us": 5744}, "compiled_autograd_id": null, "frame_id": 0, "frame_compile_id": 0, "attempt": 0}
+V1206 15:19:20.988000 1524181 torch/_dynamo/utils.py:1288] {"chromium_event": {}, "compiled_autograd_id": null, "frame_id": 0, "frame_compile_id": 0, "attempt": 0, "has_payload": "7845c97ccc7681a0ddb92dc33ca4ba2a"}
 	{
 	"name": "dynamo",
-	"ts": 1733463247728613.0,
+	"ts": 1733527160988554.2,
 	"args": {
-	"compile_id": "-/0/0",
+	"compile_id": "0/0",
 	"frame_key": "1",
 	"co_name": "fn",
 	"co_filename": "/data/users/xmfan/a/pytorch/test/dynamo/test_misc.py",
@@ -609,9 +609,9 @@ V1205 21:34:07.728000 1556615 torch/_dynamo/utils.py:1288] {"chromium_event": {}
 	"non_compliant_ops": [],
 	"compliant_custom_ops": [],
 	"restart_reasons": [],
-	"dynamo_time_before_restart_s": 0.01111214,
+	"dynamo_time_before_restart_s": 0.005744147,
 	"has_guarded_code": false,
-	"dynamo_config": "{\"verify_correctness\": false, \"minimum_call_count\": 1, \"dead_code_elimination\": true, \"cache_size_limit\": 8, \"accumulated_cache_size_limit\": 256, \"skip_code_recursive_on_cache_limit_hit\": true, \"fail_on_cache_limit_hit\": false, \"specialize_int\": false, \"specialize_float\": false, \"dynamic_shapes\": true, \"use_lazy_graph_module\": true, \"assume_static_by_default\": true, \"automatic_dynamic_shapes\": true, \"force_parameter_static_shapes\": true, \"force_nn_module_property_static_shapes\": true, \"allow_ignore_mark_dynamic\": false, \"guard_nn_modules\": true, \"guard_nn_modules_using_dict_tags\": true, \"suppress_errors\": true, \"replay_record_enabled\": false, \"rewrite_assert_with_torch_assert\": true, \"disable\": false, \"cprofile\": false, \"skipfiles_inline_module_allowlist\": {}, \"allowed_functions_module_string_ignorelist\": [\"torch._decomp\", \"torch._refs\", \"torch._prims\", \"torch.distributions\", \"torch.testing\"], \"capture_scalar_outputs\": false, \"capture_dynamic_output_shape_ops\": false, \"prefer_deferred_runtime_asserts_over_guards\": false, \"allow_complex_guards_as_runtime_asserts\": false, \"force_unspec_int_unbacked_size_like_on_torchrec_kjt\": false, \"optimize_ddp\": true, \"do_not_emit_runtime_asserts\": false, \"_ddp_optimization_mode\": [\"ddp_optimizer\", \"python_reducer\", \"python_reducer_without_compiled_forward\", \"no_optimization\"], \"skip_torchrec\": true, \"optimize_ddp_lazy_compile\": false, \"skip_fsdp_guards\": true, \"skip_fsdp_hooks\": true, \"skip_nnmodule_hook_guards\": true, \"skip_no_tensor_aliasing_guards_on_parameters\": true, \"raise_on_ctx_manager_usage\": true, \"raise_on_unsafe_aot_autograd\": false, \"error_on_nested_jit_trace\": true, \"error_on_nested_fx_trace\": true, \"allow_rnn\": false, \"capture_sparse_compute\": true, \"error_on_recompile\": false, \"report_guard_failures\": true, \"trace_numpy\": true, \"numpy_default_float\": \"float64\", \"numpy_default_complex\": \"complex128\", \"numpy_default_int\": \"int64\", \"use_numpy_random_stream\": false, \"enable_cpp_guard_manager\": true, \"inline_inbuilt_nn_modules\": true, \"record_compile_time_instruction_count\": false, \"cudagraph_backend_keep_input_mutation\": false, \"cudagraph_backend_support_input_mutation\": false, \"only_allow_pt2_compliant_ops\": false, \"capture_autograd_function\": true, \"capture_func_transforms\": true, \"fake_tensor_cache_enabled\": true, \"fake_tensor_cache_crosscheck_enabled\": false, \"compiled_autograd\": false, \"compiled_autograd_kwargs_override\": {}, \"enable_compiler_collectives\": false, \"automatic_dynamic_local_pgo\": false, \"automatic_dynamic_remote_pgo\": null}"
+	"dynamo_config": "{\"verify_correctness\": false, \"minimum_call_count\": 1, \"dead_code_elimination\": true, \"cache_size_limit\": 8, \"accumulated_cache_size_limit\": 256, \"skip_code_recursive_on_cache_limit_hit\": true, \"fail_on_cache_limit_hit\": false, \"specialize_int\": false, \"specialize_float\": false, \"dynamic_shapes\": true, \"use_lazy_graph_module\": true, \"assume_static_by_default\": true, \"automatic_dynamic_shapes\": true, \"force_parameter_static_shapes\": true, \"force_nn_module_property_static_shapes\": true, \"allow_ignore_mark_dynamic\": false, \"guard_nn_modules\": true, \"guard_nn_modules_using_dict_tags\": true, \"suppress_errors\": true, \"replay_record_enabled\": false, \"rewrite_assert_with_torch_assert\": true, \"disable\": false, \"cprofile\": false, \"skipfiles_inline_module_allowlist\": {}, \"allowed_functions_module_string_ignorelist\": [\"torch._refs\", \"torch._decomp\", \"torch.testing\", \"torch.distributions\", \"torch._prims\"], \"capture_scalar_outputs\": false, \"capture_dynamic_output_shape_ops\": false, \"prefer_deferred_runtime_asserts_over_guards\": false, \"allow_complex_guards_as_runtime_asserts\": false, \"force_unspec_int_unbacked_size_like_on_torchrec_kjt\": false, \"optimize_ddp\": true, \"do_not_emit_runtime_asserts\": false, \"_ddp_optimization_mode\": [\"ddp_optimizer\", \"python_reducer\", \"python_reducer_without_compiled_forward\", \"no_optimization\"], \"skip_torchrec\": true, \"optimize_ddp_lazy_compile\": false, \"skip_fsdp_guards\": true, \"skip_fsdp_hooks\": true, \"skip_nnmodule_hook_guards\": true, \"skip_no_tensor_aliasing_guards_on_parameters\": true, \"raise_on_ctx_manager_usage\": true, \"raise_on_unsafe_aot_autograd\": false, \"error_on_nested_jit_trace\": true, \"error_on_nested_fx_trace\": true, \"allow_rnn\": false, \"capture_sparse_compute\": true, \"error_on_recompile\": false, \"report_guard_failures\": true, \"trace_numpy\": true, \"numpy_default_float\": \"float64\", \"numpy_default_complex\": \"complex128\", \"numpy_default_int\": \"int64\", \"use_numpy_random_stream\": false, \"enable_cpp_guard_manager\": true, \"inline_inbuilt_nn_modules\": true, \"record_compile_time_instruction_count\": false, \"cudagraph_backend_keep_input_mutation\": false, \"cudagraph_backend_support_input_mutation\": false, \"only_allow_pt2_compliant_ops\": false, \"capture_autograd_function\": true, \"capture_func_transforms\": true, \"fake_tensor_cache_enabled\": true, \"fake_tensor_cache_crosscheck_enabled\": false, \"compiled_autograd\": false, \"compiled_autograd_kwargs_override\": {}, \"enable_compiler_collectives\": false, \"automatic_dynamic_local_pgo\": false, \"automatic_dynamic_remote_pgo\": null}"
 	},
 	"ph": "E",
 	"cat": "dynamo_timed",
