@@ -127,19 +127,62 @@ impl StackTrieNode {
 }
 
 #[derive(Eq, PartialEq, Hash, Deserialize, Serialize, Debug, Clone)]
-pub struct CompileId {
+pub struct DynamoId {
     pub frame_id: u32,
     pub frame_compile_id: u32,
     pub attempt: u32,
 }
 
+#[derive(Eq, PartialEq, Hash, Deserialize, Serialize, Debug, Clone)]
+#[serde(untagged)]
+pub enum CompileId {
+    // NOTE: serde(untagged) will match in the order
+    // this enum is defined
+
+    // When compiled autograd calls torch.compile
+    CompiledAutogradInitiated {
+        compiled_autograd_id: u32,
+        #[serde(flatten)]
+        dynamo_id: Option<DynamoId>,
+    },
+    // When user calls torch.compile
+    UserInitiated(DynamoId),
+}
+
+fn _format_dynamo_id(d: &DynamoId) -> String {
+    if d.attempt != 0 {
+        format!("{}/{}_{}", d.frame_id, d.frame_compile_id, d.attempt)
+    } else {
+        format!("{}/{}", d.frame_id, d.frame_compile_id)
+    }
+}
+
+fn format_dynamo_id(dynamo_id: &Option<DynamoId>) -> String {
+    if let Some(d) = dynamo_id {
+        _format_dynamo_id(d)
+    } else {
+        format!("-/-")
+    }
+}
+
 impl fmt::Display for CompileId {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "[{}/{}", self.frame_id, self.frame_compile_id)?;
-        if self.attempt != 0 {
-            write!(f, "_{}", self.attempt)?;
+        match self {
+            CompileId::UserInitiated(d) => {
+                write!(f, "[{}]", _format_dynamo_id(d))
+            }
+            CompileId::CompiledAutogradInitiated {
+                compiled_autograd_id,
+                dynamo_id,
+            } => {
+                write!(
+                    f,
+                    "[{}/{}]",
+                    compiled_autograd_id,
+                    format_dynamo_id(dynamo_id)
+                )
+            }
         }
-        write!(f, "]")
     }
 }
 

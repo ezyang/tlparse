@@ -378,14 +378,24 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
             let compile_id_dir: PathBuf = e
                 .compile_id
                 .as_ref()
-                .map_or(
-                    format!("unknown_{lineno}"),
-                    |CompileId {
-                         frame_id,
-                         frame_compile_id,
-                         attempt,
-                     }| { format!("{frame_id}_{frame_compile_id}_{attempt}") },
-                )
+                .map_or(format!("unknown_{lineno}"), |c| match c {
+                    CompileId::UserInitiated(d) => {
+                        format!("{}_{}_{}", d.frame_id, d.frame_compile_id, d.attempt)
+                    }
+                    CompileId::CompiledAutogradInitiated {
+                        compiled_autograd_id,
+                        dynamo_id,
+                    } => {
+                        if let Some(d) = dynamo_id {
+                            format!(
+                                "{}_{}_{}_{}",
+                                compiled_autograd_id, d.frame_id, d.frame_compile_id, d.attempt
+                            )
+                        } else {
+                            format!("{}_-_-_-", compiled_autograd_id)
+                        }
+                    }
+                })
                 .into();
             let parser: Box<dyn StructuredLogParser> =
                 Box::new(crate::parsers::CompilationMetricsParser {
@@ -450,7 +460,18 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
             }
             let mut cid = e.compile_id.clone();
             if let Some(c) = cid.as_mut() {
-                c.attempt = 0;
+                match c {
+                    CompileId::UserInitiated(d) => {
+                        // Is this for data migration?
+                        d.attempt = 0;
+                    }
+                    CompileId::CompiledAutogradInitiated {
+                        compiled_autograd_id: _,
+                        dynamo_id: _,
+                    } => {
+                        // DynamoId should already have attempt set
+                    }
+                }
             }
             metrics_index.entry(cid).or_default().push(m.clone());
         }
