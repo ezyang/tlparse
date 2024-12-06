@@ -137,7 +137,7 @@ pub struct DynamoId {
 #[serde(untagged)]
 pub enum CompileId {
     // NOTE: serde(untagged) will match in the order
-    // this enum is defined 
+    // this enum is defined
 
     // When compiled autograd calls torch.compile
     CompiledAutogradInitiated {
@@ -146,7 +146,7 @@ pub enum CompileId {
         dynamo_id: Option<DynamoId>,
     },
     // When user calls torch.compile
-    UserInitiated(DynamoId)
+    UserInitiated(DynamoId),
 }
 
 fn _format_dynamo_id(d: &DynamoId) -> String {
@@ -170,10 +170,18 @@ impl fmt::Display for CompileId {
         match self {
             CompileId::UserInitiated(d) => {
                 write!(f, "[-/{}]", _format_dynamo_id(d))
-            },
-            CompileId::CompiledAutogradInitiated { compiled_autograd_id, dynamo_id } => {
-                write!(f, "[{}/{}]", compiled_autograd_id, format_dynamo_id(dynamo_id))
-            },
+            }
+            CompileId::CompiledAutogradInitiated {
+                compiled_autograd_id,
+                dynamo_id,
+            } => {
+                write!(
+                    f,
+                    "[{}/{}]",
+                    compiled_autograd_id,
+                    format_dynamo_id(dynamo_id)
+                )
+            }
         }
     }
 }
