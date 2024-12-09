@@ -128,16 +128,27 @@ impl StackTrieNode {
 
 #[derive(Eq, PartialEq, Hash, Deserialize, Serialize, Debug, Clone)]
 pub struct CompileId {
-    pub frame_id: u32,
-    pub frame_compile_id: u32,
-    pub attempt: u32,
+    pub compiled_autograd_id: Option<u32>,
+    pub frame_id: Option<u32>,
+    pub frame_compile_id: Option<u32>,
+    pub attempt: Option<u32>,
 }
 
 impl fmt::Display for CompileId {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "[{}/{}", self.frame_id, self.frame_compile_id)?;
-        if self.attempt != 0 {
-            write!(f, "_{}", self.attempt)?;
+        write!(f, "[")?;
+        if let Some(compiled_autograd_id) = self.compiled_autograd_id {
+            write!(f, "{}/", compiled_autograd_id)?;
+        }
+        let frame_id = self.frame_id.map_or("-".to_string(), |v| v.to_string());
+        let frame_compile_id = self
+            .frame_compile_id
+            .map_or("-".to_string(), |v| v.to_string());
+        write!(f, "{}/{}", frame_id, frame_compile_id)?;
+        if let Some(attempt) = self.attempt {
+            if attempt != 0 {
+                write!(f, "_{}", attempt)?;
+            }
         }
         write!(f, "]")
     }

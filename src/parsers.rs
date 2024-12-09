@@ -59,10 +59,22 @@ fn simple_file_output(
         .map_or(
             format!("unknown_{lineno}"),
             |CompileId {
+                 compiled_autograd_id,
                  frame_id,
                  frame_compile_id,
                  attempt,
-             }| { format!("{frame_id}_{frame_compile_id}_{attempt}") },
+             }| {
+                let frame_id_str = frame_id.map_or("-".to_string(), |v| v.to_string());
+                let frame_compile_id_str =
+                    frame_compile_id.map_or("-".to_string(), |v| v.to_string());
+                let attempt_str = attempt.map_or("-".to_string(), |v| v.to_string());
+
+                if let Some(ca_id) = compiled_autograd_id {
+                    format!("{ca_id}_{frame_id_str}_{frame_compile_id_str}_{attempt_str}")
+                } else {
+                    format!("{frame_id_str}_{frame_compile_id_str}_{attempt_str}")
+                }
+            },
         )
         .into();
     let subdir = PathBuf::from(compile_id_dir);
@@ -380,7 +392,10 @@ impl StructuredLogParser for CompilationMetricsParser<'_> {
                 .map_or("(unknown) ".to_string(), |c| format!("{cid} ", cid = c));
             let mut cid = compile_id.clone();
             if let Some(c) = cid.as_mut() {
-                c.attempt = 0;
+                if let Some(_frame_id) = c.frame_compile_id {
+                    // data migration for old logs that don't have attempt
+                    c.attempt = Some(0);
+                }
             }
             let stack_html = self
                 .stack_index
