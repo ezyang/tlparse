@@ -56,26 +56,7 @@ fn simple_file_output(
 ) -> anyhow::Result<ParserResults> {
     let compile_id_dir: PathBuf = compile_id
         .as_ref()
-        .map_or(
-            format!("unknown_{lineno}"),
-            |CompileId {
-                 compiled_autograd_id,
-                 frame_id,
-                 frame_compile_id,
-                 attempt,
-             }| {
-                let frame_id_str = frame_id.map_or("-".to_string(), |v| v.to_string());
-                let frame_compile_id_str =
-                    frame_compile_id.map_or("-".to_string(), |v| v.to_string());
-                let attempt_str = attempt.map_or("-".to_string(), |v| v.to_string());
-
-                if let Some(ca_id) = compiled_autograd_id {
-                    format!("{ca_id}_{frame_id_str}_{frame_compile_id_str}_{attempt_str}")
-                } else {
-                    format!("{frame_id_str}_{frame_compile_id_str}_{attempt_str}")
-                }
-            },
-        )
+        .map_or(format!("unknown_{lineno}"), |cid| cid.as_directory_name())
         .into();
     let subdir = PathBuf::from(compile_id_dir);
     let f = subdir.join(filename);

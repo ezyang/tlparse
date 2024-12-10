@@ -117,6 +117,11 @@ common cause of recompilation is a graph break in an inlined function call, whic
 and avoid inlining the function in the first place.
 </p>
 <p>
+When compiled autograd is enabled, the compile id will include a prefix signifier <code>[a/x/y]</code>,
+where a is the <strong>compiled autograd id</strong>. For instance, <code>[0/-/-]</code> refers 
+to the first graph captured by compiled autograd. It is then traced by torch.compile as <code>[0/x/y_z]</code>.
+</p>
+<p>
 Here is a high level description of PT2's compilation phases, and the intermediate products each
 phase generates:
 </p>

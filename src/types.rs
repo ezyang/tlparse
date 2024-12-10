@@ -154,6 +154,22 @@ impl fmt::Display for CompileId {
     }
 }
 
+impl CompileId {
+    pub fn as_directory_name(&self) -> String {
+        let frame_id_str = self.frame_id.map_or("-".to_string(), |v| v.to_string());
+        let frame_compile_id_str = self
+            .frame_compile_id
+            .map_or("-".to_string(), |v| v.to_string());
+        let attempt_str = self.attempt.map_or("-".to_string(), |v| v.to_string());
+
+        if let Some(ca_id) = self.compiled_autograd_id {
+            format!("{ca_id}_{frame_id_str}_{frame_compile_id_str}_{attempt_str}")
+        } else {
+            format!("{frame_id_str}_{frame_compile_id_str}_{attempt_str}")
+        }
+    }
+}
+
 #[derive(Default, Debug)]
 pub struct Stats {
     pub ok: u64,
