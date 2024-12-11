@@ -135,10 +135,13 @@ pub struct CompileId {
 }
 
 impl fmt::Display for CompileId {
+    // NOTE: If you want to elide an id e.g. attempt, compiled_autograd_id, you need to ensure
+    // the representation remains unique. One way is to use a unique prefix.
+
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "[")?;
         if let Some(compiled_autograd_id) = self.compiled_autograd_id {
-            write!(f, "{}/", compiled_autograd_id)?;
+            write!(f, "!{}/", compiled_autograd_id)?;
         }
         let frame_id = self.frame_id.map_or("-".to_string(), |v| v.to_string());
         let frame_compile_id = self
@@ -156,17 +159,16 @@ impl fmt::Display for CompileId {
 
 impl CompileId {
     pub fn as_directory_name(&self) -> String {
+        let compiled_autograd_id_str = self
+            .compiled_autograd_id
+            .map_or("-".to_string(), |v| v.to_string());
         let frame_id_str = self.frame_id.map_or("-".to_string(), |v| v.to_string());
         let frame_compile_id_str = self
             .frame_compile_id
             .map_or("-".to_string(), |v| v.to_string());
         let attempt_str = self.attempt.map_or("-".to_string(), |v| v.to_string());
 
-        if let Some(ca_id) = self.compiled_autograd_id {
-            format!("{ca_id}_{frame_id_str}_{frame_compile_id_str}_{attempt_str}")
-        } else {
-            format!("{frame_id_str}_{frame_compile_id_str}_{attempt_str}")
-        }
+        format!("{compiled_autograd_id_str}_{frame_id_str}_{frame_compile_id_str}_{attempt_str}")
     }
 }
 
