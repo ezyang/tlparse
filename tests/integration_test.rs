@@ -11,12 +11,12 @@ fn prefix_exists(map: &HashMap<PathBuf, String>, prefix: &str) -> bool {
 #[test]
 fn test_parse_simple() {
     let expected_files = [
-        "0_0_0/aot_forward_graph",
-        "0_0_0/dynamo_output_graph",
+        "-_0_0_0/aot_forward_graph",
+        "-_0_0_0/dynamo_output_graph",
         "index.html",
         "failures_and_restarts.html",
-        "0_0_0/inductor_post_grad_graph",
-        "0_0_0/inductor_output_code",
+        "-_0_0_0/inductor_post_grad_graph",
+        "-_0_0_0/inductor_output_code",
     ];
     // Read the test file
     // simple.log was generated from the following:
@@ -42,12 +42,12 @@ fn test_parse_simple() {
 #[test]
 fn test_parse_compilation_metrics() {
     let expected_files = [
-        "0_0_1/dynamo_output_graph",
-        "0_0_1/compilation_metrics",
-        "1_0_1/dynamo_output_graph",
-        "1_0_1/compilation_metrics",
-        "2_0_0/dynamo_output_graph",
-        "2_0_0/compilation_metrics",
+        "-_0_0_1/dynamo_output_graph",
+        "-_0_0_1/compilation_metrics",
+        "-_1_0_1/dynamo_output_graph",
+        "-_1_0_1/compilation_metrics",
+        "-_2_0_0/dynamo_output_graph",
+        "-_2_0_0/compilation_metrics",
         "index.html",
         "failures_and_restarts.html",
     ];
@@ -75,8 +75,8 @@ fn test_parse_compilation_metrics() {
 #[test]
 fn test_parse_compilation_failures() {
     let expected_files = [
-        "0_0_0/dynamo_output_graph",
-        "0_0_0/compilation_metrics",
+        "-_0_0_0/dynamo_output_graph",
+        "-_0_0_0/compilation_metrics",
         "index.html",
         "failures_and_restarts.html",
     ];
@@ -103,7 +103,7 @@ fn test_parse_compilation_failures() {
 
 #[test]
 fn test_parse_artifact() {
-    let expected_files = ["0_0_0/fx_graph_cache_hash", "index.html"];
+    let expected_files = ["-_0_0_0/fx_graph_cache_hash", "index.html"];
     // Read the test file
     // artifacts.log was generated from the following:
     // NOTE: this test command looks wrong, and is not producing anything close to artifacts.log
@@ -153,9 +153,9 @@ fn test_parse_chromium_event() {
 #[test]
 fn test_cache_hit_miss() {
     let expected_files = [
-        "1_0_0/fx_graph_cache_miss_33.json",
-        "1_0_0/fx_graph_cache_miss_9.json",
-        "1_0_0/fx_graph_cache_hit_20.json",
+        "-_1_0_0/fx_graph_cache_miss_33.json",
+        "-_1_0_0/fx_graph_cache_miss_9.json",
+        "-_1_0_0/fx_graph_cache_hit_20.json",
         "index.html",
     ];
     // Generated via TORCH_TRACE=~/trace_logs/test python test/inductor/test_codecache.py -k test_flex_attention_caching
