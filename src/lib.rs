@@ -378,14 +378,7 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
             let compile_id_dir: PathBuf = e
                 .compile_id
                 .as_ref()
-                .map_or(
-                    format!("unknown_{lineno}"),
-                    |CompileId {
-                         frame_id,
-                         frame_compile_id,
-                         attempt,
-                     }| { format!("{frame_id}_{frame_compile_id}_{attempt}") },
-                )
+                .map_or(format!("unknown_{lineno}"), |cid| cid.as_directory_name())
                 .into();
             let parser: Box<dyn StructuredLogParser> =
                 Box::new(crate::parsers::CompilationMetricsParser {
@@ -450,7 +443,10 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
             }
             let mut cid = e.compile_id.clone();
             if let Some(c) = cid.as_mut() {
-                c.attempt = 0;
+                if let Some(_frame_id) = c.frame_compile_id {
+                    // data migration for old logs that don't have attempt
+                    c.attempt = Some(0);
+                }
             }
             metrics_index.entry(cid).or_default().push(m.clone());
         }

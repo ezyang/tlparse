@@ -56,14 +56,7 @@ fn simple_file_output(
 ) -> anyhow::Result<ParserResults> {
     let compile_id_dir: PathBuf = compile_id
         .as_ref()
-        .map_or(
-            format!("unknown_{lineno}"),
-            |CompileId {
-                 frame_id,
-                 frame_compile_id,
-                 attempt,
-             }| { format!("{frame_id}_{frame_compile_id}_{attempt}") },
-        )
+        .map_or(format!("unknown_{lineno}"), |cid| cid.as_directory_name())
         .into();
     let subdir = PathBuf::from(compile_id_dir);
     let f = subdir.join(filename);
@@ -380,7 +373,10 @@ impl StructuredLogParser for CompilationMetricsParser<'_> {
                 .map_or("(unknown) ".to_string(), |c| format!("{cid} ", cid = c));
             let mut cid = compile_id.clone();
             if let Some(c) = cid.as_mut() {
-                c.attempt = 0;
+                if let Some(_frame_id) = c.frame_compile_id {
+                    // data migration for old logs that don't have attempt
+                    c.attempt = Some(0);
+                }
             }
             let stack_html = self
                 .stack_index
