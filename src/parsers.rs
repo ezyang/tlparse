@@ -346,6 +346,7 @@ pub struct CompilationMetricsParser<'t> {
     pub tt: &'t TinyTemplate<'t>,
     pub stack_index: &'t RefCell<StackIndex>,
     pub symbolic_shape_specialization_index: &'t RefCell<SymbolicShapeSpecializationIndex>,
+    pub guard_added_fast_index: &'t RefCell<GuardAddedFastIndex>,
     pub output_files: &'t Vec<OutputFile>,
     pub compile_id_dir: &'t PathBuf,
 }
@@ -409,6 +410,18 @@ impl StructuredLogParser for CompilationMetricsParser<'_> {
                     stack_html: format_stack(&spec.stack.unwrap_or(Vec::new())),
                 })
                 .collect();
+            let guards_added_fast = self
+                .guard_added_fast_index
+                .borrow_mut()
+                .remove(&cid)
+                .unwrap_or(Vec::new())
+                .drain(..)
+                .map(|guard| GuardAddedFastContext {
+                    expr: guard.expr.unwrap_or("".to_string()),
+                    user_stack_html: format_stack(&guard.user_stack.unwrap_or(Vec::new())),
+                    stack_html: format_stack(&guard.stack.unwrap_or(Vec::new())),
+                })
+                .collect();
             let remove_prefix = |x: &String| -> String {
                 // url is X_Y_Z/<rest>. Get the rest of the string for the link
                 // on compilation metrics page
@@ -433,6 +446,7 @@ impl StructuredLogParser for CompilationMetricsParser<'_> {
                 stack_html: stack_html,
                 mini_stack_html: mini_stack_html,
                 symbolic_shape_specializations: specializations,
+                guards_added_fast: guards_added_fast,
                 output_files: &output_files,
                 compile_id_dir: &self.compile_id_dir,
                 qps: TEMPLATE_QUERY_PARAM_SCRIPT,

@@ -18,6 +18,8 @@ pub type CompilationMetricsIndex = FxIndexMap<Option<CompileId>, Vec<Compilation
 pub type StackIndex = FxHashMap<Option<CompileId>, StackSummary>; // NB: attempt is always 0 here
 pub type SymbolicShapeSpecializationIndex =
     FxHashMap<Option<CompileId>, Vec<SymbolicShapeSpecializationMetadata>>;
+pub type GuardAddedFastIndex =
+    FxHashMap<Option<CompileId>, Vec<GuardAddedFastMetadata>>;
 
 pub type FxIndexMap<K, V> = IndexMap<K, V, BuildHasherDefault<FxHasher>>;
 
@@ -63,11 +65,14 @@ impl StackTrieNode {
         metrics_index: Option<&CompilationMetricsIndex>,
     ) -> Result<String, fmt::Error> {
         let mut f = String::new();
+        write!(f, "<details>")?;
+        write!(f, "<summary>Stack</summary>")?;
         write!(f, "<div class='stack-trie'>")?;
         write!(f, "<ul>")?;
         self.fmt_inner(&mut f, metrics_index)?;
         write!(f, "</ul>")?;
         write!(f, "</div>")?;
+        write!(f, "</details>")?;
         Ok(f)
     }
 
@@ -390,10 +395,16 @@ pub struct CompilationMetricsContext<'e> {
     pub compile_id: String,
     pub stack_html: String,
     pub symbolic_shape_specializations: Vec<SymbolicShapeSpecializationContext>,
+    pub guards_added_fast: Vec<GuardAddedFastContext>,
     pub output_files: &'e Vec<OutputFile>,
     pub compile_id_dir: &'e PathBuf,
     pub mini_stack_html: String,
     pub qps: &'static str,
+}
+
+#[derive(Debug, Serialize)]
+pub struct GuardsAddedFastContext {
+    pub guards: Vec<GuardAddedFastContext>,
 }
 
 #[derive(Debug, Serialize)]
@@ -452,11 +463,19 @@ pub enum Metadata<'e> {
     BwdCompilationMetrics(&'e BwdCompilationMetricsMetadata),
     Artifact(&'e ArtifactMetadata),
     DumpFile(&'e DumpFileMetadata),
+    GuardAddedFast(&'e GuardAddedFastMetadata),
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct DumpFileMetadata {
     pub name: String,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct GuardAddedFastMetadata {
+    pub expr: Option<String>,
+    pub stack: Option<StackSummary>,
+    pub user_stack: Option<StackSummary>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -496,6 +515,7 @@ pub struct Envelope {
     pub describe_source: Option<SourceDesc>,
     pub dump_file: Option<DumpFileMetadata>,
     pub chromium_event: Option<EmptyMetadata>,
+    pub guard_added_fast: Option<GuardAddedFastMetadata>,
     #[serde(flatten)]
     pub _other: FxHashMap<String, Value>,
 }
@@ -615,6 +635,13 @@ pub struct SymbolicShapeSpecializationContext {
     pub symbol: String,
     pub sources: Vec<String>,
     pub value: String,
+    pub user_stack_html: String,
+    pub stack_html: String,
+}
+
+#[derive(Debug, Serialize)]
+pub struct GuardAddedFastContext {
+    pub expr: String,
     pub user_stack_html: String,
     pub stack_html: String,
 }

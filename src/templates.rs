@@ -20,6 +20,12 @@ table td { vertical-align: top; }
 .status-empty { background-color: white; color: black; }
 .status-ok { background-color: green; color: white; }
 .status-break { background-color: lime; color: black; }
+summary::-webkit-details-marker { color: #00ACF3; font-size: 125%; margin-right: 2px; }
+summary:focus { outline-style: none; }
+article > details > summary { font-size: 28px; margin-top: 16px; }
+details > p { margin-left: 24px; }
+details details { margin-left: 36px; }
+details details summary { font-size: 16px; }
 "#;
 
 pub static JAVASCRIPT: &str = r#"
@@ -299,6 +305,19 @@ pub static TEMPLATE_COMPILATION_METRICS: &str = r#"
         <td>{spec.value}</td>
         <td>{spec.user_stack_html | format_unescaped}</td>
         <td>{spec.stack_html | format_unescaped}</td>
+    </tr>
+    {{ endfor }}
+    </table>
+    <h2>Guards added fast</h2>
+    <table>
+    <tr>
+        <th>Expr</th> <th>User stack</th> <th>Framework stack</th>
+    </tr>
+    {{ for g in guards_added_fast }}
+    <tr>
+        <td>{g.expr}</td>
+        <td>{g.user_stack_html | format_unescaped}</td>
+        <td>{g.stack_html | format_unescaped}</td>
     </tr>
     {{ endfor }}
     </table>
