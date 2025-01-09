@@ -18,8 +18,7 @@ pub type CompilationMetricsIndex = FxIndexMap<Option<CompileId>, Vec<Compilation
 pub type StackIndex = FxHashMap<Option<CompileId>, StackSummary>; // NB: attempt is always 0 here
 pub type SymbolicShapeSpecializationIndex =
     FxHashMap<Option<CompileId>, Vec<SymbolicShapeSpecializationMetadata>>;
-pub type GuardAddedFastIndex =
-    FxHashMap<Option<CompileId>, Vec<GuardAddedFastMetadata>>;
+pub type GuardAddedFastIndex = FxHashMap<Option<CompileId>, Vec<GuardAddedFastMetadata>>;
 
 pub type FxIndexMap<K, V> = IndexMap<K, V, BuildHasherDefault<FxHasher>>;
 
