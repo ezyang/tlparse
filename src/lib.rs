@@ -218,6 +218,7 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
 
     let symbolic_shape_specialization_index: RefCell<SymbolicShapeSpecializationIndex> =
         RefCell::new(FxHashMap::default());
+    let guard_added_fast_index: RefCell<GuardAddedFastIndex> = RefCell::new(FxHashMap::default());
 
     // Store results in an output Vec<PathBuf, String>
     let mut output: Vec<(PathBuf, String)> = Vec::new();
@@ -385,6 +386,7 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
                     tt: &tt,
                     stack_index: &stack_index,
                     symbolic_shape_specialization_index: &symbolic_shape_specialization_index,
+                    guard_added_fast_index: &guard_added_fast_index,
                     output_files: &copied_directory,
                     compile_id_dir: &compile_id_dir,
                 });
@@ -465,6 +467,13 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
                 .entry(e.compile_id.clone())
                 .or_default()
                 .push(specialization);
+        }
+        if let Some(guard_added_fast) = e.guard_added_fast {
+            guard_added_fast_index
+                .borrow_mut()
+                .entry(e.compile_id.clone())
+                .or_default()
+                .push(guard_added_fast)
         }
 
         if let Some(m) = e.dynamo_start {
