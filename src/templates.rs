@@ -161,6 +161,12 @@ Build products below:
 </ul>
 </div>
 
+
+<h2>Provenance Tracking</h2>
+<p>
+View detailed <a href='provenance_tracking.html'>provenance tracking information</a> for this compilation.
+</p>
+
 {{ if has_unknown_stack_trie }}
 <div>
 <h2>Unknown stacks</h2>
@@ -411,4 +417,25 @@ pub static TEMPLATE_QUERY_PARAM_SCRIPT: &str = r#"
         });
     });
     </script>
+"#;
+
+pub static TEMPLATE_PROVENANCE_TRACKING: &str = r#"
+<html>
+<head>
+    <style>
+    {css}
+    </style>
+    <title>Provenance Tracking</title>
+</head>
+<body>
+    <h1>Provenance Tracking Information</h1>
+    <p>
+    This page shows detailed information about the provenance tracking during compilation.
+    </p>
+    
+    <!-- Add your provenance tracking specific content here -->
+    
+    {qps | format_unescaped}
+</body>
+</html>
 "#;
