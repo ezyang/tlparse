@@ -2370,7 +2370,7 @@ V1206 15:24:50.260000 1667746 torch/_dynamo/utils.py:1327] {"chromium_event": {}
 	"pid": 0,
 	"s": "p"
 	}
-V1206 15:24:50.260000 1667746 torch/_functorch/_aot_autograd/autograd_cache.py:763] {"artifact": {"name": "aotautograd_cache_hash", "encoding": "json"}, "compiled_autograd_id": null, "frame_id": 1, "frame_compile_id": 0, "attempt": 0, "has_payload": "5601d02186053adcc1ba29fd248c1d20"}
+V1206 15:24:50.260000 1667746 torch/_functorch/_aot_autograd/autograd_cache.py:763] {"artifact": {"name": "aotautograd_cache_bypass", "encoding": "json"}, "compiled_autograd_id": null, "frame_id": 1, "frame_compile_id": 0, "attempt": 0, "has_payload": "5601d02186053adcc1ba29fd248c1d20"}
 	{"cache_bypass_reason": "Unsupported call_function target flex_attention. \n Function module: torch.ops.higher_order, \nFunction name: flex_attention", "cache_bypass_hard_exception": false, "key": null, "cache_state": "bypass", "components": [], "compile_id": "1/0"}
 V1206 15:24:50.260000 1667746 torch/_dynamo/utils.py:1288] {"chromium_event": {}, "compiled_autograd_id": null, "frame_id": 1, "frame_compile_id": 0, "attempt": 0, "has_payload": "1b940c0ffee7b576f294d159fb3b7a84"}
 	{
@@ -4637,7 +4637,7 @@ V1206 15:24:50.603000 1667746 torch/_dynamo/utils.py:1327] {"chromium_event": {}
 	"pid": 0,
 	"s": "p"
 	}
-V1206 15:24:50.603000 1667746 torch/_functorch/_aot_autograd/autograd_cache.py:763] {"artifact": {"name": "aotautograd_cache_hash", "encoding": "json"}, "compiled_autograd_id": null, "frame_id": 1, "frame_compile_id": 0, "attempt": 0, "has_payload": "5601d02186053adcc1ba29fd248c1d20"}
+V1206 15:24:50.603000 1667746 torch/_functorch/_aot_autograd/autograd_cache.py:763] {"artifact": {"name": "aotautograd_cache_bypass", "encoding": "json"}, "compiled_autograd_id": null, "frame_id": 1, "frame_compile_id": 0, "attempt": 0, "has_payload": "5601d02186053adcc1ba29fd248c1d20"}
 	{"cache_bypass_reason": "Unsupported call_function target flex_attention. \n Function module: torch.ops.higher_order, \nFunction name: flex_attention", "cache_bypass_hard_exception": false, "key": null, "cache_state": "bypass", "components": [], "compile_id": "1/0"}
 V1206 15:24:50.603000 1667746 torch/_dynamo/utils.py:1288] {"chromium_event": {}, "compiled_autograd_id": null, "frame_id": 1, "frame_compile_id": 0, "attempt": 0, "has_payload": "bd634b54ab5138da3c38e2434aae7337"}
 	{
@@ -7249,7 +7249,7 @@ V1206 15:24:54.138000 1667746 torch/_dynamo/utils.py:1327] {"chromium_event": {}
 	"pid": 0,
 	"s": "p"
 	}
-V1206 15:24:54.138000 1667746 torch/_functorch/_aot_autograd/autograd_cache.py:763] {"artifact": {"name": "aotautograd_cache_hash", "encoding": "json"}, "compiled_autograd_id": null, "frame_id": 1, "frame_compile_id": 0, "attempt": 0, "has_payload": "5601d02186053adcc1ba29fd248c1d20"}
+V1206 15:24:54.138000 1667746 torch/_functorch/_aot_autograd/autograd_cache.py:763] {"artifact": {"name": "aotautograd_cache_bypass", "encoding": "json"}, "compiled_autograd_id": null, "frame_id": 1, "frame_compile_id": 0, "attempt": 0, "has_payload": "5601d02186053adcc1ba29fd248c1d20"}
 	{"cache_bypass_reason": "Unsupported call_function target flex_attention. \n Function module: torch.ops.higher_order, \nFunction name: flex_attention", "cache_bypass_hard_exception": false, "key": null, "cache_state": "bypass", "components": [], "compile_id": "1/0"}
 V1206 15:24:54.139000 1667746 torch/_dynamo/utils.py:1288] {"chromium_event": {}, "compiled_autograd_id": null, "frame_id": 1, "frame_compile_id": 0, "attempt": 0, "has_payload": "cca36f8b4f9f5ea8ad866b857a634eb8"}
 	{

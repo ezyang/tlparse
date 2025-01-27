@@ -89,11 +89,11 @@ fn run_parser<'t>(
     if let Some(md) = parser.get_metadata(&e) {
         let results = parser.parse(lineno, md, e.rank, &e.compile_id, &payload);
         fn extract_suffix(filename: &String) -> String {
-            if filename.contains("fx_graph_cache_miss") {
+            if filename.contains("cache_miss") {
                 "❌".to_string()
-            } else if filename.contains("fx_graph_cache_hit") {
+            } else if filename.contains("cache_hit") {
                 "✅".to_string()
-            } else if filename.contains("fx_graph_cache_bypass") {
+            } else if filename.contains("cache_bypass") {
                 "❓".to_string()
             } else {
                 "".to_string()
