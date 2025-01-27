@@ -41,6 +41,9 @@ pub struct Cli {
     /// Enabiling this option will enforce output as plain text for easier diffing
     #[arg(short, long)]
     plain_text: bool,
+    /// For export specific logs
+    #[arg(short, long)]
+    export: bool,
 }
 
 fn main() -> anyhow::Result<()> {
@@ -89,6 +92,7 @@ fn main() -> anyhow::Result<()> {
         custom_header_html: cli.custom_header_html,
         verbose: cli.verbose,
         plain_text: cli.plain_text,
+        export: cli.export,
     };
 
     let output = parse_path(&path, config)?;

@@ -661,12 +661,60 @@ impl StructuredLogParser for ArtifactParser {
     }
 }
 
+pub struct PropagateRealTensorsParser<'t> {
+    tt: &'t TinyTemplate<'t>,
+}
+impl StructuredLogParser for PropagateRealTensorsParser<'_> {
+    fn name(&self) -> &'static str {
+        "propagate_real_tensors"
+    }
+    fn get_metadata<'e>(&self, e: &'e Envelope) -> Option<Metadata<'e>> {
+        e.propagate_real_tensors
+            .as_ref()
+            .map(|m| Metadata::SymbolicShapePropagateRealTensor(m))
+    }
+    fn parse<'e>(
+        &self,
+        lineno: usize,
+        metadata: Metadata<'e>,
+        _rank: Option<u32>,
+        compile_id: &Option<CompileId>,
+        _payload: &str,
+    ) -> anyhow::Result<ParserResults> {
+        if let Metadata::SymbolicShapePropagateRealTensor(m) = metadata {
+            let filename = "symbolic_guard_information.html";
+            let stack_html = format_stack(&m.stack.clone().unwrap_or(Vec::new()));
+
+            let context = SymbolicGuardContext {
+                css: crate::CSS,
+                expr: m.expr.clone().unwrap(),
+                stack_html: stack_html,
+            };
+            let output = self.tt.render(&filename, &context)?;
+            simple_file_output(&filename, lineno, compile_id, &output)
+        } else {
+            Err(anyhow::anyhow!(
+                "Expected SymbolicShapePropagateRealTensor metadata"
+            ))
+        }
+    }
+}
+
 // Register your parser here
 pub fn default_parsers<'t>(
     tt: &'t TinyTemplate<'t>,
     parser_config: &ParseConfig,
 ) -> Vec<Box<dyn StructuredLogParser + 't>> {
     // We need to use Box wrappers here because vecs in Rust need to have known size
+    if parser_config.export {
+        return vec![
+            Box::new(PropagateRealTensorsParser { tt }),
+            Box::new(SentinelFileParser::new("exported_program", |e| {
+                e.exported_program.as_ref()
+            })),
+        ];
+    }
+
     let result: Vec<Box<dyn StructuredLogParser>> = vec![
         Box::new(SentinelFileParser::new("optimize_ddp_split_graph", |e| {
             e.optimize_ddp_split_graph.as_ref()

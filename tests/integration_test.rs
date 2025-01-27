@@ -176,3 +176,33 @@ fn test_cache_hit_miss() {
         );
     }
 }
+
+#[test]
+fn test_export_report() {
+    let expected_files = [
+        "-_-_-_-/exported_program",
+        "index.html",
+        "-_-_-_-/symbolic_guard_information",
+    ];
+    // Read the test file
+    // chromium_events.log was generated from the following:
+    // TORCH_TRACE=~/trace_logs/test python test/export/test_draft_export.py -k test_data_dependent_failure
+    let path = Path::new("tests/inputs/export.log").to_path_buf();
+    let config = tlparse::ParseConfig {
+        strict: true,
+        export: true,
+        ..Default::default()
+    };
+    let output = tlparse::parse_path(&path, config);
+    assert!(output.is_ok());
+    let map: HashMap<PathBuf, String> = output.unwrap().into_iter().collect();
+    println!("{:?}", map.keys());
+    // Check all files are present
+    for prefix in expected_files {
+        assert!(
+            prefix_exists(&map, prefix),
+            "{} not found in output",
+            prefix
+        );
+    }
+}
