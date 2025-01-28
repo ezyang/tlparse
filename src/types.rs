@@ -683,6 +683,7 @@ pub struct ExportIndexContext {
     pub num_failures: usize,
     pub success: bool,
     pub exported_program_url: String,
+    pub qps: &'static str,
 }
 
 #[derive(Debug, Serialize)]

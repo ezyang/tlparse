@@ -597,6 +597,7 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
             num_failures: num_failures,
             success: num_failures == 0,
             exported_program_url: exported_program_url.unwrap_or("".to_string()),
+            qps: TEMPLATE_QUERY_PARAM_SCRIPT,
         };
 
         output.push((

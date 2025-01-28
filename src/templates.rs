@@ -484,6 +484,7 @@ you may address them.
 {{ endif }}
 
 Here is the resulting exported program: <a href="{exported_program_url}">link</a>.
+{qps | format_unescaped}
 </body>
 </html>
 "#;
