@@ -363,6 +363,19 @@ pub struct SymbolicShapeSpecializationMetadata {
     pub user_stack: Option<StackSummary>,
 }
 
+#[derive(Debug, Deserialize, Serialize)]
+pub struct SymbolicShapePropagateRealTensorMetadata {
+    pub expr: Option<String>,
+    pub result: Option<String>,
+    pub stack: Option<StackSummary>,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct FakeKernelMetadata {
+    pub op: Option<String>,
+    pub reason: Option<String>,
+}
+
 #[derive(Debug, Serialize)]
 pub struct BwdCompilationMetricsContext<'e> {
     pub m: &'e BwdCompilationMetricsMetadata,
@@ -399,6 +412,13 @@ pub struct CompilationMetricsContext<'e> {
     pub compile_id_dir: &'e PathBuf,
     pub mini_stack_html: String,
     pub qps: &'static str,
+}
+
+#[derive(Debug, Serialize)]
+pub struct SymbolicGuardContext {
+    pub css: &'static str,
+    pub expr: String,
+    pub stack_html: String,
 }
 
 #[derive(Debug, Serialize)]
@@ -440,6 +460,25 @@ impl Display for FailureReason {
 }
 
 #[derive(Debug, Serialize)]
+pub struct ExportFailure {
+    pub failure_type: String,
+    pub reason: String,
+    pub additional_info: String,
+}
+impl Display for ExportFailure {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "<td>{0}</td>
+            <td><pre>{1}</pre></td>
+            <td><pre>{2}</pre></td>
+            ",
+            self.failure_type, self.reason, self.additional_info
+        )
+    }
+}
+
+#[derive(Debug, Serialize)]
 pub struct RestartsAndFailuresContext {
     // Serialized versions of (CompileId, FailureReason)
     pub failures: Vec<(String, String)>,
@@ -463,6 +502,7 @@ pub enum Metadata<'e> {
     Artifact(&'e ArtifactMetadata),
     DumpFile(&'e DumpFileMetadata),
     GuardAddedFast(&'e GuardAddedFastMetadata),
+    SymbolicShapePropagateRealTensor(&'e SymbolicShapePropagateRealTensorMetadata),
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -508,6 +548,9 @@ pub struct Envelope {
     pub graph_dump: Option<GraphDumpMetadata>,
     pub link: Option<LinkMetadata>,
     pub symbolic_shape_specialization: Option<SymbolicShapeSpecializationMetadata>,
+    pub propagate_real_tensors: Option<SymbolicShapePropagateRealTensorMetadata>,
+    pub missing_fake_kernel: Option<FakeKernelMetadata>,
+    pub mismatched_fake_kernel: Option<FakeKernelMetadata>,
     pub artifact: Option<ArtifactMetadata>,
     pub describe_storage: Option<StorageDesc>,
     pub describe_tensor: Option<TensorDesc>,
@@ -515,6 +558,7 @@ pub struct Envelope {
     pub dump_file: Option<DumpFileMetadata>,
     pub chromium_event: Option<EmptyMetadata>,
     pub guard_added_fast: Option<GuardAddedFastMetadata>,
+    pub exported_program: Option<EmptyMetadata>,
     #[serde(flatten)]
     pub _other: FxHashMap<String, Value>,
 }
@@ -627,6 +671,18 @@ pub struct IndexContext {
     pub custom_header_html: String,
     pub has_chromium_events: bool,
     pub qps: &'static str,
+}
+
+#[derive(Debug, Serialize)]
+pub struct ExportIndexContext {
+    pub css: &'static str,
+    pub javascript: &'static str,
+    pub directory: Vec<(String, Vec<OutputFile>)>,
+    pub failures: Vec<ExportFailure>,
+    pub custom_header_html: String,
+    pub num_failures: usize,
+    pub success: bool,
+    pub exported_program_url: String,
 }
 
 #[derive(Debug, Serialize)]

@@ -28,6 +28,7 @@ pub struct ParseConfig {
     pub custom_header_html: String,
     pub verbose: bool,
     pub plain_text: bool,
+    pub export: bool,
 }
 
 impl Default for ParseConfig {
@@ -39,6 +40,7 @@ impl Default for ParseConfig {
             custom_header_html: String::default(),
             verbose: false,
             plain_text: false,
+            export: false,
         }
     }
 }
@@ -225,18 +227,26 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
 
     let mut tt: TinyTemplate = TinyTemplate::new();
     tt.add_formatter("format_unescaped", tinytemplate::format_unescaped);
-    tt.add_template("index.html", TEMPLATE_INDEX)?;
-    tt.add_template("failures_and_restarts.html", TEMPLATE_FAILURES_AND_RESTARTS)?;
-    tt.add_template("dynamo_guards.html", TEMPLATE_DYNAMO_GUARDS)?;
-    tt.add_template("compilation_metrics.html", TEMPLATE_COMPILATION_METRICS)?;
-    tt.add_template(
-        "bwd_compilation_metrics.html",
-        TEMPLATE_BWD_COMPILATION_METRICS,
-    )?;
-    tt.add_template(
-        "aot_autograd_backward_compilation_metrics.html",
-        TEMPLATE_AOT_AUTOGRAD_BACKWARD_COMPILATION_METRICS,
-    )?;
+    if config.export {
+        tt.add_template("index.html", TEMPLATE_EXPORT_INDEX)?;
+        tt.add_template(
+            "symbolic_guard_information.html",
+            TEMPLATE_SYMBOLIC_GUARD_INFO,
+        )?;
+    } else {
+        tt.add_template("index.html", TEMPLATE_INDEX)?;
+        tt.add_template("failures_and_restarts.html", TEMPLATE_FAILURES_AND_RESTARTS)?;
+        tt.add_template("dynamo_guards.html", TEMPLATE_DYNAMO_GUARDS)?;
+        tt.add_template("compilation_metrics.html", TEMPLATE_COMPILATION_METRICS)?;
+        tt.add_template(
+            "bwd_compilation_metrics.html",
+            TEMPLATE_BWD_COMPILATION_METRICS,
+        )?;
+        tt.add_template(
+            "aot_autograd_backward_compilation_metrics.html",
+            TEMPLATE_AOT_AUTOGRAD_BACKWARD_COMPILATION_METRICS,
+        )?;
+    }
 
     let mut unknown_fields: FxHashSet<String> = FxHashSet::default();
 
@@ -247,6 +257,8 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
         failures: Vec::new(),
         qps: TEMPLATE_QUERY_PARAM_SCRIPT,
     };
+
+    let mut export_failures: Vec<ExportFailure> = Vec::new();
 
     // NB: Sometimes, the log output we get from Logarithm stutters with a blank line.
     // Filter them out, they're never valid (a blank line in payload will still be \t)
@@ -485,7 +497,116 @@ pub fn parse_path(path: &PathBuf, config: ParseConfig) -> anyhow::Result<ParseOu
                 stack_trie.insert(stack, e.compile_id.clone());
             };
         };
+
+        if let Some(guard) = e.propagate_real_tensors {
+            if config.export {
+                let failure_type = "Data Dependent Error";
+
+                let reason = format!(
+                    "When exporting, we were unable to figure out if the
+                    expression <code>{}</code> always holds.<br> As a result, it
+                    was specialized to evaluate to <code>{}</code>, and asserts
+                    were inserted into the graph.",
+                    guard.expr.clone().unwrap(),
+                    guard.result.unwrap()
+                );
+
+                let filename = format!(
+                    "symbolic_guard_information_{}.html",
+                    (output_count - 1).to_string(),
+                );
+                let compile_id_dir: PathBuf = e
+                    .compile_id
+                    .as_ref()
+                    .map_or(format!("unknown_{lineno}"), |cid| cid.as_directory_name())
+                    .into();
+                let additional_info = format!(
+                    "Please click <a href='{}/{}'>here</a> for more information.",
+                    compile_id_dir.display(),
+                    filename,
+                );
+
+                export_failures.push(ExportFailure {
+                    failure_type: failure_type.to_string(),
+                    reason: reason,
+                    additional_info: additional_info,
+                });
+            }
+        }
+
+        if let Some(fake_kernel) = e.missing_fake_kernel {
+            if config.export {
+                let failure_type = "Missing Fake Kernel";
+
+                let reason = format!(
+                    "<code>torch.ops.{}</code> is missing a fake kernel implementation",
+                    fake_kernel.op.unwrap()
+                );
+
+                let additional_info = "Please refer to <a href='https://docs.google.com/document/d/1_W62p8WJOQQUzPsJYa7s701JXt0qf2OfLub2sbkHOaU/edit#heading=h.ahugy69p2jmz'>this doc</a> for more detailed instructions on how to write a fake kernel.";
+
+                export_failures.push(ExportFailure {
+                    failure_type: failure_type.to_string(),
+                    reason: reason,
+                    additional_info: additional_info.to_string(),
+                });
+            }
+        }
+
+        if let Some(fake_kernel) = e.mismatched_fake_kernel {
+            if config.export {
+                let failure_type = "Mismatched Fake Kernel";
+
+                let reason = format!(
+                    "<code>torch.ops.{}</code> has a fake kernel implementation,
+                    but it has incorrect behavior, based on the real kernel.<br>
+                    The reason for the mismatch is: {}",
+                    fake_kernel.op.unwrap(),
+                    fake_kernel.reason.unwrap(),
+                );
+
+                let additional_info = "Please refer to <a href='https://docs.google.com/document/d/1_W62p8WJOQQUzPsJYa7s701JXt0qf2OfLub2sbkHOaU/edit#heading=h.ahugy69p2jmz'>this doc</a> for more detailed instructions on how to write a fake kernel.";
+
+                export_failures.push(ExportFailure {
+                    failure_type: failure_type.to_string(),
+                    reason: reason,
+                    additional_info: additional_info.to_string(),
+                });
+            }
+        }
     }
+
+    if config.export {
+        let num_failures = export_failures.len();
+
+        let exported_program_url = directory
+            .values()
+            .flatten()
+            .find(|output_file| output_file.url.contains("exported_program"))
+            .map(|output_file| output_file.url.clone());
+
+        let index_context = ExportIndexContext {
+            css: EXPORT_CSS,
+            javascript: JAVASCRIPT,
+            custom_header_html: config.custom_header_html,
+            directory: directory
+                .drain(..)
+                .map(|(x, y)| (x.map_or("(unknown)".to_string(), |e| e.to_string()), y))
+                .collect(),
+            failures: export_failures,
+            num_failures: num_failures,
+            success: num_failures == 0,
+            exported_program_url: exported_program_url.unwrap_or("".to_string()),
+        };
+
+        output.push((
+            PathBuf::from("index.html"),
+            tt.render("index.html", &index_context)?,
+        ));
+
+        return Ok(output);
+    }
+
     output.push((
         PathBuf::from("failures_and_restarts.html"),
         tt.render("failures_and_restarts.html", &breaks)?,

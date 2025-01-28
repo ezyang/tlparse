@@ -41,6 +41,40 @@ pub static JAVASCRIPT: &str = r#"
   }
 "#;
 
+pub static EXPORT_CSS: &str = r#"
+table {
+    width: 90%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    border: 2px solid #000; /* Add border around the table */
+}
+table, th, td {
+    border: 1px solid #999; /* Add border to table cells */
+    padding: 10px;
+    text-align: left;
+}
+th {
+    background-color: #d3d3d3;
+    font-weight: bold;
+}
+tr:nth-child(odd) {
+    background-color: #f2f2f2;
+}
+a {
+    color: #0066cc;
+    text-decoration: none;
+}
+a:hover {
+    text-decoration: underline;
+}
+td:first-child {
+    width: auto;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+"#;
+
 pub static TEMPLATE_DYNAMO_GUARDS: &str = r#"
 <html>
 <body>
@@ -411,4 +445,62 @@ pub static TEMPLATE_QUERY_PARAM_SCRIPT: &str = r#"
         });
     });
     </script>
+"#;
+
+pub static TEMPLATE_EXPORT_INDEX: &str = r#"
+<html>
+<head>
+  <meta charset="UTF-8">
+</head>
+<style>
+{css | format_unescaped}
+</style>
+<script>
+{javascript | format_unescaped}
+</script>
+<body>
+<div>
+{custom_header_html | format_unescaped}
+<h1>Draft Export Report</h1>
+{{ if success }}
+<p>
+Congratulations! No issues are found during export, and it was able to soundly
+produce a graph. You can now change back to torch.export.export()
+</p>
+{{ else }}
+<b>{num_failures} issue(s) were found during export</b>, and it was not able to
+soundly produce a graph. The following is a list of all the issues found and how
+you may address them.
+<table>
+<tr> <th> Failure Type </th> <th> Reason </th> <th> Additional Info </th> </tr>
+{{ for failure in failures }}
+<tr> 
+    <td>{failure.failure_type | format_unescaped}</td>
+    <td>{failure.reason | format_unescaped}</td>
+    <td>{failure.additional_info | format_unescaped}</td>
+</tr>
+{{ endfor }}
+</table>
+{{ endif }}
+
+Here is the resulting exported program: <a href="{exported_program_url}">link</a>.
+</body>
+</html>
+"#;
+
+pub static TEMPLATE_SYMBOLIC_GUARD_INFO: &str = r#"
+<html>
+<head>
+    <style>
+    {css}
+    </style>
+    <title>Symbolic Shapes Information</title>
+    <base href="..">
+</head>
+<body>
+    <h1>More detailed information on <code>{expr}</code></h1>
+    <h2>Stack</h2>
+    {stack_html | format_unescaped}
+</body>
+</html>
 "#;
