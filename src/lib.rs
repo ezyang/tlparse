@@ -2130,7 +2130,7 @@ fn prepare_and_validate_graphs(
 )> {
     use std::collections::HashMap;
 
-    let rank_graphs: HashMap<u32, Vec<(&str, f64)>> = runtime_estimations
+    let mut rank_graphs: HashMap<u32, Vec<(&str, f64)>> = runtime_estimations
         .iter()
         .map(|gr| {
             (
@@ -2143,6 +2143,12 @@ fn prepare_and_validate_graphs(
             acc.entry(rank).or_default().push((graph, runtime));
             acc
         });
+
+    // Artifacts arrive in filesystem order, which can differ across ranks.
+    // Align matching graphs before comparing their runtimes by position.
+    for graphs in rank_graphs.values_mut() {
+        graphs.sort_by(|a, b| a.0.cmp(b.0));
+    }
 
     let max_graphs = rank_graphs.values().map(|graphs| graphs.len()).max()?;
     let min_graphs = rank_graphs.values().map(|graphs| graphs.len()).min()?;
