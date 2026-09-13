@@ -2435,6 +2435,59 @@ fn test_runtime_analysis_working() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 #[test]
+fn test_runtime_analysis_independent_of_artifact_order() -> Result<(), Box<dyn std::error::Error>> {
+    let (input_dir, output_dir) = setup_runtime_test_with_ranks(&[0, 1])?;
+
+    Command::cargo_bin("tlparse")?
+        .arg(input_dir.path())
+        .arg("--all-ranks-html")
+        .arg("--overwrite")
+        .arg("-o")
+        .arg(output_dir.path())
+        .arg("--no-browser")
+        .assert()
+        .success();
+
+    let mut runtimes =
+        parsers::read_runtime_estimations(&output_dir.path().to_path_buf(), &[0, 1])?;
+    runtimes.sort_by(|a, b| a.rank.cmp(&b.rank).then_with(|| a.graph.cmp(&b.graph)));
+    let ordered = analyze_graph_runtime_deltas(&runtimes).expect("runtime analysis should exist");
+
+    // Artifact discovery uses directory enumeration, whose order is not guaranteed.
+    // Reverse only rank 1's graphs to exercise differing discovery orders across ranks.
+    runtimes.sort_by(|a, b| {
+        a.rank.cmp(&b.rank).then_with(|| {
+            if a.rank == 1 {
+                b.graph.cmp(&a.graph)
+            } else {
+                a.graph.cmp(&b.graph)
+            }
+        })
+    });
+    let permuted = analyze_graph_runtime_deltas(&runtimes).expect("runtime analysis should exist");
+
+    assert!(!permuted.has_mismatched_graph_counts);
+    assert_eq!(permuted.graphs.len(), 4);
+    for (graph, (expected_id, expected_delta)) in permuted.graphs.iter().zip([
+        ("-_0_0_0", 0.690),
+        ("-_0_1_0", 0.693),
+        ("-_0_2_0", 0.693),
+        ("-_0_3_0", 0.693),
+    ]) {
+        assert_eq!(graph.graph_id, expected_id);
+        assert_eq!(graph.delta_ms, expected_delta, "graph {expected_id}");
+        assert_eq!(graph.rank_details[0].rank, 0);
+        assert_eq!(graph.rank_details[1].rank, 1);
+    }
+    assert_eq!(
+        serde_json::to_value(permuted)?,
+        serde_json::to_value(ordered)?
+    );
+
+    Ok(())
+}
+
+#[test]
 fn test_runtime_analysis_mismatched_graphs() -> Result<(), Box<dyn std::error::Error>> {
     // Use entire directory - rank 4 is missing a graph compared to ranks 0,1,2,3
     let input_dir = PathBuf::from("tests/inputs/multi_rank_runtime");
